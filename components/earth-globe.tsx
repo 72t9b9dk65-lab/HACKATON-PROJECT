@@ -9,9 +9,12 @@ import {
   geoCentroid,
   geoCircle,
 } from 'd3-geo';
-import { feature, merge } from 'topojson-client';
-import type { Feature, FeatureCollection, Geometry } from 'geojson';
-import type { Topology, GeometryCollection } from 'topojson-specification';
+import {
+  buildWorld,
+  type CountryMeta,
+  type GeoFeature,
+  type WorldTopology,
+} from '@/lib/world-model';
 import {
   Droplets,
   HeartPulse,
@@ -41,11 +44,6 @@ export const categoryIcons = {
   shelter: House,
   education: GraduationCap,
 };
-type CountryMeta = Record<
-  string,
-  { name: string; continent: string; coords: [number, number] }
->;
-type GeoFeature = Feature<Geometry, { name: string }>;
 export type GlobeProps = {
   mode: MapMode;
   level: MapLevel;
@@ -73,11 +71,9 @@ export default function EarthGlobe({
   raised,
   onCountries,
 }: GlobeProps) {
-  const [world, setWorld] = useState<{
-    features: GeoFeature[];
-    continents: { id: string; geometry: Geometry }[];
-    meta: CountryMeta;
-  } | null>(null);
+  const [world, setWorld] = useState<ReturnType<typeof buildWorld> | null>(
+    null,
+  );
   const [error, setError] = useState(false);
   const [retry, setRetry] = useState(0);
   const [rotation, setRotation] = useState<[number, number, number]>([
@@ -100,55 +96,38 @@ export default function EarthGlobe({
     Promise.all([
       fetch('/data/world.json', { signal: controller.signal }).then((r) => {
         if (!r.ok) throw Error();
-        return r.json() as Promise<Topology<{ countries: GeometryCollection }>>;
+        return r.json() as Promise<WorldTopology>;
       }),
       fetch('/data/countries.json', { signal: controller.signal }).then((r) => {
         if (!r.ok) throw Error();
         return r.json() as Promise<CountryMeta>;
       }),
     ])
-      .then(
-        ([topology, meta]: [
-          Topology<{ countries: GeometryCollection }>,
-          CountryMeta,
-        ]) => {
-          const collection = feature(
-            topology,
-            topology.objects.countries,
-          ) as FeatureCollection<Geometry, { name: string }>;
-          const features = collection.features;
-          const continentFeatures = continents.map((c) => ({
-            id: c.id,
-            geometry: merge(topology, {
-              type: 'GeometryCollection',
-              geometries: topology.objects.countries.geometries.filter(
-                (g) => meta[String(g.id)?.padStart(3, '0')]?.continent === c.id,
-              ),
+      .then(([topology, meta]: [WorldTopology, CountryMeta]) => {
+        const preparedWorld = buildWorld(topology, meta);
+        const { features } = preparedWorld;
+        setWorld(preparedWorld);
+        callbacks.current.onCountries?.(
+          features
+            .filter((f) => f.id !== undefined)
+            .map((f) => {
+              const id = String(f.id).padStart(3, '0');
+              return (
+                territories.find((t) => t.id === id) ?? {
+                  id,
+                  name: meta[id]?.name ?? f.properties.name,
+                  continent: meta[id]?.continent ?? 'Mondo',
+                  coordinates:
+                    meta[id]?.coords ?? (geoCentroid(f) as [number, number]),
+                  score: -1,
+                  raised: 0,
+                  goal: 0,
+                  people: 0,
+                }
+              );
             }),
-          }));
-          setWorld({ features, continents: continentFeatures, meta });
-          callbacks.current.onCountries?.(
-            features
-              .filter((f) => f.id !== undefined)
-              .map((f) => {
-                const id = String(f.id).padStart(3, '0');
-                return (
-                  territories.find((t) => t.id === id) ?? {
-                    id,
-                    name: meta[id]?.name ?? f.properties.name,
-                    continent: meta[id]?.continent ?? 'Mondo',
-                    coordinates:
-                      meta[id]?.coords ?? (geoCentroid(f) as [number, number]),
-                    score: -1,
-                    raised: 0,
-                    goal: 0,
-                    people: 0,
-                  }
-                );
-              }),
-          );
-        },
-      )
+        );
+      })
       .catch((e) => {
         if (e.name !== 'AbortError') setError(true);
       });

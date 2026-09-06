@@ -31,6 +31,6 @@ Per una versione operativa occorrono dati territoriali verificati e datati, peri
 
 ## Validazione
 
-Test automatici: riconciliazione delle raccolte, assenza di doppio conteggio, validazione degli importi, stime e residui, ricaricamento del profilo e integrità delle geometrie. Controllo TypeScript e compilazione per Cloudflare Workers.
+Sette test automatici: riconciliazione delle raccolte, assenza di doppio conteggio, validazione degli importi, stime e residui, ricaricamento del profilo, integrità delle geometrie e preparazione dell’atlante attraverso lo stesso codice del browser. Il test di regressione riproduceva `objects.forEach is not a function` prima della correzione della chiamata a `topojson.merge`. Controllo TypeScript e compilazione per Cloudflare Workers.
 
-Il sito registra, se supportato, il solo strumento WebMCP `navigate_earthhealth_territory`. Non crea donazioni; apre il territorio nella stessa interfaccia. Nell’ambiente di sviluppo non era disponibile un contesto di validazione WebMCP, quindi tale integrazione resta non verificata. Non sono stati eseguiti test browser visuali o dei gesti touch in questa sessione.
+Il sito registra, se supportato, il solo strumento WebMCP `navigate_earthhealth_territory`. Non crea donazioni; apre il territorio nella stessa interfaccia. Dopo la segnalazione del globo assente, verificati nell’anteprima browser il rendering della sfera e la navigazione al continente Africa. Per WebMCP sono stati verificati registrazione, navigazione valida e rifiuto di un territorio inesistente senza cambiare il luogo selezionato. Questa verifica mirata non copre tutti i percorsi di donazione o i gesti touch.

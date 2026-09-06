@@ -1,3 +1,4 @@
+import { buildWorld } from '../lib/world-model.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -135,5 +136,27 @@ test('Every geographic boundary has a unique key, metadata and a valid spherical
     );
     assert.ok(shapes.length > 0);
     assert.ok(geoArea(merge(world, shapes)) > 0);
+  }
+});
+
+test('The browser atlas preparation builds all country and continent paths without throwing', () => {
+  const topology = JSON.parse(
+    fs.readFileSync(new URL('../public/data/world.json', import.meta.url)),
+  );
+  const metadata = JSON.parse(
+    fs.readFileSync(new URL('../public/data/countries.json', import.meta.url)),
+  );
+  const world = buildWorld(topology, metadata);
+  assert.equal(world.features.length, 177);
+  assert.equal(world.continents.length, 6);
+  for (const continent of world.continents) {
+    const target = continents.find((c) => c.id === continent.id);
+    const projection = geoOrthographic().rotate([
+      -target.coordinates[0],
+      -target.coordinates[1],
+      0,
+    ]);
+    const path = geoPath(projection)(continent.geometry);
+    assert.ok(path && !path.includes('NaN'), `${continent.id} must render`);
   }
 });
