@@ -315,13 +315,13 @@ export default function EarthHealth() {
         <button
           className="brand"
           onClick={explore}
-          aria-label="EarthHealth, vai al globo"
+          aria-label="earthealth, vai al globo"
         >
           <span className="brand-mark">
             <Globe2 size={24} />
           </span>
           <span>
-            earth<span className="brand-light">health</span>
+            eart<span className="brand-light">health</span>
             <span className="brand-dot">.</span>
           </span>
         </button>
@@ -348,7 +348,7 @@ export default function EarthHealth() {
         <div className="header-actions">
           <button
             className="icon-button help"
-            aria-label="Come funziona EarthHealth"
+            aria-label="Come funziona earthealth"
             onClick={() => setInfo(true)}
           >
             <CircleHelp size={20} />
@@ -827,7 +827,7 @@ export default function EarthHealth() {
           </section>
         </div>
         <footer className="site-footer">
-          <span>© 2026 EarthHealth</span>
+          <span>© 2026 earthealth</span>
           <span>Un mondo migliore comincia da un gesto.</span>
           <button onClick={() => setInfo(true)}>
             Trasparenza e metodologia
@@ -839,7 +839,7 @@ export default function EarthHealth() {
         <DialogContent className="eh-dialog">
           <DialogTitle>Un prototipo, con trasparenza.</DialogTitle>
           <DialogDescription>
-            EarthHealth collega le persone ai bisogni del mondo. Questa è una
+            earthealth collega le persone ai bisogni del mondo. Questa è una
             prima esperienza dimostrativa.
           </DialogDescription>
           <div className="info-block">
@@ -869,7 +869,7 @@ export default function EarthHealth() {
                 Natural Earth / World Atlas
               </a>
               . I canali esterni sono siti ufficiali delle organizzazioni, senza
-              partnership o tracciamento automatico da parte di EarthHealth.
+              partnership o tracciamento automatico da parte di earthealth.
             </p>
           </div>
         </DialogContent>

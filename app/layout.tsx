@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'EarthHealth — L’aiuto, dove serve',
+  title: 'earthealth — L’aiuto, dove serve',
   description:
     'Esplora i bisogni del pianeta, scegli una causa e segui il percorso del tuo aiuto. Prototipo con dati e donazioni dimostrativi.',
 };

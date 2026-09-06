@@ -1,4 +1,4 @@
-# EarthHealth
+# earthealth
 
 Un prototipo di un atlante per connettere bisogni umanitari, donazioni anonime e rendicontazione.
 

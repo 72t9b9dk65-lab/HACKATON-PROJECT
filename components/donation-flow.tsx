@@ -456,7 +456,7 @@ export function DonationDocument({
   const prediction = estimate(donation.amount, donation.category);
   function download() {
     const text = [
-      'EARTHHEALTH — DOCUMENTO DIMOSTRATIVO',
+      'EARTHEALTH — DOCUMENTO DIMOSTRATIVO',
       'Non è una ricevuta fiscale, un pagamento o una prova di consegna.',
       `ID: ${donation.id}`,
       `Profilo: @${username}`,
@@ -474,7 +474,7 @@ export function DonationDocument({
     );
     const a = document.createElement('a');
     a.href = url;
-    a.download = `EarthHealth-DEMO-${donation.id}.txt`;
+    a.download = `earthealth-DEMO-${donation.id}.txt`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }

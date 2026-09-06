@@ -242,7 +242,7 @@ export function CommunityPanel({
     <aside className="territory-panel community-panel">
       <div className="panel-breadcrumb">
         <Users size={15} />
-        <span>La community EarthHealth</span>
+        <span>La community earthealth</span>
       </div>
       <span className="overline">IL BENE HA TANTI NOMI</span>
       <h2>
