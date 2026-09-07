@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PawPrint, Pencil } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -30,19 +30,19 @@ export function ShelterProfile({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <div className="personal-profile-heading">
-        <span className="personal-profile-avatar">
-          <PawPrint size={26} />
-        </span>
+        <img
+          className="personal-profile-shelter-art"
+          src="/shelters/pixel-shelter.png"
+          width="60"
+          height="60"
+          alt=""
+        />
         <div>
-          <span className="donation-eyebrow">
-            {profile.name}’S PERSONAL SHELTER
-          </span>
-          <h1>{profile.shelterName}</h1>
-          <p>
-            {sessionOnly
-              ? 'Profile available for this session'
-              : 'Personal profile · saved on this device'}
-          </p>
+          <h1>
+            {profile.shelterName},{' '}
+            <em style={{ fontWeight: 400 }}>connected to real dogs</em>
+          </h1>
+          <p>Watch care take shape. Click a dog to meet them.</p>
         </div>
         <DialogTrigger
           render={<Button variant="outline" disabled={!ready} />}
@@ -57,8 +57,10 @@ export function ShelterProfile({
       <DialogContent className="donation-shell virtual-dog-dialog personal-profile-dialog">
         <DialogTitle>Your personal shelter</DialogTitle>
         <DialogDescription>
-          Name your shelter and make it yours. This profile is stored in this
-          browser.
+          Name your shelter and make it yours.{' '}
+          {sessionOnly
+            ? 'Profile available for this session.'
+            : 'This profile is stored in this browser.'}
         </DialogDescription>
         <form
           onSubmit={(event) => {

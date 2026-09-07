@@ -1,25 +1,13 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { ArrowUp, ArrowUpRight, MapPin, Pause, Play } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
+import { useDogCare } from '@/hooks/use-dog-care';
 import { DogName } from '@/components/dog-name';
-import { DogNeedBadge } from '@/components/dog-need-badge';
 import { DogPortrait } from '@/components/dog-portrait';
-import { PixelCareIcon } from '@/components/pixel-care-icon';
+import { DogNeedBadge } from '@/components/dog-need-badge';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  careKinds,
-  kronor,
-  profileDogs,
-  type fundingSummary,
-} from '@/lib/donation-shell';
+import { kronor, profileDogs, type fundingSummary } from '@/lib/donation-shell';
 import { carePlan, type CareProjection } from '@/lib/care-impact';
 import type { ExpenseReplay } from '@/lib/donation-spending';
 import {
@@ -68,11 +56,7 @@ export function VirtualShelter({
   useEffect(() => {
     if (replay) setPaused(false);
   }, [replay?.key]);
-  const [inspected, setInspected] = useState<{
-    id: string;
-    preview: boolean;
-    waiting?: boolean;
-  } | null>(null);
+  const { inspected, openDog } = useDogCare();
   const residents = profileDogs.filter(
     (dog) =>
       residentIds.includes(dog.id) && funding.byDog[dog.id].amountOre > 0,
@@ -85,9 +69,6 @@ export function VirtualShelter({
   const previewDogs = visiblePreviewIds.map((id) =>
     profileDogs.find((dog) => dog.id === id)!,
   );
-  const dog = inspected
-    ? profileDogs.find((item) => item.id === inspected.id)!
-    : null;
   const population = [
     ...previewDogs.map((item) => ({
       dog: item,
@@ -133,61 +114,28 @@ export function VirtualShelter({
   const plan = carePlan(projection.careId);
 
   return (
-    <Dialog
-      open={inspected !== null}
-      onOpenChange={(open) => {
-        if (!open) setInspected(null);
-      }}
-    >
+    <>
       <section
         className="virtual-shelter"
-        aria-labelledby="virtual-shelter-title"
+        aria-label={`${shelterName} activities`}
       >
-        <div className="virtual-shelter-heading">
-          <img
-            src="/shelters/pixel-shelter.png"
-            width="80"
-            height="80"
-            alt=""
-            aria-hidden="true"
-          />
-          <div>
-            <h2 id="virtual-shelter-title">
-              {shelterName}, connected to real dogs
-            </h2>
-            <p>Watch care take shape. Click a dog to meet them.</p>
-          </div>
-          <Button
-            variant="outline"
-            className="virtual-motion-toggle"
-            onClick={() => setPaused((current) => !current)}
-            aria-label={
-              paused ? 'Resume shelter animation' : 'Pause shelter animation'
-            }
-            aria-pressed={paused}
+        {visiblePreviewIds.length > 0 && (
+          <div
+            className="virtual-shelter-legend"
+            aria-live="polite"
+            aria-atomic="true"
           >
-            {paused ? <Play size={16} /> : <Pause size={16} />}
-          </Button>
-        </div>
-
-        <div
-          className="virtual-shelter-legend"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          <span>
-            <i /> {residents.length} shelter companions
-          </span>
-          {visiblePreviewIds.length > 0 && (
-            <span>
-              <i className="virtual-preview-dot" />{' '}
-              {confirmed ? visiblePreviewIds.length : projection.dogCount}{' '}
-              {confirmed
-                ? 'dogs in this demo gift'
-                : 'estimated care recipients in preview'}
-            </span>
-          )}
-        </div>
+            {visiblePreviewIds.length > 0 && (
+              <span>
+                <i className="virtual-preview-dot" />{' '}
+                {confirmed ? visiblePreviewIds.length : projection.dogCount}{' '}
+                {confirmed
+                  ? 'dogs in this demo gift'
+                  : 'estimated care recipients in preview'}
+              </span>
+            )}
+          </div>
+        )}
 
         {!replay && previewActive && (
           <div className="shelter-impact-summary">
@@ -239,19 +187,100 @@ export function VirtualShelter({
             )}
           </div>
         )}
-        <ShelterLifeScene
-          fullImpact={fullImpact}
-          previewActive={previewActive}
-          companions={companions}
-          projection={projection}
-          paused={paused || inspected !== null}
-          replay={replay}
-          onExitReplay={onExitReplay}
-          onInspect={(id, preview) => {
-            setInspected({ id, preview });
-            onSelectDog(id);
-          }}
-        />
+        <div className="shelter-with-roster">
+          <ShelterLifeScene
+            residentCount={residents.length}
+            motionPaused={paused}
+            onTogglePause={() => setPaused((current) => !current)}
+            fullImpact={fullImpact}
+            previewActive={previewActive}
+            companions={companions}
+            projection={projection}
+            paused={paused || inspected !== null}
+            replay={replay}
+            onExitReplay={onExitReplay}
+            onInspect={(id, preview) => {
+              openDog(id, preview ? 'preview' : 'supported');
+              onSelectDog(id);
+            }}
+          />
+          <aside
+            className="shelter-roster"
+            aria-labelledby="shelter-roster-title"
+          >
+            <div className="shelter-roster-heading">
+              <h3 id="shelter-roster-title">Shelter dogs</h3>
+              <span aria-label={`${companions.length} dogs shown`}>
+                {companions.length}
+              </span>
+            </div>
+            <ul className="shelter-roster-list">
+              {companions.map((companion) => {
+                const dog = profileDogs.find(
+                  (item) => item.id === companion.profileId,
+                );
+                return (
+                  <li key={companion.key}>
+                    {dog ? (
+                      <button
+                        type="button"
+                        className="shelter-roster-dog"
+                        data-preview={companion.preview}
+                        aria-current={
+                          replay?.expense.dogId === dog.id ? 'true' : undefined
+                        }
+                        aria-label={`Open ${dog.name}’s profile${companion.preview ? ', donation preview' : ''}`}
+                        onClick={() => {
+                          openDog(
+                            dog.id,
+                            companion.preview ? 'preview' : 'supported',
+                          );
+                          onSelectDog(dog.id);
+                        }}
+                      >
+                        <DogPortrait dog={dog} />
+                        <span className="shelter-roster-details">
+                          <DogName name={dog.name} />
+                          <span>{dog.breed}</span>
+                          <small>{dog.location}</small>
+                          {companion.preview && (
+                            <span className="shelter-roster-preview">
+                              Preview
+                            </span>
+                          )}
+                        </span>
+                      </button>
+                    ) : (
+                      <div className="shelter-roster-dog" data-preview="true">
+                        <img
+                          className="shelter-roster-future"
+                          src={companion.sprite}
+                          width="62"
+                          height="62"
+                          alt=""
+                          loading="lazy"
+                        />
+                        <span className="shelter-roster-details">
+                          <strong>Future dog</strong>
+                          <span>Not matched yet</span>
+                          <span className="shelter-roster-preview">
+                            Preview
+                          </span>
+                        </span>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            {companions.length === 0 && (
+              <p className="shelter-roster-empty">
+                Your dogs will appear here when your first donation provides
+                care.
+              </p>
+            )}
+          </aside>
+        </div>
         <p className="virtual-shelter-note">
           {replay
             ? 'Replaying a recorded demo expense. '
@@ -262,8 +291,9 @@ export function VirtualShelter({
                 : projection.activeDogs
                   ? `${projection.activeDogs} ${projection.activeDogs === 1 ? 'dog has' : 'dogs have'} ${plan.name.toLowerCase()} scheduled on this forecast day. `
                   : 'No care use scheduled on this forecast day. '}
-          Daily routines and need labels are illustrative. Faded dogs preview
-          possible care; they are not verified recipients.
+          Published calendar activities guide the scene; unscheduled routines
+          and need labels are illustrative. Faded dogs preview possible care;
+          they are not verified recipients.
         </p>
       </section>
 
@@ -303,13 +333,13 @@ export function VirtualShelter({
           aria-label="Dogs waiting for shared care"
         >
           {waitingDogs.map((item) => (
-            <DialogTrigger
+            <button
               key={item.id}
-              render={<button type="button" />}
+              type="button"
               className="dog-in-need-card"
               data-matching={matchesCareNeed(item.id, projection.careId)}
               onClick={() => {
-                setInspected({ id: item.id, preview: false, waiting: true });
+                openDog(item.id, 'waiting');
                 onSelectDog(item.id);
               }}
               aria-label={`Meet ${item.name}, ${item.breed}. Demo needs: ${dogNeeds(
@@ -336,7 +366,7 @@ export function VirtualShelter({
               <DogName name={item.name} />
               <span className="dog-in-need-breed">{item.breed}</span>
               <small>Demo needs</small>
-            </DialogTrigger>
+            </button>
           ))}
           {waitingDogs.length === 0 && (
             <p className="dogs-in-need-empty">
@@ -350,74 +380,6 @@ export function VirtualShelter({
           reports from Hundstallet. Group listings remain on the Sweden map.
         </p>
       </section>
-
-      {dog && inspected && (
-        <DialogContent className="donation-shell virtual-dog-dialog">
-          <DogPortrait dog={dog} />
-          <span className="donation-eyebrow">
-            {inspected.waiting
-              ? 'DOGS IN NEED · DEMO SCENARIO'
-              : inspected.preview
-                ? 'CARE PREVIEW · NOT YET ADDED'
-                : 'A REAL DOG BEHIND YOUR CARE'}
-          </span>
-          <DialogTitle>
-            <DogName name={dog.name} />
-          </DialogTitle>
-          <p className="virtual-profile-breed">
-            {dog.breed} · {dog.group ? 'Group profile' : dog.age}
-          </p>
-          <p className="virtual-profile-location">
-            <MapPin size={15} /> {dog.location} · {dog.status}
-          </p>
-          <DialogDescription>{dog.description}</DialogDescription>
-          <div className="dogs-in-need-legend">
-            {dogNeeds(dog.id).map((need) => (
-              <DogNeedBadge key={need} need={need} showLabel />
-            ))}
-          </div>
-          <p className="dogs-in-need-note">
-            Illustrative needs, not verified health information. See the
-            official profile for details.
-          </p>
-          {inspected.waiting ? (
-            <p className="virtual-profile-preview-note">
-              Choose an amount to preview shared care for matching dogs. This
-              dog is currently in the waiting grid.
-            </p>
-          ) : inspected.preview ? (
-            <p className="virtual-profile-preview-note">
-              This is an illustrative match for your chosen amount. No donation
-              has been added for this preview. The selected plan could
-              contribute to {plan.name.toLowerCase()}.
-            </p>
-          ) : (
-            <div className="virtual-profile-care">
-              <strong>
-                {kronor(funding.byDog[dog.id].amountOre)} SEK{' '}
-                <small>used in recorded demo care</small>
-              </strong>
-              <div>
-                {careKinds.map((kind) => (
-                  <span key={kind.id}>
-                    <PixelCareIcon kind={kind.id} width="24" height="24" />
-                    {kronor(funding.byDog[dog.id].allocation[kind.id])} SEK{' '}
-                    <small>{kind.label}</small>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-          <a
-            className="virtual-profile-link"
-            href={dog.source}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Meet {dog.name} on Hundstallet <ArrowUpRight size={17} />
-          </a>
-        </DialogContent>
-      )}
-    </Dialog>
+    </>
   );
 }

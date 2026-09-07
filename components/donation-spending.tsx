@@ -1,5 +1,7 @@
 'use client';
 
+import { useDogCare } from '@/hooks/use-dog-care';
+
 import { useState } from 'react';
 import { ArrowLeft, ArrowUpRight, ChevronDown, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -92,6 +94,7 @@ export function SpendingBreakdown({
   onClose: () => void;
   onSelectDog: (id: string) => void;
 }) {
+  const { openDog } = useDogCare();
   const [view, setView] = useState('categories');
   const dogs = profileDogs.filter((dog) =>
     spending.residentIds.includes(dog.id),
@@ -171,8 +174,11 @@ export function SpendingBreakdown({
                   <button
                     type="button"
                     className="spending-column spending-dog-column"
-                    onClick={() => onSelectDog(dog.id)}
-                    aria-label={`${dog.name}: ${kronor(spending.funding.byDog[dog.id].amountOre)} SEK used. See their care moment.`}
+                    onClick={() => {
+                      onSelectDog(dog.id);
+                      openDog(dog.id);
+                    }}
+                    aria-label={`${dog.name}: ${kronor(spending.funding.byDog[dog.id].amountOre)} SEK used. Open their profile.`}
                   >
                     <strong className="spending-column-value">
                       {kronor(spending.funding.byDog[dog.id].amountOre)}{' '}
@@ -226,10 +232,6 @@ export function ExpenseTransactions({
       aria-labelledby="expense-transactions-title"
     >
       <h2 id="expense-transactions-title">Your care transactions</h2>
-      <p>
-        {expenses.length} demo expenses. Imported dates, amounts and categories
-        come from your spreadsheet; dog assignments are simulated.
-      </p>
       <div className="expense-transaction-list">
         {sorted.map((expense) => {
           const category = expenseCategories.find(

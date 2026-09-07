@@ -79,13 +79,14 @@ export function shelterActivityLayout(
   viewportWidth: number,
   population: number,
   activities?: ShelterActivity[],
+  rowHeight = 108,
 ) {
   // Five legible destinations stay on one row; compact screens can pan the scene.
   const width = Math.max(760, viewportWidth);
   const homeWidth = Math.min(510, width - 80);
   const columns = Math.floor(homeWidth / 76);
   const rows = Math.ceil(population / columns);
-  const activityTop = Math.max(445, 275 + rows * 108) + 36;
+  const activityTop = Math.max(445, 275 + rows * rowHeight) + 36;
   const busiest = Math.max(
     0,
     ...shelterActivities.map((station) =>
@@ -95,7 +96,7 @@ export function shelterActivityLayout(
     ),
   );
   const height =
-    activityTop + Math.max(222, 96 + Math.ceil(busiest / 2) * 108 + 16);
+    activityTop + Math.max(222, 96 + Math.ceil(busiest / 2) * rowHeight + 16);
   const stationWidth = (width - 32) / shelterActivities.length;
   const stations = shelterActivities.map((station, index) => ({
     ...station,
@@ -115,7 +116,7 @@ export function shelterActivityLayout(
         (rowCount * cell) / 2 +
         ((index % columns) + 0.5) * cell -
         32,
-      y: 275 + Math.floor(index / columns) * 108,
+      y: 275 + Math.floor(index / columns) * rowHeight,
     };
   });
   function position(index: number, activity: ShelterActivity) {
@@ -130,7 +131,7 @@ export function shelterActivityLayout(
         8,
         Math.min(width - 72, station.x + station.width / 2 - 32 + lane * 34),
       ),
-      y: station.y + 96 + Math.floor(rank / 2) * 108,
+      y: station.y + 96 + Math.floor(rank / 2) * rowHeight,
     };
   }
   return { width, height, activityTop, stations, homes, position };

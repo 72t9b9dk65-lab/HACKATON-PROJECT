@@ -30,6 +30,7 @@ import {
   type MapCamera,
 } from '@/lib/shelter-camera';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
+import { useDogCare } from '@/hooks/use-dog-care';
 import { DogName } from '@/components/dog-name';
 import { DogPortrait } from '@/components/dog-portrait';
 
@@ -52,6 +53,7 @@ export default function ShelterMap({
   funding: Funding;
   onSelectDog: (id: string) => void;
 }) {
+  const { openDog } = useDogCare();
   const container = useRef<HTMLDivElement>(null);
   const directory = useRef<HTMLDivElement>(null);
   const markerRefs = useRef<Record<string, SVGGElement | null>>({});
@@ -620,6 +622,7 @@ export default function ShelterMap({
                   aria-pressed={dog.id === selectedDogId}
                   onClick={() => {
                     onSelectDog(dog.id);
+                    openDog(dog.id);
                     if (dog.shelterId && dog.shelterId !== focusId)
                       setFocusId(dog.shelterId);
                   }}

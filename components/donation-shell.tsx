@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, Camera, Check } from 'lucide-react';
+import { ArrowUpRight, Check } from 'lucide-react';
+import {
+  DogCareProvider,
+  StaffCalendarButton,
+} from '@/components/dog-care-provider';
+import { DogJourney } from '@/components/dog-profile-dialog';
 import ShelterMap from '@/components/shelter-map';
 import { VirtualShelter } from '@/components/virtual-shelter';
 import { CarePlanner, CareTimeline } from '@/components/care-planner';
@@ -29,13 +34,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
 import {
   giftAllocation,
   SHARED_CARE_ID,
@@ -267,355 +265,241 @@ export default function DonationShell() {
   }
 
   return (
-    <div className="donation-shell">
-      <header className="donation-header">
-        <a href="/" className="donation-brand" aria-label="Hundstallet home">
-          <span>
-            <PixelCareIcon kind="heart" width="24" height="24" />
+    <DogCareProvider expenses={expenses} onReplay={replayExpense}>
+      <div className="donation-shell">
+        <header className="donation-header">
+          <a href="/" className="donation-brand" aria-label="Hundstallet home">
+            <span>
+              <PixelCareIcon kind="heart" width="24" height="24" />
+            </span>
+            HUNDSTALLET
+            <span className="donation-brand-divider" />{' '}
+            <small>A little care goes a long way.</small>
+          </a>
+          <StaffCalendarButton />
+          <span className="donation-prototype">
+            <span /> Interactive prototype
           </span>
-          HUNDSTALLET
-          <span className="donation-brand-divider" />{' '}
-          <small>A little care goes a long way.</small>
-        </a>
-        <span className="donation-prototype">
-          <span /> Interactive prototype
-        </span>
-      </header>
+        </header>
 
-      <main className="donation-workspace">
-        <ShelterProfile
-          profile={profile}
-          onSave={setProfile}
-          ready={ready}
-          sessionOnly={sessionOnly}
-        />
-        <section
-          className="donation-main donation-main-personal"
-          aria-label="Your virtual shelter and real shelters"
-        >
+        <main className="donation-workspace">
+          <ShelterProfile
+            profile={profile}
+            onSave={setProfile}
+            ready={ready}
+            sessionOnly={sessionOnly}
+          />
           <section
-            className="donation-panel donation-panel-total donation-panel-personal"
-            aria-label="Your giving and personal shelter"
+            className="donation-main donation-main-personal"
+            aria-label="Your virtual shelter and real shelters"
           >
-            <div className="personal-care-workspace personal-giving-workspace">
-              <aside
-                className="personal-giving-sidebar"
-                aria-label="Your donations and care transactions"
-              >
-                <Dialog
-                  open={donationOpen}
-                  onOpenChange={(open) => {
-                    setDonationOpen(open);
-                    if (open) {
-                      setPreviewActive(false);
-                      focusShelterOnClose.current = false;
-                      setBreakdownOpen(false);
-                      setReplay(null);
-                    }
-                  }}
-                  onOpenChangeComplete={(open) => {
-                    if (!open && focusShelterOnClose.current) {
-                      sceneAnchor.current?.scrollIntoView({
-                        block: 'start',
-                        behavior: window.matchMedia(
-                          '(prefers-reduced-motion: reduce)',
-                        ).matches
-                          ? 'auto'
-                          : 'smooth',
-                      });
-                    }
-                  }}
+            <section
+              className="donation-panel donation-panel-total donation-panel-personal"
+              aria-label="Your giving and personal shelter"
+            >
+              <div className="personal-care-workspace personal-giving-workspace">
+                <aside
+                  className="personal-giving-sidebar"
+                  aria-label="Your donations and care transactions"
                 >
-                  <DialogTrigger
-                    data-slot="button"
-                    render={
-                      <Button
-                        type="button"
-                        className="donation-primary donation-launch"
-                        disabled={!ready}
-                      />
-                    }
-                  >
-                    <PixelCareIcon kind="heart" width="28" height="28" />
-                    Donate
-                    <ArrowUpRight size={25} />
-                  </DialogTrigger>
-                  <DialogContent
-                    className="donation-shell donation-dialog"
-                    finalFocus={() =>
-                      focusShelterOnClose.current ? sceneAnchor.current : true
-                    }
-                  >
-                    <DialogTitle>
-                      What could your gift make possible?
-                    </DialogTitle>
-                    <DialogDescription>
-                      Choose an example or enter your own amount. Preview the
-                      impact in your shelter before confirming.
-                    </DialogDescription>
-                    <CarePlanner
-                      amount={draftAmount}
-                      careId={careId}
-                      frequency={frequency}
-                      onAmount={changeAmount}
-                      onCare={changeCare}
-                      onFrequency={changeFrequency}
-                      onConfirm={donate}
-                      onPreview={() => closeDonationToShelter(true)}
-                      ready={ready}
-                      atLimit={gifts.length >= 1000}
-                      monthlyPlan={profile.monthlyPlan}
-                      onCancelMonthly={() => {
-                        setProfile((current) => ({
-                          ...current,
-                          monthlyPlan: null,
-                        }));
-                        setNotice(
-                          'Monthly preview removed. Your donation history is unchanged.',
-                        );
-                      }}
-                    />
-                  </DialogContent>
-                </Dialog>
-                <DonationBalance
-                  spending={spending}
-                  open={breakdownOpen}
-                  onToggle={() => setBreakdownOpen((value) => !value)}
-                />
-                <ExpenseTransactions
-                  expenses={expenses}
-                  selectedId={replay?.expense.id}
-                  onReplay={replayExpense}
-                />
-              </aside>
-              <div
-                className="personal-care-scene"
-                id="personal-shelter-view"
-                role="region"
-                aria-label={
-                  breakdownOpen ? 'Your spending' : 'Your personal shelter'
-                }
-                ref={sceneAnchor}
-                tabIndex={-1}
-              >
-                {breakdownOpen ? (
-                  <SpendingBreakdown
-                    spending={spending}
-                    onClose={() => {
-                      setBreakdownOpen(false);
-                      sceneAnchor.current?.focus({ preventScroll: true });
+                  <Dialog
+                    open={donationOpen}
+                    onOpenChange={(open) => {
+                      setDonationOpen(open);
+                      if (open) {
+                        setPreviewActive(false);
+                        focusShelterOnClose.current = false;
+                        setBreakdownOpen(false);
+                        setReplay(null);
+                      }
                     }}
-                    onSelectDog={(id) => {
-                      const expense = [...expenses]
-                        .reverse()
-                        .find((item) => item.dogId === id);
-                      if (expense) replayExpense(expense);
+                    onOpenChangeComplete={(open) => {
+                      if (!open && focusShelterOnClose.current) {
+                        sceneAnchor.current?.scrollIntoView({
+                          block: 'start',
+                          behavior: window.matchMedia(
+                            '(prefers-reduced-motion: reduce)',
+                          ).matches
+                            ? 'auto'
+                            : 'smooth',
+                        });
+                      }
                     }}
-                  />
-                ) : (
-                  <div className="shelter-scene-anchor">
-                    <VirtualShelter
-                      funding={funding}
-                      residentIds={residentIds}
-                      previewIds={previewIds}
-                      previewActive={previewActive}
-                      onExitPreview={() => setPreviewActive(false)}
-                      projection={projection}
-                      confirmed={confirmedScene && !fullImpact}
-                      fullImpact={fullImpact}
-                      onFullImpact={setFullImpact}
-                      shelterName={profile.shelterName}
-                      onSelectDog={selectDog}
-                      replay={replay}
-                      onExitReplay={() => setReplay(null)}
-                    >
-                      {previewActive && (
-                        <CareTimeline
-                          projection={projection}
-                          startDate={startDate}
-                          onDay={(day) => {
-                            setReplay(null);
-                            setTimelineDay(day);
-                          }}
+                  >
+                    <DialogTrigger
+                      data-slot="button"
+                      render={
+                        <Button
+                          type="button"
+                          className="donation-primary donation-launch"
+                          disabled={!ready}
                         />
-                      )}
-                    </VirtualShelter>
-                  </div>
+                      }
+                    >
+                      <PixelCareIcon kind="heart" width="28" height="28" />
+                      Donate
+                      <ArrowUpRight size={25} />
+                    </DialogTrigger>
+                    <DialogContent
+                      className="donation-shell donation-dialog"
+                      finalFocus={() =>
+                        focusShelterOnClose.current ? sceneAnchor.current : true
+                      }
+                    >
+                      <DialogTitle>
+                        What could your gift make possible?
+                      </DialogTitle>
+                      <DialogDescription>
+                        Choose an example or enter your own amount. Preview the
+                        impact in your shelter before confirming.
+                      </DialogDescription>
+                      <CarePlanner
+                        amount={draftAmount}
+                        careId={careId}
+                        frequency={frequency}
+                        onAmount={changeAmount}
+                        onCare={changeCare}
+                        onFrequency={changeFrequency}
+                        onConfirm={donate}
+                        onPreview={() => closeDonationToShelter(true)}
+                        ready={ready}
+                        atLimit={gifts.length >= 1000}
+                        monthlyPlan={profile.monthlyPlan}
+                        onCancelMonthly={() => {
+                          setProfile((current) => ({
+                            ...current,
+                            monthlyPlan: null,
+                          }));
+                          setNotice(
+                            'Monthly preview removed. Your donation history is unchanged.',
+                          );
+                        }}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                  <DonationBalance
+                    spending={spending}
+                    open={breakdownOpen}
+                    onToggle={() => setBreakdownOpen((value) => !value)}
+                  />
+                  <ExpenseTransactions
+                    expenses={expenses}
+                    selectedId={replay?.expense.id}
+                    onReplay={replayExpense}
+                  />
+                </aside>
+                <div
+                  className="personal-care-scene"
+                  id="personal-shelter-view"
+                  role="region"
+                  aria-label={
+                    breakdownOpen ? 'Your spending' : 'Your personal shelter'
+                  }
+                  ref={sceneAnchor}
+                  tabIndex={-1}
+                >
+                  {breakdownOpen ? (
+                    <SpendingBreakdown
+                      spending={spending}
+                      onClose={() => {
+                        setBreakdownOpen(false);
+                        sceneAnchor.current?.focus({ preventScroll: true });
+                      }}
+                      onSelectDog={selectDog}
+                    />
+                  ) : (
+                    <div className="shelter-scene-anchor">
+                      <VirtualShelter
+                        funding={funding}
+                        residentIds={residentIds}
+                        previewIds={previewIds}
+                        previewActive={previewActive}
+                        onExitPreview={() => setPreviewActive(false)}
+                        projection={projection}
+                        confirmed={confirmedScene && !fullImpact}
+                        fullImpact={fullImpact}
+                        onFullImpact={setFullImpact}
+                        shelterName={profile.shelterName}
+                        onSelectDog={selectDog}
+                        replay={replay}
+                        onExitReplay={() => setReplay(null)}
+                      >
+                        {previewActive && (
+                          <CareTimeline
+                            projection={projection}
+                            startDate={startDate}
+                            onDay={(day) => {
+                              setReplay(null);
+                              setTimelineDay(day);
+                            }}
+                          />
+                        )}
+                      </VirtualShelter>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div
+                className="donation-receipt"
+                aria-live="polite"
+                role="status"
+              >
+                {notice ? (
+                  <>
+                    <Check size={17} />
+                    <span>{notice}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="donation-status-dot" />
+                    <span>
+                      {amountOre
+                        ? `${kronor(spending.usedOre)} SEK used for ${residentIds.length} shelter companions · ${kronor(spending.pendingOre)} SEK pending`
+                        : 'Your first gift starts a shared care trail'}
+                    </span>
+                  </>
                 )}
               </div>
-            </div>
-
-            <div className="donation-receipt" aria-live="polite" role="status">
-              {notice ? (
-                <>
-                  <Check size={17} />
-                  <span>{notice}</span>
-                </>
-              ) : (
-                <>
-                  <span className="donation-status-dot" />
-                  <span>
-                    {amountOre
-                      ? `${kronor(spending.usedOre)} SEK used for ${residentIds.length} shelter companions · ${kronor(spending.pendingOre)} SEK pending`
-                      : 'Your first gift starts a shared care trail'}
-                  </span>
-                </>
-              )}
-            </div>
-            <div className="donation-ledger-meta">
-              <span>
-                {openingFunding &&
-                  `${kronor(openingFunding.amountOre)} SEK sample opening funding`}
-                {myGifts.length > 0 &&
-                  ` · ${myGifts.length} demo ${myGifts.length === 1 ? 'gift' : 'gifts'} added`}
-              </span>
-              <span>
-                {sessionOnly ? 'This session only' : 'Saved on this device'}
-              </span>
+              <div className="donation-ledger-meta">
+                <span>
+                  {openingFunding &&
+                    `${kronor(openingFunding.amountOre)} SEK sample opening funding`}
+                  {myGifts.length > 0 &&
+                    ` · ${myGifts.length} demo ${myGifts.length === 1 ? 'gift' : 'gifts'} added`}
+                </span>
+                <span>
+                  {sessionOnly ? 'This session only' : 'Saved on this device'}
+                </span>
+              </div>
+            </section>
+            <div className="donation-map">
+              <ShelterMap
+                selectedDogId={selectedId}
+                funding={funding}
+                onSelectDog={selectDog}
+              />
             </div>
           </section>
-          <div className="donation-map">
-            <ShelterMap
-              selectedDogId={selectedId}
-              funding={funding}
-              onSelectDog={selectDog}
-            />
-          </div>
-        </section>
 
-        <section
-          className="donation-journey"
-          aria-label={`${dog.name}’s photo journey`}
-        >
-          <Carousel
-            key={dog.id}
-            opts={{ align: 'start', containScroll: 'trimSnaps' }}
-            className="donation-carousel"
-          >
-            <div className="donation-journey-heading">
-              <div>
-                <span className="donation-eyebrow">THE LITTLE MOMENTS</span>
-                <h2>{dog.name}’s journey</h2>
-                <p>
-                  {dog.location} · {dog.breed} · Photos from Hundstallet
-                </p>
-              </div>
-              <div className="donation-carousel-controls">
-                <CarouselPrevious />
-                <CarouselNext />
-              </div>
-            </div>
-            <CarouselContent className="donation-photo-track">
-              {dog.photos.map((photo, index) => (
-                <CarouselItem
-                  key={photo.src}
-                  className="donation-timeline-item"
-                >
-                  <div className="donation-timeline-stop">
-                    <span />
-                    Profile photo{' '}
-                    <small>{String(index + 1).padStart(2, '0')}</small>
-                  </div>
-                  <figure>
-                    <div className="donation-photo">
-                      <img
-                        src={photo.src}
-                        alt={photo.caption}
-                        loading="lazy"
-                        width="420"
-                        height="280"
-                      />
-                      <span className="donation-photo-credit">Hundstallet</span>
-                    </div>
-                    <figcaption>
-                      <h3>{photo.caption}</h3>
-                      <a href={dog.source} target="_blank" rel="noreferrer">
-                        From the published profile <ArrowUpRight size={13} />
-                      </a>
-                    </figcaption>
-                  </figure>
-                </CarouselItem>
-              ))}
-              {latestGift && (
-                <CarouselItem className="donation-timeline-item">
-                  <div className="donation-timeline-stop">
-                    <span />
-                    {new Intl.DateTimeFormat('en-GB', {
-                      day: 'numeric',
-                      month: 'short',
-                    }).format(new Date(latestGift.createdAt))}
-                    <small>DEMO GIFT</small>
-                  </div>
-                  <figure>
-                    <div className="donation-photo donation-photo-placeholder donation-gift-moment">
-                      <PixelCareIcon kind="heart" width="46" height="46" />
-                      <strong>
-                        You added {kronor(latestGift.amountOre)} SEK
-                      </strong>
-                      <p>
-                        {kronor(giftAllocation(latestGift).food)} for food,{' '}
-                        {kronor(giftAllocation(latestGift).health)} for vet
-                        care, and {kronor(giftAllocation(latestGift).comfort)}{' '}
-                        for daily care.
-                      </p>
-                      <span>Simulated allocation · awaiting a care update</span>
-                    </div>
-                    <figcaption>
-                      <h3>A little more shared care</h3>
-                      <p>
-                        {myGifts.length} demo{' '}
-                        {myGifts.length === 1 ? 'gift' : 'gifts'} on this device
-                      </p>
-                    </figcaption>
-                  </figure>
-                </CarouselItem>
-              )}
-              <CarouselItem className="donation-timeline-item donation-upcoming">
-                <div className="donation-timeline-stop">
-                  <span />
-                  Next chapter <small>UPCOMING</small>
-                </div>
-                <figure>
-                  <div className="donation-photo donation-photo-placeholder">
-                    <div>
-                      <PixelCareIcon kind="food" width="52" height="52" />
-                      <Camera size={25} />
-                    </div>
-                    <strong>A meal. A photo. An update.</strong>
-                    <p>
-                      A future shelter update could show {dog.name} enjoying the
-                      food your gift helped fund.
-                    </p>
-                    <span>Awaiting a connected update</span>
-                  </div>
-                  <figcaption>
-                    <h3>See your care arrive</h3>
-                    <p>Placeholder · no purchase or delivery verified</p>
-                  </figcaption>
-                </figure>
-              </CarouselItem>
-            </CarouselContent>
-          </Carousel>
-          <p className="donation-journey-note">
-            Profile photos are undated and aren’t evidence of these demo
-            allocations. A dated care timeline will appear here when shelter
-            updates are connected.
+          <section className="donation-journey">
+            <DogJourney key={dog.id} dog={dog} />
+          </section>
+        </main>
+        <footer className="donation-footer">
+          <p>
+            Independent prototype · dog profiles checked 7 Sep 2026 · donations
+            and spending simulated
           </p>
-        </section>
-      </main>
-      <footer className="donation-footer">
-        <p>
-          Independent prototype · dog profiles checked 7 Sep 2026 · donations
-          and spending simulated
-        </p>
-        <a
-          href="https://hundstallet.se/hundar/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Hundstallet’s official website <ArrowUpRight size={14} />
-        </a>
-      </footer>
-    </div>
+          <a
+            href="https://hundstallet.se/hundar/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Hundstallet’s official website <ArrowUpRight size={14} />
+          </a>
+        </footer>
+      </div>
+    </DogCareProvider>
   );
 }

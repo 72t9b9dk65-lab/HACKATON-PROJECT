@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { Moon, Sun, X } from 'lucide-react';
+import { Moon, Sun, X, Pause, Play, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DialogTrigger } from '@/components/ui/dialog';
+import { useDogCare } from '@/hooks/use-dog-care';
+import { activeDogUpdate, dogEventPhoto } from '@/lib/care-calendar';
 import { DogName } from '@/components/dog-name';
-import { DogNeedBadge } from '@/components/dog-need-badge';
-import { dogNeeds } from '@/lib/dog-needs';
 import {
   expenseActivity,
   expenseCategories,
@@ -38,6 +37,9 @@ export type ShelterCompanion = {
 };
 
 export function ShelterLifeScene({
+  residentCount,
+  motionPaused,
+  onTogglePause,
   companions,
   projection,
   paused,
@@ -47,6 +49,9 @@ export function ShelterLifeScene({
   fullImpact,
   previewActive,
 }: {
+  residentCount: number;
+  motionPaused: boolean;
+  onTogglePause: () => void;
   companions: ShelterCompanion[];
   projection: CareProjection;
   paused: boolean;
@@ -56,6 +61,7 @@ export function ShelterLifeScene({
   fullImpact: boolean;
   previewActive: boolean;
 }) {
+  const { events, now } = useDogCare();
   const viewport = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(900);
   const [clock, setClock] = useState<{ hour: number; minute: number } | null>(
@@ -118,6 +124,13 @@ export function ShelterLifeScene({
   }, [replay?.key, replayStep, paused, visible, focused, reducedMotion]);
   const hour = replay ? expenseHour(replay.expense) : (clock?.hour ?? 12);
   const night = isShelterNight(hour);
+  const sceneDate = replay
+    ? new Date(replay.expense.recordedAt)
+    : now
+      ? new Date(now)
+      : null;
+  const dateZone =
+    replay && !expenseHasTime(replay.expense) ? 'UTC' : 'Europe/Stockholm';
   const activities = companions.map((dog, index) =>
     replay
       ? dog.profileId === replay.expense.dogId && replayStep > 0
@@ -125,9 +138,23 @@ export function ShelterLifeScene({
         : night
           ? ('sleep' as const)
           : ('home' as const)
-      : dogActivity(index, hour, projection.careId, dog.careScheduled),
+      : ((!previewActive && dog.profileId
+          ? activeDogUpdate(events, dog.profileId, now)?.activity
+          : undefined) ??
+        dogActivity(index, hour, projection.careId, dog.careScheduled)),
   );
-  const layout = shelterActivityLayout(width, companions.length, activities);
+  const eventPhotos = companions.map((dog) => {
+    if (!dog.profileId || previewActive) return undefined;
+    if (replay && (replay.expense.dogId !== dog.profileId || replayStep < 2))
+      return undefined;
+    return dogEventPhoto(events, dog.profileId, now, replay?.expense.id);
+  });
+  const layout = shelterActivityLayout(
+    width,
+    companions.length,
+    activities,
+    eventPhotos.some(Boolean) ? 132 : 108,
+  );
   const replayIndex = replay
     ? companions.findIndex((dog) => dog.profileId === replay.expense.dogId)
     : -1;
@@ -150,9 +177,6 @@ export function ShelterLifeScene({
     replayPosition?.y,
     reducedMotion,
   ]);
-  const atHome = activities.filter(
-    (activity) => activity === 'home' || activity === 'sleep',
-  ).length;
   const plan = carePlan(projection.careId);
 
   return (
@@ -200,30 +224,64 @@ export function ShelterLifeScene({
         </div>
       )}
       <div className="shelter-life-clock">
-        <span>
-          {night ? <Moon size={18} /> : <Sun size={18} />}{' '}
-          <strong>
-            {replay && !expenseHasTime(replay.expense) ? (
-              'Daytime illustration'
-            ) : (
-              <>
-                {clock || replay ? String(hour).padStart(2, '0') : '--'}:
-                {replay
+        <span className="shelter-clock-date-block">
+          {night ? <Moon size={24} /> : <Sun size={24} />}
+          <span className="shelter-clock-calendar">
+            <time dateTime={sceneDate?.toISOString()}>
+              <strong>
+                {sceneDate
                   ? new Intl.DateTimeFormat('en-GB', {
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
+                      timeZone: dateZone,
+                    }).format(sceneDate)
+                  : 'Today at the shelter'}
+              </strong>
+              {sceneDate && (
+                <small>
+                  {new Intl.DateTimeFormat('en-GB', {
+                    year: 'numeric',
+                    timeZone: dateZone,
+                  }).format(sceneDate)}
+                </small>
+              )}
+            </time>
+            <span className="shelter-clock-time">
+              {replay && !expenseHasTime(replay.expense)
+                ? 'Daytime illustration · time not supplied'
+                : sceneDate
+                  ? new Intl.DateTimeFormat('en-GB', {
+                      hour: '2-digit',
                       minute: '2-digit',
+                      hourCycle: 'h23',
                       timeZone: 'Europe/Stockholm',
-                    })
-                      .format(new Date(replay.expense.recordedAt))
-                      .padStart(2, '0')
-                  : clock
-                    ? String(clock.minute).padStart(2, '0')
-                    : '--'}
-              </>
-            )}
-          </strong>{' '}
-          {night ? 'A quiet night' : 'A day at the shelter'}
+                    }).format(sceneDate)
+                  : '--:--'}
+              {' · '}
+              {night ? 'A quiet night' : 'A day at the shelter'}
+            </span>
+          </span>
         </span>
-        <span>{replay ? 'Expense replay' : 'Live clock · Stockholm'}</span>
+        <span className="shelter-clock-companions" aria-live="polite">
+          <i aria-hidden="true" /> {residentCount} shelter companions
+        </span>
+        <span>
+          <Button
+            variant="outline"
+            className="virtual-motion-toggle"
+            onClick={onTogglePause}
+            aria-label={
+              motionPaused
+                ? 'Resume shelter animation'
+                : 'Pause shelter animation'
+            }
+            aria-pressed={motionPaused}
+          >
+            {motionPaused ? <Play size={16} /> : <Pause size={16} />}
+          </Button>
+          {replay ? 'Expense replay' : 'Live clock · Stockholm'}
+        </span>
       </div>
       <div
         className="shelter-life-viewport"
@@ -244,13 +302,6 @@ export function ShelterLifeScene({
             className="shelter-home"
             style={{ height: layout.activityTop - 20 }}
           >
-            <div className="shelter-home-title">
-              <strong>The big kennel</strong>
-              <span>
-                {atHome} {night ? 'sleeping' : 'resting'} ·{' '}
-                {night ? 'Sweet dreams' : 'A place to feel at home'}
-              </span>
-            </div>
             <img
               src="/shelters/pixel-big-kennel.png"
               width="540"
@@ -262,7 +313,7 @@ export function ShelterLifeScene({
             className="shelter-activity-row-label"
             style={{ top: layout.activityTop - 24 }}
           >
-            A little care, all day long
+            Live updates
           </div>
           {layout.stations.map((station) => {
             const count = activities.filter(
@@ -309,9 +360,11 @@ export function ShelterLifeScene({
             const position = layout.position(index, activity);
             const replaying = replay?.expense.dogId === dog.profileId;
             const label =
-              replaying && replayStep === 1
-                ? 'On the way'
-                : activityLabel(activity);
+              activity === 'home' || activity === 'sleep'
+                ? null
+                : replaying && replayStep === 1
+                  ? 'On the way'
+                  : activityLabel(activity);
             const body = (
               <>
                 {activity === 'sleep' && (
@@ -319,13 +372,6 @@ export function ShelterLifeScene({
                     <i>z</i>
                     <i>z</i>
                     <i>Z</i>
-                  </span>
-                )}
-                {dog.profileId && (
-                  <span className="shelter-life-need-badges">
-                    {dogNeeds(dog.profileId).map((need) => (
-                      <DogNeedBadge key={need} need={need} />
-                    ))}
                   </span>
                 )}
                 <img
@@ -338,7 +384,14 @@ export function ShelterLifeScene({
                 <span className="shelter-life-dog-name">
                   {dog.profileId ? <DogName name={dog.name} /> : dog.name}
                 </span>
-                <span className="shelter-life-dog-action">{label}</span>
+                {label && (
+                  <span className="shelter-life-dog-action">{label}</span>
+                )}
+                {eventPhotos[index] && (
+                  <span className="shelter-life-dog-photo">
+                    <Camera size={12} aria-hidden="true" /> Photo
+                  </span>
+                )}
               </>
             );
             return (
@@ -357,20 +410,20 @@ export function ShelterLifeScene({
                 }
               >
                 {dog.profileId ? (
-                  <DialogTrigger
-                    render={<button type="button" />}
+                  <button
+                    type="button"
                     className="shelter-life-dog"
                     data-preview={dog.preview}
                     onClick={() => onInspect(dog.profileId!, dog.preview)}
-                    aria-label={`${dog.name}, ${dog.breed}. ${label}${dog.preview ? ', care preview' : ''}. Open real profile.`}
+                    aria-label={`${dog.name}, ${dog.breed}${label ? `, ${label}` : ''}${dog.preview ? ', care preview' : ''}${eventPhotos[index] ? ', event photo available' : ''}. Open real profile.`}
                   >
                     {body}
-                  </DialogTrigger>
+                  </button>
                 ) : (
                   <div
                     className="shelter-life-dog"
                     data-preview={dog.preview}
-                    aria-label={`Illustrative future dog. ${label}. Not matched to a real profile.`}
+                    aria-label={`Illustrative future dog${label ? `, ${label}` : ''}. Not matched to a real profile.`}
                   >
                     {body}
                   </div>
