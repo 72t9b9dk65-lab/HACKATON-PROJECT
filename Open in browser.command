@@ -24,5 +24,6 @@ if [ ! -x node_modules/.bin/vinext ]; then
 fi
 
 printf '\nOpening Hundstallet in your browser…\nKeep this Terminal open. Press Ctrl+C to stop the site.\n\n'
+npm run db:local
 export EARTHHEALTH_OPEN_BROWSER=1
-npm run dev -- --hostname 127.0.0.1
+npm run dev:isolated

@@ -3,6 +3,7 @@ import tailwindcss from '@tailwindcss/postcss';
 import vinext from 'vinext';
 import { defineConfig } from 'vite';
 import hostingConfig from './.openai/hosting.json';
+import { localReceiptReader } from './scripts/local/receipt-plugin';
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   '00000000-0000-4000-8000-000000000000';
@@ -47,16 +48,25 @@ export default defineConfig(async () => {
   return {
     css: { postcss: { plugins: [tailwindcss()] } },
     server: {
+      port: 3001,
+      strictPort: true,
+      host: '127.0.0.1',
       open: process.env.EARTHHEALTH_OPEN_BROWSER === '1',
       ...(isCodexSeatbeltSandbox
         ? { watch: { useFsEvents: false, usePolling: true } }
         : {}),
     },
     plugins: [
+      localReceiptReader(),
       vinext(),
       sites(),
       cloudflare({
         viteEnvironment: { name: 'rsc', childEnvironments: ['ssr'] },
+        persistState: process.env.CARE_STATE_DIR
+          ? { path: process.env.CARE_STATE_DIR }
+          : true,
+        remoteBindings: false,
+        tunnel: false,
         config: localBindingConfig,
       }),
     ],

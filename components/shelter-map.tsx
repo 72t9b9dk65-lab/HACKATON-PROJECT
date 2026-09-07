@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { geoPath } from 'd3-geo';
 import type { FeatureCollection, Geometry } from 'geojson';
 import {
@@ -30,7 +30,7 @@ import {
   type MapCamera,
 } from '@/lib/shelter-camera';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
-import { useDogCare } from '@/hooks/use-dog-care';
+import { DogCareContext } from '@/hooks/use-dog-care';
 import { DogName } from '@/components/dog-name';
 import { DogPortrait } from '@/components/dog-portrait';
 
@@ -48,12 +48,17 @@ export default function ShelterMap({
   selectedDogId,
   funding,
   onSelectDog,
+  onOpenDog,
+  showFunding = true,
 }: {
   selectedDogId: string;
   funding: Funding;
   onSelectDog: (id: string) => void;
+  onOpenDog?: (id: string) => void;
+  showFunding?: boolean;
 }) {
-  const { openDog } = useDogCare();
+  const care = useContext(DogCareContext);
+  const openDog = onOpenDog ?? care?.openDog ?? onSelectDog;
   const container = useRef<HTMLDivElement>(null);
   const directory = useRef<HTMLDivElement>(null);
   const markerRefs = useRef<Record<string, SVGGElement | null>>({});
@@ -493,7 +498,7 @@ export default function ShelterMap({
                 >
                   {count} profiles{!shelter && ' · explore ↗'}
                 </text>
-                {!shelter && (
+                {!shelter && showFunding && (
                   <text
                     textAnchor="middle"
                     x={labelX + 71}
@@ -649,25 +654,27 @@ export default function ShelterMap({
                   Official profile <ArrowUpRight size={12} />
                 </a>
               </div>
-              <div className="shelter-dog-support">
-                <strong>
-                  {kronor(selectedFunding.amountOre)} <small>SEK</small>
-                </strong>
-                <span>
-                  {careKinds.map((kind) => (
-                    <span
-                      key={kind.id}
-                      title={`${kind.label}: ${kronor(selectedFunding.allocation[kind.id])} SEK`}
-                    >
-                      <PixelCareIcon kind={kind.id} width="19" height="19" />
-                      <small>
-                        {kronor(selectedFunding.allocation[kind.id])}
-                      </small>
-                    </span>
-                  ))}
-                </span>
-                <small>Demo care</small>
-              </div>
+              {showFunding && (
+                <div className="shelter-dog-support">
+                  <strong>
+                    {kronor(selectedFunding.amountOre)} <small>SEK</small>
+                  </strong>
+                  <span>
+                    {careKinds.map((kind) => (
+                      <span
+                        key={kind.id}
+                        title={`${kind.label}: ${kronor(selectedFunding.allocation[kind.id])} SEK`}
+                      >
+                        <PixelCareIcon kind={kind.id} width="19" height="19" />
+                        <small>
+                          {kronor(selectedFunding.allocation[kind.id])}
+                        </small>
+                      </span>
+                    ))}
+                  </span>
+                  <small>Demo care</small>
+                </div>
+              )}
             </div>
             <p className="shelter-directory-note">
               Published profiles · 7 Sep 2026 · includes groups. Avatars are

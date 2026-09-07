@@ -1,126 +1,113 @@
 # Hundstallet — A second chance, together
 
-An independent hackathon prototype for engaging supporters in care, rehabilitation, and rehoming for vulnerable dogs. A personal virtual shelter connects roaming pixel companions to real published dog profiles, a Sweden-only shelter map, and a simulated giving journey.
+An independent, local hackathon prototype connecting a personal virtual shelter to the everyday work behind a dog's second chance.
 
-## Run locally
+**Donor:** give → follow the funded care → meet the real dog → keep their story.
 
-Requires Node.js 22.13 or later. Run `npm ci`, then `npm run dev`.
+**Staff:** read a receipt → check its products → allocate → photo + dogs → publish.
 
-- **macOS:** double-click `Open in browser.command`, or run `bash "Open in browser.command"` from the extracted project folder.
-- **Windows:** double-click `Open in browser.bat` after extracting the project folder.
+This branch is an independent worktree. Nothing is pushed or deployed. Payments and external staff connections are not enabled.
 
-Both launchers install missing dependencies and open your browser. Keep the terminal open; press Ctrl+C to stop the server.
+## Open the local platform
 
-## Prototype experience
+Requires Node.js 22.13 or later. The original project can keep running on port 3000; this copy uses **3001** and its own data directory.
 
-The homepage centers on a personal shelter profile and activity scene. A left column contains a large **Donate** button, the donated total split into Pending and Used, and dated care transactions. The shelter sits at the top of the right column. Clicking the total replaces that shelter view with the spending breakdown; **Back to shelter** restores it. The Sweden map and real photo journey remain below the workspace.
+```sh
+npm ci
+npm run db:local
+npm run dev:isolated
+```
 
-- Edit the supporter name and shelter name in the personal profile. Profile details and the optional monthly plan persist on this device without creating an online account.
-- Pixel dogs roam in the personal shelter and approach generated food/enrichment, rehabilitation, and examination/vaccination stations on forecast care days. Faded dogs are potential recipients. Clicking a named dog opens its real photo, breed, age, status, shelter, demo support, and official profile link. Motion can be paused and respects reduced-motion preferences. Future recipients beyond the individual directory are explicitly anonymous illustrations, not invented profiles.
-- The shelter scene has a large communal kennel above one row of park walks, meals, recovery, veterinarian, and playtime stations. Its clock follows actual Europe/Stockholm time, including daylight saving, and re-syncs when a hidden tab returns. Hours are never accelerated. Day/night and the illustrative routines follow that clock; sleeping dogs return to the kennel with floating Z letters. Motion can pause for profiles, focus, hidden tabs, and reduced-motion preferences without stopping the real clock. This routine never advances the donation timeline or ledger. Compact screens can pan the scene, and larger populations scroll vertically.
-- The normal shelter shows only fully opaque companions backed by recorded demo expenses. Draft amounts and saved monthly plans do not automatically show faded dogs on page load. **Preview in your shelter** (or explicitly saving a monthly forecast) starts a donation preview; **Exit donation preview**, replaying an expense, or confirming a one-time donation returns to the normal shelter. Expense replays keep other dogs opaque too.
-- **Full impact** is the default view within an active donation preview: all estimated recipients and complete care units funded by the selected amount are shown as the outcome after care is delivered. For monthly plans this covers the contributions accumulated through the selected timeline day. The summary shows the care value and any sub-unit remainder, which stays available for the next care unit. This forecast never moves recorded Pending money to Used. **Selected forecast day** retains the daily care schedule; neither view accelerates the scene clock. Expense replays still use their recorded time or an explicitly labeled daytime illustration when the source has no time.
-- The impact timeline starts collapsed. **Dogs in need** sits directly below it, with a scrollable grid of individual profiles and food, medical, urgent-care, and check-up badges. These stable demo needs are not sourced medical reports. Care previews match the selected category, move recipients out of the waiting grid, and return them when the amount decreases. Only dogs with at least one recorded expense are permanent companions. Unspent donations do not add residents; faded preview dogs remain hypothetical. A dog appears only once in the scene even when receiving repeat care.
-- Click a pixel shelter to fly from Sweden to its real facility location, showing nearby OpenStreetMap roads and buildings. A rectangular, scrollable grid shows its published dog profiles. **All profiles** includes all 43 listings from the official directory on 7 September 2026, including two group listings and two trial adoptions. The single “Rehoming team” listing remains visible without an invented shelter location.
-- Selecting a grid avatar shows its published photo, official profile link, and simulated care allocation. Selecting a profile at another shelter moves the map there. Escape or **Sweden** returns to the overview.
-- **Donate** opens a popup with the three care examples (100 SEK food/enrichment, 240 SEK veterinary care/rehabilitation, or 1,100 SEK examination/vaccination), a custom amount from 1 to 10,000 SEK, and one-time/monthly choices. **Preview in your shelter** closes the popup and shows the current estimate without recording a gift; reopening retains the selection. Confirming closes the popup and returns to the shelter. The official 500 SEK example becomes ten food/enrichment dog-days for one dog. Costs are based on the official giving page checked on 7 September 2026, with source data and modeling assumptions in `public/data/hundstallet/care-examples.json`.
-- Select **Every month** and move the daily slider across twelve months. Forecast contributions accumulate on calendar-month anniversaries, complete care units are scheduled day by day, and unused balances carry toward the next unit. Repeated food/rehabilitation care does not inflate unique recipient counts. Examination/vaccination equivalents use different illustrative recipients. Save, update, or remove a monthly preview without changing donation history or scheduling any automatic charges.
-- For a one-time gift, **Donate** records the full amount as Pending. Staff receipt entry moves costs to Used; uploading evidence then identifies the beneficiary dogs. Existing imported/first-care demo expenses are preserved. Monthly forecasts and animations never create expenses. The total always equals Pending plus Used in integer öre.
-- The transaction history uses all 100 rows of the supplied **Fake Transactions.xlsx**, sheet **Blad1**, range **A1:C101**. Source totals are food 1,338 SEK, medicine 1,233 SEK, shelter 1,108 SEK, and toys 1,104 SEK: **4,783 SEK Used**. The workbook supplies no incoming gifts, so the sample opening funding equals that expenditure, with **0 SEK Pending**. This replaces only the previous 500 SEK starter gift and its two expenses; user-added gifts and expenses remain intact. New gifts can add Pending funds. The map displays recorded demo spending.
-- Clicking the balance replaces the right-hand shelter with vertical columns for every goods/services category, including zero-spend categories. Switch to **Dogs in your shelter** for attributed spending per dog. Category totals include receipts awaiting a photo; dog totals include only costs with identified beneficiaries. Selecting a dog or an assigned transaction returns to the shelter for its replay.
-- The transaction list below donation choices shows an expense icon, recipient, amount, and date, newest first. The imported workbook has date-only records, displayed with **Time not supplied**. It contains no dog assignments: rows rotate across Åke, Koby, and Ove as explicitly simulated matches. Clicking a transaction or a dog spending column replays food, medicine/recovery, shelter/rest, or toys/play. Imported replays use a labeled daytime illustration; new demo expenses retain their actual demo timestamp in Europe/Stockholm. Replays highlight the recipient, respect pause/reduced motion, and never change balances. **Back to routine** resumes the ordinary scene. These are illustrated demo replays, not organization-posted evidence.
-- Official directory photos remain undated. Staff-uploaded care photos carry their local posting time, transaction and category. They drive a dog to the corresponding station for two hours and remain accessible from the transaction thumbnail and dog timeline afterward.
-- Sweden’s coastline, counties, lakes, rivers, city labels, panning, zoom, and reset remain available. Both map views use warm white backgrounds, light brown geographic details, and cream shelter cards.
+- Donor shelter: http://127.0.0.1:3001/
+- Staff workspace: http://127.0.0.1:3001/staff
+- Shelter map: http://127.0.0.1:3001/explore
+- Independent record checker: http://127.0.0.1:3001/verify
 
-## Data and prototype boundaries
+The macOS and Windows **Open in browser** launchers install missing dependencies, apply local migrations, and open the app. Keep the terminal open. Migration commands are explicitly local and safe to repeat.
 
-### Local staff site
+On macOS, receipt images are read by Apple Vision and PDFs by PDFKit, with no document sent to an external OCR service. The first image may take longer while the Swift helper compiles. To prepare it before a presentation:
 
-Open `/staff` (also linked from **Staff workspace** in the donor site). This is a separate staff interface on the same local origin, with the existing personal donor and three clearly labeled sample donor portfolios. It shows donated, available and used amounts, category totals, and the exact donor contribution to each transaction.
+```sh
+npm run ocr:build
+```
 
-**Distribute products to donators**, beside **All care transactions**, assigns whole purchased products across funded portfolios. One donor pays each product's full price; prices are never split. The allocator starts with expensive items and prefers the donor charged the least in the current batch, subject to available balance. A bounded rearrangement search handles cases where the first placement does not fit. Existing item assignments are released and replaced atomically, so receipt totals, total Used, photos and dates stay unchanged. Repeating the action with unchanged donations produces the same ownership, never another charge.
+On other operating systems, staff can upload the document and paste its text or enter its product lines. No external OCR key is required. The image/PDF reader is a local development middleware, not a deployed Worker feature.
 
-Imported transactions have category totals but no product names, quantities or prices. **Add purchased products** lets staff enter the actual items; their combined price must exactly match the original transaction total. Saving assigns those items to donors. Until itemized, historical transactions keep their existing funding and are excluded from product redistribution. The transaction row shows each entered product, its full price and its paying donor. A donor's own history shows only their funded items. Overrides remain separate from original receipts and imported source expenses.
+## What is implemented
 
-1. Attach an invoice or receipt (PDF/JPG/PNG/WebP, up to 1 MB). Enter the supplier, reference, purchase date, product descriptions, categories, quantities and unit prices including VAT. Quantity expands into separate purchased units at the stated price. Use separate rows for differently priced products. Document extraction is manual; no OCR, backend, sign-in or external connection is implemented.
-2. Review each product, price, paying donor and resulting balance, then record the receipt. Every unit is charged in full to one wallet in integer öre. A product cannot be assigned if no individual donor can cover it, even when combined funds are sufficient. Failed placements, duplicate supplier/reference pairs, invalid product totals or failed storage writes leave the receipt unrecorded and balances unchanged. Existing transaction edits obey the same atomic behavior.
-3. Click a transaction's empty photo slot, attach a care photo and select one or more dogs. Its category is inherited from the transaction. The photo never creates another charge. Each donor's cost is attributed equally across the transaction's identified dogs, with any residual öre assigned deterministically. New evidence can refine dog attribution without changing the original cost or donor shares.
+### Personal shelter
 
-`hundstallet.staff-portfolios.v1` stores receipts, allocations and photos. The existing giving ledger supplies the current donor's gifts and historical expenses. The shared browser hook coordinates receipt and donation writes with Web Locks, reads the latest balances before committing, and synchronizes both sites through local storage events. All receipt lines are saved in one storage write; quota errors cannot partially charge wallets. Uploads are device-local, capped to a 4-million-character staff snapshot, and are never added to the repository. Receipt costs count as Used before dogs are known; permanent companions are added only after staff identifies a dog with an attributed positive cost. Existing imported demo assignments remain until replaced by staff evidence.
+- Real Stockholm date and clock, day/night styling, pause and reduced-motion support. Only a published photo sends a dog to a care station; the photo stays live for one or two hours, then remains in the dog's journey.
+- Permanent companions require a positive contribution to a funded product and a published update identifying that dog. A donation alone never claims that a dog received care.
+- Real portraits, pixel avatars, official profile links, following without donating, a photo timeline, and the contributor's care basket. Homecoming milestones move dogs into a lasting **Home at last** section.
+- Custom gifts, three official care examples and one-time/monthly forecasts. Faded dogs appear only when a donor explicitly requests a preview. The collapsed daily forecast accumulates monthly care capacity, keeps unspent remainders and avoids presenting repeated care as new unique recipients.
+- Available/used balances, category and dog spending, receipt details, original documents, and photo evidence. Original workbook records without beneficiary details remain explicitly unattributed.
+- A shared care goal, a copyable local invitation link, participation keepsakes, and official routes for real giving, adoption, fostering and fundraising. These badges have no financial value.
+- All 43 public directory listings remain explorable on the existing Sweden map. Group listings do not masquerade as individual supported dogs.
 
-The primary donor's existing balance is preserved, including an initially fully spent workbook balance. Make a demo donation from the donor site to add available funds to that portfolio. The other three sample accounts start with 1,200, 800 and 2,000 SEK available. Photos are local prototype entries, not authenticated Hundstallet posts.
+### Staff workspace
 
-This is an independent shell, not an official Hundstallet service. Public names, profile summaries, shelter assignments, and photographs are an imported snapshot of the official public directory. All financial amounts, allocations, and donation events are simulated. Åke's profile mentions allergy food; the app does not claim that a purchase was made for him or that Hundstallet earmarks donations to particular dogs.
+- **Today** prioritizes pending allocations and funded items missing a photo. **Receipts & products**, **Supporters**, and **Stories & calendar** expose the detail when needed.
+- Upload up to ten receipts in a queue; supported documents are JPEG, PNG, WebP, PDF and text, up to 12 MB each. OCR proposes fields; staff must check supplier, reference, date, categories, quantities and final unit prices.
+- Receipt rows expand into individually priced purchased units. Differently priced products stay different. Totals must reconcile exactly in integer öre. Saving a draft does not use donations.
+- A reviewed allocation assigns whole products to available portfolios, balancing the current batch. If no portfolio can cover a costly service alone, that one identifiable item may be co-funded. The service is not turned into fictional equal-priced products.
+- Confirmed allocations never redistribute when a new receipt or gift arrives. Insufficient funds leave the entire allocation pending. Corrections retain the original purchase and restore its funds through an audit entry.
+- Attach a photo, select the funded products and the dogs who used them. The activity category is inherited from those products. A photo never creates another expense.
+- Schedule a photo or journey milestone. Publishing and expiry follow wall time; withdrawal leaves a correction history. A milestone can exist without an expense, but it cannot manufacture financial support.
+- Itemize an imported workbook entry only when its original receipt is attached. The original amount and every existing donor contribution remain unchanged.
+- Export the ledger, product allocations, correction history and record proofs as JSON. Sample supporter shelters can be opened directly from their portfolio.
 
-The supplied transaction workbook is preserved unchanged. `public/data/hundstallet/fake-transactions.json` retains every source row, original calendar date and category, amounts in integer öre, workbook hash, source range, and assumptions. The workbook's `kr` format is interpreted as SEK. `scripts/import-fake-transactions.py` reproduces the fixture using read-only openpyxl (available in the bundled Codex spreadsheet runtime). No times, dog names, incoming donations, or payment receipts are asserted to come from the spreadsheet. Source categories map to corresponding care stations without changing their displayed transaction labels or amounts.
+### Shared records and evidence
 
-Photo order is gallery order, not a verified care chronology. The original photos have no asserted event dates and do not prove expenditure, delivery, or outcomes. The next-update card is visibly a placeholder; donations do not generate organization updates or advance a dog's rehabilitation. Photo sources, original URLs, and hashes are recorded in `public/dogs/hundstallet/sources.json`. Copyright remains with the original rights holders.
+- Staff and donor views use the same local D1/SQLite database. Uploaded documents and photos are in local R2 storage. Financial state is not held in `localStorage`.
+- Polling refreshes visible tabs every three seconds. Optimistic revision checks prevent stale concurrent writes; command IDs make retrying an uncertain response safe.
+- Receipt, gift, photo and correction events append SHA-256 record fingerprints linked to the preceding fingerprint. Original receipt bytes also receive a fingerprint.
+- The verification page checks an exported record or complete chain and compares a receipt file, entirely on the reader's device.
+- An optional Ethereum wallet flow can anchor a fingerprint on **Sepolia**, using a zero-value transaction. The server checks the actual transaction receipt and its data before accepting a confirmed anchor. No wallet key is stored, and no blockchain transaction was sent during development.
+- A local hash checks internal consistency. A separately verified external anchor is needed to independently detect a rewritten local history. Neither hashes nor blockchain prove that an underlying care event was true.
 
-The original 25 AI-generated dog sprites are retained, with 16 additional sprites covering missing breeds and generic mixed-breed appearances. They are illustrations, not portraits or confirmed ancestry. A generated shelter icon represents all three locations and is not a rendering of the actual buildings. The real profile-photo carousel remains below the map.
+## Data and boundaries
 
-Public shelter addresses are verified against the official contact page; mapped facility points are sourced from OpenStreetMap, Eniro, and Hitta. The close-up uses local OpenStreetMap geography under ODbL 1.0 with visible attribution. Building coverage is incomplete around Alingsås; the prototype retains the verified address point instead of fabricating a building footprint. These maps are an exploration interface, not navigation instructions.
+The supplied **Fake Transactions.xlsx** is preserved unchanged: all 100 rows, date-only precision, categories and the **4,783 SEK** expense total. The spreadsheet contains no original receipts, product breakdowns, incoming donations or beneficiary identities. Its opening contribution is a balancing demo fixture, not a claimed payment.
 
-Gift and expense records are saved together in one browser snapshot under `hundstallet.giving-ledger.v2`. The previous `hundstallet.donation-shell.v1` gift records are imported once without modifying them. Invalid expense snapshots are ignored while retaining valid gift amounts; an allocation alone cannot create Used spending. If storage is unavailable, the shell works for the current session and says so. There are no payments, blockchain transactions, server accounts, or live integrations. Real giving is available on [Hundstallet's official website](https://hundstallet.se/stod-oss/).
+A separate sample receipt and four sample portfolios make the first demonstration useful. Public profile pictures used in sample care stories are marked **Demo story** and are not represented as photos of a real purchase or treatment. Seeded live moments naturally expire; publish a new, explicitly labelled sample moment for a later demo.
 
-Previous EarthHealth and Hundstallet flows and their local records are retained for reference and are not used by the active homepage.
+Public profiles and sources are a 7 September 2026 snapshot. Photographs retain their original ownership. Lightweight WebP previews preserve the originals and their source manifest; the 106 derivatives total approximately 3.34 MB against 15.36 MB of source images. Uploaded care photos are resized on the client and stripped of embedded camera metadata; receipt documents retain their original bytes.
 
-## Production path
+Local state lives in `.wrangler/state/` (ignored by Git); keep that folder to retain demo changes. The `.local/` folder holds the OCR executable, its compiler cache and optional isolated test data. The original checkout's browser storage and data are untouched. No existing browser-only demo gifts are silently imported into this independent copy.
 
-1. Connect an authorized payment provider, server-side donation records, refunds, and reconciliation.
-2. Integrate consented dog-care records and staff-approved updates, with evidence links, timestamps, and correction history.
-3. Replace illustrative allocation with reconciled organizational accounting and explicit shared-cost rules.
-4. If blockchain is required, anchor batched receipt proofs on a selected network and expose independently verifiable transaction references. Keep personal and case-sensitive data off-chain. An anchor proves record integrity, not whether an expense or outcome is true.
-5. Add account recovery, consent-based notifications, moderation, and privacy controls before enabling a live community.
+The service is deliberately restricted to localhost, with sample accounts and no authentication. Before any real launch it needs authorized staff and donor identities, permission boundaries, payment-provider reconciliation, data protection and retention rules, backup/recovery, reviewed accounting attribution, accessible browser/device testing, and a security/dependency review. The current single-snapshot storage is suitable for a hackathon; production should use normalized records and tested operational controls. No production-readiness or fundraising uplift is claimed.
 
-## Sources
+## Verify the implementation
 
-Consulted September 7, 2026:
+```sh
+npm test
+npm run typecheck
+npm run lint:platform
+npm run build
+```
 
-- [Complete dog directory](https://hundstallet.se/hundar/): 43 published profiles, including groups, with names, breeds, ages, shelter assignments, status, links, and photos.
-- [Official shelter addresses](https://hundstallet.se/var-verksamhet/kontakt/) and [OpenStreetMap](https://www.openstreetmap.org/copyright): facility locations and nearby geographic context. Coordinate source links are in `lib/hundstallet-shelters.ts`; map attribution is in `public/data/hundstallet/map-sources.json`.
-- [Hundstallet’s mission and shelter locations](https://hundstallet.se/var-verksamhet/)
-- [How Hundstallet uses donations](https://hundstallet.kb.kundo.se/guide/vad-anvands-mina-pengar-till?category=gavor-och-donationer)
-- [Official giving page](https://hundstallet.se/stod-oss/)
-- [Natural Earth 1:10 million](https://www.naturalearthdata.com/downloads/10m-physical-vectors/) and [county boundaries](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/): public-domain geography pinned to source revision `ca96624a56bd078437bca8184e78163e5039ad19`. These are cartographic context rather than cadastral or navigation-grade boundaries.
-- [Natural Earth / World Atlas](https://github.com/topojson/world-atlas): retained public-domain globe assets.
-- [Country metadata](https://github.com/mledoze/countries): ODbL-1.0. The derived selection is in `public/data/countries.json`; three `map-*` identifiers are internal rather than ISO codes.
+The suite includes the retained reference models and new platform tests for money conservation, stable ownership, batch allocation, expensive services, duplicate receipts, corrections, itemization, photo/category links, scheduling, expiry, milestones and fingerprint tampering.
 
-## Validation and code
+The HTTP integration check must run against a **separate** QA database and port. Stop the development server first because Vinext runs one server per checkout.
 
-Run `npm test`, `npm run typecheck`, and `npm run build`. Tests cover the four official care examples, every day of twelve-month forecasts, exact allocations, carryover, short months and leap years, repeat-care recipient counts, local profile/plan persistence, scene bounds, asset alpha, photo availability, map projection, and the retained earlier models.
+```sh
+npx wrangler d1 migrations apply CARE_DB --local --config wrangler.local.jsonc --persist-to .local/qa-state
+CARE_STATE_DIR=.local/qa-state npx vinext dev --host 127.0.0.1 --port 3002
+# In a second terminal:
+CARE_QA_URL=http://127.0.0.1:3002 npm run test:api
+```
 
-- `components/donation-shell.tsx`: atomic gift/expense state, custom demo donations, and horizontal photo timeline.
-- `lib/donation-spending.ts`: validated expense records, pending/used balances, category and recipient reconciliation, migration, and replay metadata.
-- `components/donation-spending.tsx`: sidebar balance, category/dog spending columns, and dated transaction history.
-- `components/virtual-shelter.tsx`: care stations, supported and preview dogs, movement to services, and real-profile dialogs.
-- `components/care-planner.tsx` and `components/shelter-profile.tsx`: care choices, monthly preview, daily timeline, and personal profile editing.
-- `lib/care-impact.ts`: sourced care units, calendar schedule, cumulative capacity/use, reserve handling, and estimated recipients.
-- `lib/shelter-profile.ts` and `lib/virtual-shelter.ts`: device-local profile/plan validation, custom amount parsing, and matched profile selection.
-- `lib/shelter-scene.ts`: responsive dog home and care-station coordinates.
-- `components/shelter-life-scene.tsx` and `lib/shelter-activities.ts`: activity clock, day/night display, kennel/activities layout, deterministic routines, and sleep state.
-- `assets/shelter-activities/generation.json`: exact built-in image prompts, generated originals, alpha checks, saved paths, and the kennel's retained soft halo. New assets are `public/shelters/pixel-big-kennel.png`, `public/care/pixel/park-walk.png`, and `public/care/pixel/play-enrichment.png`.
-- `lib/dog-needs.ts` and `components/dog-need-badge.tsx`: explicitly illustrative need labels, care matching, and the grid/shelter partition.
-- `public/care/pixel/` and `assets/care-stations/generation.json`: three generated transparent care stations, exact prompts, provenance, and saved paths.
-- `components/shelter-map.tsx`: pixel shelter markers, animated close-up, full dog directory, and selected-dog care.
-- `lib/shelter-camera.ts`: geographic camera interpolation and facility centering.
-- `public/data/hundstallet/directory.json` and `lib/hundstallet-directory.ts`: complete sourced snapshot and typed data.
-- `scripts/import-hundstallet-directory.py`: repeatable import from a downloaded official directory HTML file; `--download` also retrieves published thumbnails.
-- `lib/donation-shell.ts`: sourced profiles, demo allocation, and local records.
-- `components/pixel-care-icon.tsx`: shared pixel icons for amounts and map markers.
-- `public/dogs/pixel-breeds/`: original 5 × 5 atlas plus a 4 × 4 extension, 41 individually cropped sprites, and manifests.
-- `public/shelters/pixel-shelter.png`: transparent pixel shelter marker.
-- `assets/hundstallet-map/generation.md`: shelter and additional dog generation prompts.
-- `assets/pixel-dog-breeds/generation.md`: complete built-in image generation prompt and processing notes.
-- `scripts/crop-dog-breeds.py`: repeatable cropping and alpha validation using Pillow.
-- `public/dogs/hundstallet/`: original profile photos with a source manifest.
-- `components/hundstallet.tsx`: retained earlier prototype, no longer the homepage.
-- `lib/hundstallet-data.ts`: locations, fictional dogs, stages, and proposed allocations.
-- `lib/hundstallet-model.ts`: currency validation, allocation, local receipts, reload validation, and badges.
-- `components/sweden-map.tsx` and `lib/sweden-map.ts`: Sweden-only projection, panning, zooming, and accessible shelter markers.
-- `public/data/sweden.json`: detailed Natural Earth 1:10 million Sweden boundary.
-- `public/data/sweden-details.json`: 21 counties, regional lake and river features, and Swedish city points. Hydrology is clipped to Sweden during rendering.
-- `public/data/sweden-sources.json`: pinned source URLs, revision, source SHA-256 checksums, license, and processing notes.
-- `scripts/build-sweden-map.mjs`: repeatable extraction; download the source files listed in the manifest as `<name>.json` and run `node scripts/build-sweden-map.mjs /path/to/source-directory`.
-- `components/earth-globe.tsx`: retained original globe implementation; not used by the active homepage.
+It writes only to the QA instance. Checks include an actual 1.7 MB image upload, file round-trip hashes, idempotency, concurrent requests, product allocation, multiple dogs, corrections and the origin/anchor boundaries. Stop the QA server and restart `npm run dev:isolated` afterward.
 
-Automated tests and builds do not establish that every browser interaction, touch gesture, or Windows launcher works. Live payments, blockchain integration, and real-time shelter data are not implemented.
+The main implementation is in `components/platform/`, `lib/platform/`, `app/api/platform/`, `hooks/use-care-workspace.ts`, and `db/schema.ts`. The old browser-only components remain as reference, not as the active donor or staff application. Their former documentation is archived in `docs/legacy-prototype.md`.
+
+## Presentation and sources
+
+Use [the three-minute demo and next validation steps](docs/hackathon-demo.md). The challenge is to earn repeat participation through visible care while reducing staff effort; the prototype demonstrates that loop, not a prediction of increased revenue.
+
+- [Hundstallet's giving examples and official donation page](https://hundstallet.se/stod-oss/)
+- [Public dog directory](https://hundstallet.se/hundar/) and [directory import notes](docs/hundstallet-dog-directory.md)
+- [Foster homes](https://hundstallet.se/engagera-dig/jourhem/) and [fundraisers](https://hundstallet.se/insamlingar/)
+- [How donations are used](https://hundstallet.kb.kundo.se/guide/vad-anvands-mina-pengar-till?category=gavor-och-donationer)
+- [OpenStreetMap attribution](https://www.openstreetmap.org/copyright); local source manifests remain in `public/data/hundstallet/`.
