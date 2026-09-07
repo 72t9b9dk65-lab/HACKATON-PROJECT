@@ -9,11 +9,17 @@ import {
   type CategoryId,
 } from './earth-data.ts';
 export const STORAGE_KEY = 'earthhealth.prototype.v1';
+// Migrate continent IDs used by the original Italian-language prototype.
+const legacyTerritoryIds: Record<string, string> = {
+  Europa: 'Europe',
+  'Nord America': 'North America',
+  'Sud America': 'South America',
+};
 export const stages = [
-  'Contributo registrato',
-  'Destinazione assegnata',
-  'Acquisto documentato',
-  'Aiuto consegnato',
+  'Contribution recorded',
+  'Destination assigned',
+  'Purchase documented',
+  'Aid delivered',
 ];
 export const personFactors = {
   water: 4,
@@ -59,7 +65,7 @@ export function newDonation(
     !allTerritories.some((t) => t.id === territory.id) ||
     territory.score < 0
   )
-    throw new Error('Contributo non valido.');
+    throw new Error('Invalid contribution.');
   return {
     id,
     territoryId: territory.id,
@@ -85,26 +91,39 @@ export function parseSavedState(raw: string | null): {
     data.profile.avatar < 0 ||
     data.profile.avatar > 4
   )
-    throw new Error('Profilo salvato non valido.');
+    throw new Error('Invalid saved profile.');
   const ids = new Set<string>();
   const donations: Donation[] = Array.isArray(data.donations)
-    ? data.donations.filter((d: Donation) => {
-        const valid =
-          typeof d.id === 'string' &&
-          !ids.has(d.id) &&
-          allTerritories.some(
-            (t) =>
-              t.id === d.territoryId && (t.countryId ?? t.id) === d.countryId,
-          ) &&
-          validAmount(d.amount) &&
-          categories.some((c) => c.id === d.category) &&
-          Number.isInteger(d.stage) &&
-          d.stage >= 0 &&
-          d.stage <= 3 &&
-          Number.isFinite(Date.parse(d.createdAt));
-        if (valid) ids.add(d.id);
-        return valid;
-      })
+    ? data.donations
+        .map((d: Donation) => {
+          const territoryId =
+            legacyTerritoryIds[d.territoryId] ?? d.territoryId;
+          const countryId = legacyTerritoryIds[d.countryId] ?? d.countryId;
+          const territory = allTerritories.find((t) => t.id === territoryId);
+          return {
+            ...d,
+            territoryId,
+            countryId,
+            territoryName: territory?.name ?? d.territoryName,
+          };
+        })
+        .filter((d: Donation) => {
+          const valid =
+            typeof d.id === 'string' &&
+            !ids.has(d.id) &&
+            allTerritories.some(
+              (t) =>
+                t.id === d.territoryId && (t.countryId ?? t.id) === d.countryId,
+            ) &&
+            validAmount(d.amount) &&
+            categories.some((c) => c.id === d.category) &&
+            Number.isInteger(d.stage) &&
+            d.stage >= 0 &&
+            d.stage <= 3 &&
+            Number.isFinite(Date.parse(d.createdAt));
+          if (valid) ids.add(d.id);
+          return valid;
+        })
     : [];
   return {
     profile: {

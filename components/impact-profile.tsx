@@ -59,23 +59,23 @@ export function ImpactProfile({
         <div className="welcome-orbit">
           <Sprout size={57} />
         </div>
-        <span className="eyebrow">IL TUO IMPATTO COMINCIA QUI</span>
+        <span className="eyebrow">YOUR IMPACT STARTS HERE</span>
         <h2>
-          Non serve un grande nome.
+          You do not need a famous name.
           <br />
-          Basta un piccolo gesto.
+          Just a small act of kindness.
         </h2>
         <p>
-          Crea un profilo anonimo, scegli chi aiutare e segui ogni contributo.
-          Il tuo primo viaggio può iniziare oggi.
+          Create an anonymous profile, choose who to help, and follow every
+          contribution. Your first journey can begin today.
         </p>
         <button className="primary-button" onClick={onCreate}>
-          Crea il tuo profilo anonimo
+          Create your anonymous profile
           <ArrowUpRight size={18} />
         </button>
         <span className="welcome-note">
           <ShieldCheck size={15} />
-          Profilo locale · Donazioni simulate · Nessun addebito
+          Local profile · Simulated donations · No charges
         </span>
       </section>
     );
@@ -84,55 +84,58 @@ export function ImpactProfile({
       <div className="profile-banner">
         <Avatar index={profile.avatar} size={76} />
         <div>
-          <span className="eyebrow">UN NOME ANONIMO, UN GESTO CONCRETO</span>
+          <span className="eyebrow">AN ANONYMOUS NAME, A MEANINGFUL ACT</span>
           <h2>@{profile.username}</h2>
-          <p>Il tuo percorso, un aiuto alla volta.</p>
+          <p>Your journey, one contribution at a time.</p>
         </div>
         <span className="profile-device">
           <ShieldCheck size={16} />
-          Profilo demo su questo dispositivo
+          Demo profile on this device
         </span>
       </div>
       <div className="personal-stats">
         <div>
           <Heart />
-          <span>Il tuo contributo totale</span>
+          <span>Your total contribution</span>
           <strong>{money(total)}</strong>
-          <small>Donazioni simulate</small>
+          <small>Simulated donations</small>
         </div>
         <div>
           <MapPin />
-          <span>Territori raggiunti</span>
+          <span>Territories reached</span>
           <strong>{countries.toString().padStart(2, '0')}</strong>
-          <small>Destinazioni dei tuoi contributi</small>
+          <small>Destinations of your contributions</small>
         </div>
         <div>
           <Users />
-          <span>Persone potenzialmente aiutate</span>
+          <span>People potentially helped</span>
           <strong>{number(people)}</strong>
-          <small>Stima demo delle consegne simulate</small>
+          <small>Demo estimate of simulated deliveries</small>
         </div>
       </div>
       <div className="ledger-heading">
         <div>
-          <h3>Il viaggio delle tue donazioni</h3>
-          <p>Dal primo gesto alla destinazione. Tutto, in un unico posto.</p>
+          <h3>Your donations’ journey</h3>
+          <p>
+            From the first contribution to its destination. Everything in one
+            place.
+          </p>
         </div>
         <button className="outline-button" onClick={onExplore}>
-          Trova una nuova causa
+          Find a new cause
           <ArrowUpRight size={17} />
         </button>
       </div>
       {donations.length === 0 ? (
         <div className="empty-ledger">
           <Heart size={38} />
-          <h3>Ogni viaggio comincia con un gesto.</h3>
+          <h3>Every journey starts with an act of kindness.</h3>
           <p>
-            Non hai ancora effettuato donazioni di prova. Esplora il globo e
-            scegli una causa che senti vicina.
+            You have not made any test donations yet. Explore the globe and
+            choose a cause that matters to you.
           </p>
           <button className="primary-button" onClick={onExplore}>
-            Esplora i bisogni del mondo
+            Explore the world’s needs
             <ArrowRight size={17} />
           </button>
         </div>
@@ -158,12 +161,12 @@ export function ImpactProfile({
                   <strong>{money(d.amount)}</strong>
                 </div>
                 <p className="donation-date">
-                  {new Date(d.createdAt).toLocaleDateString('it-IT', {
+                  {new Date(d.createdAt).toLocaleDateString('en-GB', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',
                   })}
-                  <span>Donazione demo</span>
+                  <span>Demo donation</span>
                 </p>
                 <div className="donation-card-stage">
                   <span>{stages[d.stage]}</span>
@@ -171,24 +174,24 @@ export function ImpactProfile({
                 </div>
                 <Progress
                   value={(d.stage + 1) * 25}
-                  aria-label={`Avanzamento demo: ${stages[d.stage]}`}
+                  aria-label={`Demo progress: ${stages[d.stage]}`}
                 />
                 <p className="donation-card-impact">
                   <Package size={15} />
                   {prediction.units} {prediction.unit}{' '}
                   {d.stage >= 2
-                    ? 'in acquisto simulato'
-                    : 'previsti nello scenario'}
+                    ? 'in a simulated purchase'
+                    : 'planned in this scenario'}
                 </p>
                 <div className="donation-card-actions">
                   <button onClick={() => onDocument(d)}>
                     <FileText size={15} />
-                    Segui e documenta
+                    Track and document
                     <ArrowRight size={15} />
                   </button>
                   <button
-                    aria-label={`Mostra ${d.territoryName} sul globo`}
-                    title="Mostra sul globo"
+                    aria-label={`Show ${d.territoryName} on the globe`}
+                    title="Show on the globe"
                     onClick={() => onLocate(d.territoryId)}
                   >
                     <MapPin size={17} />
@@ -202,12 +205,11 @@ export function ImpactProfile({
       <div className="profile-transparency">
         <ShieldCheck size={23} />
         <div>
-          <h3>La trasparenza fa parte del viaggio.</h3>
+          <h3>Transparency is part of the journey.</h3>
           <p>
-            Apri «Segui e documenta» per avanzare tra i passaggi della
-            simulazione, vedere gli acquisti di esempio e scaricare il
-            rendiconto. Importi, consegne e stime non corrispondono a
-            transazioni o aiuti reali.
+            Open “Track and document” to advance through the simulation, view
+            example purchases, and download the report. Amounts, deliveries, and
+            estimates do not represent real transactions or aid.
           </p>
         </div>
       </div>
@@ -242,28 +244,28 @@ export function CommunityPanel({
     <aside className="territory-panel community-panel">
       <div className="panel-breadcrumb">
         <Users size={15} />
-        <span>La community earthealth</span>
+        <span>The earthealth community</span>
       </div>
-      <span className="overline">IL BENE HA TANTI NOMI</span>
+      <span className="overline">KINDNESS HAS MANY NAMES</span>
       <h2>
-        Anonimi.
+        Anonymous.
         <br />
-        Insieme, visibili<span>.</span>
+        Together, visible<span>.</span>
       </h2>
       <p className="territory-description">
-        Dietro ogni username c’è qualcuno che ha scelto di esserci.
+        Behind every username is someone who chose to help.
       </p>
       <div className="leaderboard-heading">
         <Trophy size={17} />
-        <h3>La classifica dei gesti</h3>
+        <h3>The kindness leaderboard</h3>
         <span>DEMO</span>
       </div>
       <Table className="leaderboard-table">
         <TableHeader>
           <TableRow>
             <TableHead>#</TableHead>
-            <TableHead>Donatore</TableHead>
-            <TableHead>Totale</TableHead>
+            <TableHead>Donor</TableHead>
+            <TableHead>Total</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -281,8 +283,8 @@ export function CommunityPanel({
                   <div>
                     <strong>{d.username}</strong>
                     <span>
-                      {d.username === profile?.username ? 'Tu · ' : ''}
-                      {d.territories} territori
+                      {d.username === profile?.username ? 'You · ' : ''}
+                      {d.territories} territories
                     </span>
                   </div>
                 </div>
@@ -293,22 +295,24 @@ export function CommunityPanel({
         </TableBody>
       </Table>
       <p className="ranking-note">
-        Totali di esempio, dal primo contributo. Solo lo username è visibile.
+        Example totals, starting with the first contribution. Only the username
+        is visible.
       </p>
       <div className="community-note">
         <span>
           <Heart size={20} />
         </span>
         <h3>
-          Non è una gara.
-          <br />È un mondo che si avvicina.
+          It is not a competition.
+          <br />
+          It is a world coming closer together.
         </h3>
-        <p>Ogni importo ha valore. Anche il tuo.</p>
+        <p>Every amount matters. Yours too.</p>
         <button
           className="donate-button"
           onClick={profile ? onExplore : onCreate}
         >
-          {profile ? 'Trova la tua prossima causa' : 'Entra nella community'}
+          {profile ? 'Find your next cause' : 'Join the community'}
           <ArrowUpRight size={18} />
         </button>
       </div>

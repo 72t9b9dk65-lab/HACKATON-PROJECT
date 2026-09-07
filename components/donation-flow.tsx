@@ -72,8 +72,8 @@ export function CreateProfileForm({
   const [avatar, setAvatar] = useState('0');
   const [error, setError] = useState('');
   function suggest() {
-    const a = ['seme', 'raggio', 'onda', 'passo', 'germoglio'];
-    const b = ['gentile', 'libero', 'sereno', 'luminoso', 'verde'];
+    const a = ['seed', 'ray', 'wave', 'step', 'sprout'];
+    const b = ['kind', 'free', 'calm', 'bright', 'green'];
     const rnd = crypto.getRandomValues(new Uint32Array(3));
     setUsername(
       `${a[rnd[0] % a.length]}_${b[rnd[1] % b.length]}${rnd[2] % 100}`,
@@ -88,7 +88,7 @@ export function CreateProfileForm({
         const clean = username.trim();
         if (!validUsername(clean)) {
           setError(
-            'Usa 3–24 lettere, numeri o trattini bassi. Scegli un nome diverso dai profili demo.',
+            'Use 3–24 letters, numbers, or underscores. Choose a name different from the demo profiles.',
           );
           return;
         }
@@ -101,7 +101,7 @@ export function CreateProfileForm({
     >
       <div className="avatar-options">
         <RadioGroup
-          aria-label="Scegli il simbolo del tuo profilo"
+          aria-label="Choose your profile symbol"
           value={avatar}
           onValueChange={(v) => setAvatar(String(v))}
         >
@@ -109,7 +109,7 @@ export function CreateProfileForm({
             <label key={i} className={Number(avatar) === i ? 'chosen' : ''}>
               <RadioGroupItem
                 value={String(i)}
-                aria-label={`Simbolo ${['germoglio', 'foglia', 'onda', 'sole', 'fiore'][i]}`}
+                aria-label={`Symbol ${['sprout', 'leaf', 'wave', 'sun', 'flower'][i]}`}
               />
               <Avatar index={i} size={48} />
             </label>
@@ -117,7 +117,7 @@ export function CreateProfileForm({
         </RadioGroup>
       </div>
       <label className="field-label" htmlFor="anonymous-name">
-        Come vuoi farti chiamare?
+        What would you like to be called?
       </label>
       <div className="username-field">
         <span>@</span>
@@ -126,7 +126,7 @@ export function CreateProfileForm({
           required
           minLength={3}
           maxLength={24}
-          placeholder="Il tuo nome anonimo"
+          placeholder="Your anonymous name"
           autoComplete="off"
           value={username}
           aria-describedby="username-hint"
@@ -135,17 +135,13 @@ export function CreateProfileForm({
             setError('');
           }}
         />
-        <button
-          type="button"
-          onClick={suggest}
-          aria-label="Suggerisci uno username"
-        >
+        <button type="button" onClick={suggest} aria-label="Suggest a username">
           <Shuffle size={19} />
         </button>
       </div>
       <p className="fine-print" id="username-hint">
-        Non usare nome, email o altri dati personali. Bastano 3–24 lettere,
-        numeri o trattini bassi.
+        Do not use your real name, email, or other personal details. Use 3–24
+        letters, numbers, or underscores.
       </p>
       {error && (
         <p className="form-error" role="alert">
@@ -155,18 +151,18 @@ export function CreateProfileForm({
       <div className="local-profile-note">
         <ShieldCheck size={19} />
         <p>
-          Il tuo profilo demo rimane su questo browser. Gli altri vedono solo lo
-          username. Non è un account online e non si sincronizza tra
-          dispositivi.
+          Your demo profile stays in this browser. Only your username is
+          displayed. This is not an online account and does not sync across
+          devices.
         </p>
       </div>
       <button className="primary-button wide" type="submit">
-        Crea profilo e continua
+        Create profile and continue
         <ArrowRight size={17} />
       </button>
       {onCancel && (
         <button type="button" className="subtle-button" onClick={onCancel}>
-          Torna indietro
+          Go back
         </button>
       )}
     </form>
@@ -188,12 +184,12 @@ export function AccountDialog({
           <Sprout size={30} />
         </span>
         <DialogTitle>
-          Il tuo nome può restare anonimo.
+          Your name can stay anonymous.
           <br />
-          Il tuo impatto, no.
+          Your impact can be seen.
         </DialogTitle>
         <DialogDescription>
-          Crea il tuo profilo per provare una donazione e seguirne ogni passo.
+          Create your profile to try a donation and follow every step.
         </DialogDescription>
         <CreateProfileForm
           onCreate={(p) => {
@@ -235,7 +231,7 @@ export function DonationDialog({
   function submit() {
     if (!validAmount(numeric)) {
       setError(
-        'Inserisci un importo tra 1 € e 25.000 €, con massimo due decimali.',
+        'Enter an amount between €1 and €25,000, with up to two decimal places.',
       );
       return;
     }
@@ -251,7 +247,7 @@ export function DonationDialog({
       setStep('success');
     } catch (e) {
       setError(
-        e instanceof Error ? e.message : 'Impossibile salvare il contributo.',
+        e instanceof Error ? e.message : 'Unable to save the contribution.',
       );
       submitting.current = false;
     }
@@ -269,10 +265,10 @@ export function DonationDialog({
             <span className="dialog-symbol">
               <Sprout size={27} />
             </span>
-            <DialogTitle>Un piccolo passo prima di aiutare.</DialogTitle>
+            <DialogTitle>One small step before helping.</DialogTitle>
             <DialogDescription>
-              Crea un profilo anonimo. Tornerai al riepilogo del contributo di{' '}
-              {money(numeric)} per {territory.name}.
+              Create an anonymous profile. You will return to the contribution
+              summary for {money(numeric)} for {territory.name}.
             </DialogDescription>
             <CreateProfileForm
               onCreate={(p) => {
@@ -287,15 +283,13 @@ export function DonationDialog({
             <span className="success-symbol">
               <Check size={34} />
             </span>
-            <span className="dialog-eyebrow">
-              DONAZIONE DI PROVA REGISTRATA
-            </span>
-            <DialogTitle>Il tuo gesto ha una destinazione.</DialogTitle>
+            <span className="dialog-eyebrow">TEST DONATION RECORDED</span>
+            <DialogTitle>Your kindness has a destination.</DialogTitle>
             <DialogDescription>
-              Hai simulato un contributo di{' '}
-              <strong>{money(created.amount)}</strong> per{' '}
-              {cat.label.toLowerCase()} in {territory.name}. Nessun denaro è
-              stato addebitato.
+              You simulated a contribution of{' '}
+              <strong>{money(created.amount)}</strong> for{' '}
+              {cat.label.toLowerCase()} in {territory.name}. No money was
+              charged.
             </DialogDescription>
             <div className="success-ticket">
               <div>
@@ -306,7 +300,7 @@ export function DonationDialog({
                 </span>
                 <strong>{money(created.amount)}</strong>
               </div>
-              <p>Stato: contributo demo registrato</p>
+              <p>Status: demo contribution recorded</p>
               <code>{created.id}</code>
             </div>
             <button
@@ -316,11 +310,11 @@ export function DonationDialog({
                 onShowProfile();
               }}
             >
-              Segui il viaggio del tuo aiuto
+              Follow your contribution’s journey
               <ArrowRight size={18} />
             </button>
             <button className="subtle-button" onClick={onClose}>
-              Continua a esplorare
+              Keep exploring
             </button>
           </>
         ) : (
@@ -333,7 +327,7 @@ export function DonationDialog({
                 <Icon size={26} />
               </span>
               <span className="dialog-eyebrow">
-                {territory.name.toUpperCase()} · SCENARIO DEMO
+                {territory.name.toUpperCase()} · DEMO SCENARIO
               </span>
             </div>
             <DialogTitle>{cat.project}</DialogTitle>
@@ -343,14 +337,14 @@ export function DonationDialog({
               <span>
                 {cat.label} · {territory.countryName ?? territory.continent}
               </span>
-              <span className="mini-demo">Esempio</span>
+              <span className="mini-demo">Example</span>
             </div>
             <div className="amount-heading">
-              <h3>Ogni contributo è un inizio.</h3>
-              <span>Donazione singola</span>
+              <h3>Every contribution is a beginning.</h3>
+              <span>One-time donation</span>
             </div>
             <RadioGroup
-              aria-label="Importo della donazione di prova"
+              aria-label="Test donation amount"
               className="amount-options"
               value={amount}
               onValueChange={(v) => {
@@ -369,9 +363,9 @@ export function DonationDialog({
               ))}
             </RadioGroup>
             <label className="custom-amount">
-              <span>Un altro importo</span>
+              <span>Another amount</span>
               <input
-                aria-label="Importo personalizzato in euro"
+                aria-label="Custom amount in euros"
                 type="number"
                 min="1"
                 max="25000"
@@ -394,12 +388,12 @@ export function DonationDialog({
                   <strong>
                     {prediction.units > 0
                       ? `${prediction.units} ${prediction.unit}`
-                      : `Una quota per ${cat.unit}`}
+                      : `A contribution towards ${cat.unit}`}
                   </strong>
                   <p>
                     {prediction.units > 0
-                      ? `Stima illustrativa: ${money(cat.unitCost)} per kit. ${prediction.remainder > 0 ? `${money(prediction.remainder)} restano da assegnare.` : ''}`
-                      : `Il contributo coprirebbe il ${Math.round((numeric / cat.unitCost) * 100)}% di un kit da ${money(cat.unitCost)}.`}
+                      ? `Illustrative estimate: ${money(cat.unitCost)} per kit. ${prediction.remainder > 0 ? `${money(prediction.remainder)} remains unallocated.` : ''}`
+                      : `The contribution would cover ${Math.round((numeric / cat.unitCost) * 100)}% of a kit costing ${money(cat.unitCost)}.`}
                   </p>
                 </div>
               </div>
@@ -411,27 +405,27 @@ export function DonationDialog({
             )}
             <button className="primary-button wide" onClick={submit}>
               {profile
-                ? `Simula una donazione di ${validAmount(numeric) ? money(numeric) : '…'}`
-                : 'Crea un profilo per contribuire'}
+                ? `Simulate a donation of ${validAmount(numeric) ? money(numeric) : '…'}`
+                : 'Create a profile to contribute'}
               <ArrowUpRight size={18} />
             </button>
             <p className="payment-note">
               <ShieldCheck size={13} />
-              Modalità demo · Nessun pagamento reale
+              Demo mode · No real payments
             </p>
             <div className="official-channel">
               <div>
-                <strong>Vuoi aiutare davvero?</strong>
-                <p>Vai al canale ufficiale dell’organizzazione.</p>
+                <strong>Want to make a real contribution?</strong>
+                <p>Visit the organization’s official donation page.</p>
               </div>
               <a href={cat.url} target="_blank" rel="noopener noreferrer">
                 {cat.organization}
                 <ArrowUpRight size={16} />
               </a>
               <small>
-                Link generale esterno, senza affiliazione. Verifica le
-                destinazioni disponibili. Le donazioni esterne non sono
-                tracciate da questo prototipo.
+                General external link, with no affiliation. Check the available
+                destinations. External donations are not tracked by this
+                prototype.
               </small>
             </div>
           </>
@@ -456,18 +450,18 @@ export function DonationDocument({
   const prediction = estimate(donation.amount, donation.category);
   function download() {
     const text = [
-      'EARTHEALTH — DOCUMENTO DIMOSTRATIVO',
-      'Non è una ricevuta fiscale, un pagamento o una prova di consegna.',
+      'EARTHEALTH — DEMO REPORT',
+      'This is not a tax receipt, a payment, or proof of delivery.',
       `ID: ${donation.id}`,
-      `Profilo: @${username}`,
-      `Data: ${new Date(donation.createdAt).toLocaleString('it-IT')}`,
-      `Destinazione: ${donation.territoryName}`,
-      `Categoria: ${cat.label}`,
-      `Importo simulato: ${money(donation.amount)}`,
-      `Stato simulato: ${stages[donation.stage]}`,
-      `Modello illustrativo: ${money(donation.amount)} / ${money(prediction.unitCost)} = ${prediction.units} ${prediction.unit}; ${money(prediction.remainder)} non assegnati.`,
-      `Persone potenzialmente raggiunte (stima inventata): ${prediction.people}.`,
-      'Nessun bene è stato acquistato e nessun aiuto è stato realmente consegnato.',
+      `Profile: @${username}`,
+      `Date: ${new Date(donation.createdAt).toLocaleString('en-GB')}`,
+      `Destination: ${donation.territoryName}`,
+      `Category: ${cat.label}`,
+      `Simulated amount: ${money(donation.amount)}`,
+      `Simulated status: ${stages[donation.stage]}`,
+      `Illustrative model: ${money(donation.amount)} / ${money(prediction.unitCost)} = ${prediction.units} ${prediction.unit}; ${money(prediction.remainder)} unallocated.`,
+      `People potentially reached (fictional estimate): ${prediction.people}.`,
+      'No goods were purchased and no aid was actually delivered.',
     ].join('\n');
     const url = URL.createObjectURL(
       new Blob([text], { type: 'text/plain;charset=utf-8' }),
@@ -487,14 +481,14 @@ export function DonationDocument({
     >
       <DialogContent className="eh-dialog document-dialog">
         <span className="dialog-eyebrow">
-          IL VIAGGIO DEL TUO AIUTO · SIMULAZIONE
+          YOUR CONTRIBUTION’S JOURNEY · SIMULATION
         </span>
         <DialogTitle>
-          {money(donation.amount)}, verso {donation.territoryName}.
+          {money(donation.amount)}, towards {donation.territoryName}.
         </DialogTitle>
         <DialogDescription>
           {cat.label} ·{' '}
-          {new Date(donation.createdAt).toLocaleDateString('it-IT', {
+          {new Date(donation.createdAt).toLocaleDateString('en-GB', {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
@@ -509,10 +503,10 @@ export function DonationDocument({
                 <p>
                   {
                     [
-                      'Il contributo è salvato nel registro locale.',
-                      'Budget destinato al progetto dimostrativo.',
-                      'Rendiconto di esempio disponibile qui sotto.',
-                      'Consegna simulata; nessun aiuto reale.',
+                      'The contribution is saved in the local ledger.',
+                      'Budget allocated to the demo project.',
+                      'An example report is available below.',
+                      'Simulated delivery; no real aid.',
                     ][i]
                   }
                 </p>
@@ -524,8 +518,8 @@ export function DonationDocument({
           <div>
             <strong>
               {donation.stage >= 2
-                ? 'Acquisto simulato'
-                : 'Acquisto previsto nello scenario'}
+                ? 'Simulated purchase'
+                : 'Planned purchase in this scenario'}
             </strong>
             <span className="mini-demo">DEMO</span>
           </div>
@@ -534,44 +528,45 @@ export function DonationDocument({
             <span>{money(prediction.units * prediction.unitCost)}</span>
           </p>
           <p>
-            Budget ancora da assegnare<span>{money(prediction.remainder)}</span>
+            Budget still to be allocated
+            <span>{money(prediction.remainder)}</span>
           </p>
           <p className="breakdown-total">
-            Totale<span>{money(donation.amount)}</span>
+            Total<span>{money(donation.amount)}</span>
           </p>
         </div>
         <div className="impact-estimate">
           <UsersIcon />
           <div>
             <strong>
-              {number(prediction.people)} persone: stima illustrativa
+              {number(prediction.people)} people: illustrative estimate
             </strong>
             <p>
               {prediction.units} kit ×{' '}
               {prediction.units ? prediction.people / prediction.units : 0}{' '}
-              persone per kit. Ipotesi di esempio, non una misura di impatto
-              verificata.
+              people per kit. An illustrative assumption, not a verified measure
+              of impact.
             </p>
           </div>
         </div>
         {donation.stage < 3 ? (
           <button className="primary-button wide" onClick={onAdvance}>
-            Avanza al prossimo passo demo
+            Advance to the next demo step
             <ArrowRight size={17} />
           </button>
         ) : (
           <p className="document-complete">
             <CircleCheck size={18} />
-            Percorso dimostrativo completato
+            Demo journey completed
           </p>
         )}
         <button className="outline-button wide" onClick={download}>
           <Download size={16} />
-          Scarica il rendiconto demo
+          Download the demo report
         </button>
         <p className="fine-print">
-          Questo documento non è una ricevuta fiscale né una prova di consegna.
-          Nessuna organizzazione ha ricevuto denaro attraverso questo prototipo.
+          This document is neither a tax receipt nor proof of delivery. No
+          organization has received money through this prototype.
         </p>
       </DialogContent>
     </Dialog>

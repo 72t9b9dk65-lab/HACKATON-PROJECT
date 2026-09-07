@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'earthealth — L’aiuto, dove serve',
+  title: 'earthealth — Help where it is needed',
   description:
-    'Esplora i bisogni del pianeta, scegli una causa e segui il percorso del tuo aiuto. Prototipo con dati e donazioni dimostrativi.',
+    'Explore the planet’s needs, choose a cause, and follow your contribution’s journey. A prototype with demo data and simulated donations.',
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it">
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

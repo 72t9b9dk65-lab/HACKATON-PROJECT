@@ -22,7 +22,7 @@ import {
 } from '../lib/donation-model.ts';
 
 const profile = {
-  username: 'test_germoglio',
+  username: 'test_sprout',
   avatar: 2,
   createdAt: '2026-09-06T12:00:00.000Z',
 };
@@ -78,7 +78,7 @@ test('The illustrative cost model discloses unallocated remainder and never inve
     people: 8,
     remainder: 10,
     unitCost: 15,
-    unit: 'kit di filtrazione',
+    unit: 'water filtration kits',
   });
   assert.equal(estimate(2, 'water').units, 0);
   assert.equal(estimate(2, 'water').people, 0);
@@ -112,6 +112,50 @@ test('Local profile and ledger survive reload; duplicated, invalid or unrelated 
     ),
   );
 });
+test('Saved Italian destinations reload in English without losing donation history or totals', () => {
+  const destinations = [
+    ['Europe', 'Europa'],
+    ['North America', 'Nord America'],
+    ['South America', 'Sud America'],
+    ['380', 'Italia'],
+    ['milano', 'Milano'],
+  ];
+  const records = destinations.map(([id, oldName], index) => {
+    const territory = [...territories, ...cities, ...continents].find(
+      (t) => t.id === id,
+    );
+    const current = {
+      ...newDonation(territory, 'water', 30, `legacy-${index}`),
+      stage: 2,
+    };
+    const isContinent = continents.some((t) => t.id === id);
+    return {
+      current,
+      previous: {
+        ...current,
+        territoryId: isContinent ? oldName : id,
+        countryId: isContinent ? oldName : current.countryId,
+        territoryName: oldName,
+      },
+    };
+  });
+  const result = parseSavedState(
+    JSON.stringify({
+      version: 1,
+      profile,
+      donations: records.map((r) => r.previous),
+    }),
+  );
+  assert.deepEqual(result.profile, profile);
+  assert.deepEqual(
+    result.donations,
+    records.map((r) => r.current),
+  );
+  assert.equal(addedFunds(result.donations).Europe, 90);
+  assert.equal(addedFunds(result.donations)['North America'], 30);
+  assert.equal(addedFunds(result.donations)['South America'], 30);
+});
+
 test('Every geographic boundary has a unique key, metadata and a valid spherical polygon', () => {
   const world = JSON.parse(
     fs.readFileSync(new URL('../public/data/world.json', import.meta.url)),

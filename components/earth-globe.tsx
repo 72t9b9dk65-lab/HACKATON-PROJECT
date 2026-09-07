@@ -116,7 +116,7 @@ export default function EarthGlobe({
                 territories.find((t) => t.id === id) ?? {
                   id,
                   name: meta[id]?.name ?? f.properties.name,
-                  continent: meta[id]?.continent ?? 'Mondo',
+                  continent: meta[id]?.continent ?? 'World',
                   coordinates:
                     meta[id]?.coords ?? (geoCentroid(f) as [number, number]),
                   score: -1,
@@ -170,7 +170,7 @@ export default function EarthGlobe({
       territories.find((t) => t.id === id) ?? {
         id,
         name: world?.meta[id]?.name ?? f.properties.name,
-        continent: world?.meta[id]?.continent ?? 'Mondo',
+        continent: world?.meta[id]?.continent ?? 'World',
         coordinates:
           world?.meta[id]?.coords ?? (geoCentroid(f) as [number, number]),
         score: -1,
@@ -212,17 +212,17 @@ export default function EarthGlobe({
       {!world && !error && (
         <div className="map-loading">
           <LoaderCircle className="spin" size={28} />
-          <span>Il mondo prende forma.</span>
+          <span>The world is taking shape.</span>
         </div>
       )}
       {error && (
         <div className="map-loading">
-          <p>La mappa non si è caricata.</p>
+          <p>The map could not be loaded.</p>
           <button
             className="light-button"
             onClick={() => setRetry((v) => v + 1)}
           >
-            Riprova
+            Retry
           </button>
         </div>
       )}
@@ -231,7 +231,7 @@ export default function EarthGlobe({
         viewBox="0 0 840 760"
         className="globe-svg"
         role="group"
-        aria-label="Globo interattivo. Trascina per ruotare, usa più e meno per lo zoom. I territori si possono cercare anche dal pulsante Cerca."
+        aria-label="Interactive globe. Drag to rotate; use plus and minus to zoom. You can also find territories using the Search button."
         tabIndex={0}
         onKeyDown={(e) => {
           if (
@@ -392,7 +392,7 @@ export default function EarthGlobe({
                     className="country-path"
                     onClick={() => pick(continents.find((t) => t.id === c.id)!)}
                   >
-                    <title>{c.id} — dati dimostrativi</title>
+                    <title>{c.id} — demo data</title>
                   </path>
                 ))}
               </>
@@ -416,8 +416,8 @@ export default function EarthGlobe({
                     <title>
                       {t.name} —{' '}
                       {t.score < 0
-                        ? 'dati non disponibili'
-                        : `indice dimostrativo ${t.score}/100`}
+                        ? 'data unavailable'
+                        : `demo index ${t.score}/100`}
                     </title>
                   </path>
                 );
@@ -447,7 +447,8 @@ export default function EarthGlobe({
                     className="country-path"
                   >
                     <title>
-                      {c.name} — area progetto indicativa, non confine comunale
+                      {c.name} — approximate project area, not a municipal
+                      boundary
                     </title>
                   </path>
                 ))}
@@ -474,7 +475,7 @@ export default function EarthGlobe({
                     className={`map-pin ${active ? 'selected' : ''}`}
                     role="button"
                     tabIndex={0}
-                    aria-label={`${t.name}, ${mode === 'needs' ? 'vedi necessità' : 'vedi aiuti'}`}
+                    aria-label={`${t.name}, ${mode === 'needs' ? 'view needs' : 'view aid'}`}
                     onPointerDown={(e) => e.stopPropagation()}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -536,7 +537,7 @@ export default function EarthGlobe({
                       <g
                         transform="translate(47,-20)"
                         role="button"
-                        aria-label={`Acqua potabile in ${t.name}`}
+                        aria-label={`Clean water in ${t.name}`}
                         tabIndex={0}
                         onClick={(e) => {
                           e.stopPropagation();

@@ -121,7 +121,7 @@ export default function EarthHealth() {
       donationsRef.current = state.donations;
     } catch {
       setStorageWarning(
-        'Non è stato possibile leggere il profilo locale. Puoi creare un nuovo profilo demo.',
+        'Unable to read your local profile. You can create a new demo profile.',
       );
     }
   }, []);
@@ -134,7 +134,7 @@ export default function EarthHealth() {
       setStorageWarning('');
     } catch {
       setStorageWarning(
-        'Il browser non consente il salvataggio locale. Il profilo e le donazioni resteranno disponibili solo fino alla chiusura della pagina.',
+        'Your browser does not allow local storage. Your profile and donations will only remain available until you close the page.',
       );
     }
   }
@@ -145,7 +145,7 @@ export default function EarthHealth() {
   }
   function recordDonation(amount: number) {
     if (!profileRef.current || !detail)
-      throw Error('Crea prima il tuo profilo anonimo.');
+      throw Error('Create your anonymous profile first.');
     const d = newDonation(
       selected,
       detail,
@@ -255,7 +255,7 @@ export default function EarthHealth() {
           {
             name: 'navigate_earthhealth_territory',
             description:
-              'Apri sul globo un territorio demo e mostra i suoi bisogni. Non crea profili né donazioni.',
+              'Open a demo territory on the globe and show its needs. Does not create profiles or donations.',
             inputSchema: {
               type: 'object',
               properties: {
@@ -275,11 +275,11 @@ export default function EarthHealth() {
                 !('territoryId' in input) ||
                 Object.keys(input).some((k) => k !== 'territoryId')
               )
-                throw Error('territoryId richiesto.');
+                throw Error('territoryId is required.');
               const t = allTerritories.find(
                 (t) => t.id === (input as { territoryId: unknown }).territoryId,
               );
-              if (!t) throw Error('Territorio demo non disponibile.');
+              if (!t) throw Error('Demo territory is unavailable.');
               flushSync(() => {
                 setPage('explore');
                 setMode('needs');
@@ -315,7 +315,7 @@ export default function EarthHealth() {
         <button
           className="brand"
           onClick={explore}
-          aria-label="earthealth, vai al globo"
+          aria-label="earthealth, go to the globe"
         >
           <span className="brand-mark">
             <Globe2 size={24} />
@@ -333,11 +333,11 @@ export default function EarthHealth() {
           <TabsList variant="line">
             <TabsTrigger value="explore">
               <Globe2 />
-              Esplora il mondo
+              Explore the world
             </TabsTrigger>
             <TabsTrigger value="profile">
               <Heart />
-              Il mio impatto
+              My impact
             </TabsTrigger>
             <TabsTrigger value="community">
               <Users />
@@ -348,7 +348,7 @@ export default function EarthHealth() {
         <div className="header-actions">
           <button
             className="icon-button help"
-            aria-label="Come funziona earthealth"
+            aria-label="How earthealth works"
             onClick={() => setInfo(true)}
           >
             <CircleHelp size={20} />
@@ -361,7 +361,7 @@ export default function EarthHealth() {
           >
             {profile ? <Avatar index={profile.avatar} size={24} /> : null}
             <span>
-              {profile ? '@' + profile.username : 'Crea il tuo profilo'}
+              {profile ? '@' + profile.username : 'Create your profile'}
             </span>
             {profile ? null : <ArrowUpRight size={17} />}
           </button>
@@ -371,27 +371,27 @@ export default function EarthHealth() {
         <div className="page-heading">
           <div>
             <div className="eyebrow">
-              <span className="tiny-star">✳</span> UN PIANETA, UNA COMMUNITY
+              <span className="tiny-star">✳</span> ONE PLANET, ONE COMMUNITY
             </div>
             <h1>
               {page === 'profile'
-                ? 'Il tuo gesto, la sua storia'
+                ? 'Your contribution, its story'
                 : page === 'community'
-                  ? 'Il bene si moltiplica'
-                  : 'L’aiuto, dove serve'}
+                  ? 'Kindness multiplies'
+                  : 'Help where it is needed'}
               <span>.</span>
             </h1>
             <p>
               {page === 'profile'
-                ? 'Segui ogni passo del tuo aiuto.'
+                ? 'Follow every step of your contribution.'
                 : page === 'community'
-                  ? 'Tanti nomi diversi. Un solo pianeta da aiutare.'
-                  : 'Esplora il mondo. Scegli una causa. Fai la differenza.'}
+                  ? 'Many different names. One planet to help.'
+                  : 'Explore the world. Choose a cause. Make a difference.'}
             </p>
           </div>
           <button className="demo-badge" onClick={() => setInfo(true)}>
             <span />
-            Prototipo · Dati dimostrativi
+            Prototype · Demo data
             <Info size={14} />
           </button>
         </div>
@@ -420,7 +420,7 @@ export default function EarthHealth() {
         )}
         <div hidden={page === 'profile'}>
           <div className={`explorer ${expanded ? 'expanded' : ''}`}>
-            <section className="map-stage" aria-label="Esplora i territori">
+            <section className="map-stage" aria-label="Explore territories">
               <div className="map-topbar">
                 <Tabs
                   value={mode}
@@ -434,11 +434,11 @@ export default function EarthHealth() {
                   <TabsList>
                     <TabsTrigger value="needs">
                       <Globe2 />
-                      Mappa dei bisogni
+                      Map of needs
                     </TabsTrigger>
                     <TabsTrigger value="impact">
                       <Heart />
-                      Gli aiuti nel mondo
+                      Aid around the world
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
@@ -447,20 +447,20 @@ export default function EarthHealth() {
                   onClick={() => setSearchOpen(true)}
                 >
                   <Search size={17} />
-                  <span>Cerca un luogo</span>
+                  <span>Search for a place</span>
                   <span className="search-shortcut">⌕</span>
                 </button>
               </div>
-              <div className="category-rail" aria-label="Filtra le categorie">
+              <div className="category-rail" aria-label="Filter categories">
                 <span className="rail-label">
-                  {mode === 'needs' ? 'BISOGNI' : 'AIUTI'}
+                  {mode === 'needs' ? 'NEEDS' : 'AID'}
                 </span>
                 <button
                   aria-pressed={category === 'all'}
                   className={category === 'all' ? 'active' : ''}
                   onClick={() => setCategory('all')}
-                  title="Tutti i bisogni"
-                  aria-label="Tutti i bisogni"
+                  title="All needs"
+                  aria-label="All needs"
                 >
                   <Layers3 size={20} />
                 </button>
@@ -483,12 +483,12 @@ export default function EarthHealth() {
               <div className="map-context">
                 <span className="live-dot" />
                 {level === 'cities'
-                  ? 'Città demo · Aree di progetto indicative'
+                  ? 'Demo cities · Approximate project areas'
                   : category !== 'all'
                     ? categories.find((c) => c.id === category)?.label
                     : mode === 'needs'
-                      ? 'Ogni bisogno conta.'
-                      : 'Ogni aiuto lascia una traccia.'}
+                      ? 'Every need matters.'
+                      : 'Every contribution leaves a trace.'}
               </div>
               <EarthGlobe
                 mode={mode}
@@ -509,11 +509,9 @@ export default function EarthHealth() {
               <div className="map-bottom">
                 <div className="map-legend">
                   <div className="legend-title">
-                    {mode === 'needs'
-                      ? 'LIVELLO DI NECESSITÀ'
-                      : 'OBIETTIVO SOSTENUTO'}
+                    {mode === 'needs' ? 'LEVEL OF NEED' : 'FUNDING PROGRESS'}
                     <button
-                      aria-label="Informazioni sulla scala"
+                      aria-label="About the scale"
                       onClick={() => setInfo(true)}
                     >
                       <Info size={13} />
@@ -523,31 +521,31 @@ export default function EarthHealth() {
                     className={`legend-gradient ${mode === 'impact' ? 'impact-gradient' : ''}`}
                   />
                   <div className="legend-labels">
-                    <span>{mode === 'needs' ? 'Critico' : '0%'}</span>
-                    <span>{mode === 'needs' ? 'Contenuto' : '100%+'}</span>
+                    <span>{mode === 'needs' ? 'Critical' : '0%'}</span>
+                    <span>{mode === 'needs' ? 'Low' : '100%+'}</span>
                   </div>
                   <div className="no-data">
                     <i />
-                    Dati non disponibili
+                    Data unavailable
                   </div>
                 </div>
                 <div className="map-controls">
                   <button
-                    aria-label={expanded ? 'Riduci mappa' : 'Espandi mappa'}
+                    aria-label={expanded ? 'Collapse map' : 'Expand map'}
                     onClick={() => setExpanded(!expanded)}
                   >
                     {expanded ? <X size={18} /> : <Maximize2 size={18} />}
                   </button>
                   <div>
                     <button
-                      aria-label="Aumenta zoom"
+                      aria-label="Zoom in"
                       disabled={zoom >= 22}
                       onClick={() => changeZoom(Math.min(22, zoom * 1.45))}
                     >
                       <Plus size={20} />
                     </button>
                     <button
-                      aria-label="Diminuisci zoom"
+                      aria-label="Zoom out"
                       disabled={zoom <= 0.82}
                       onClick={() => changeZoom(Math.max(0.82, zoom / 1.45))}
                     >
@@ -555,7 +553,7 @@ export default function EarthHealth() {
                     </button>
                   </div>
                   <button
-                    aria-label="Ripristina vista del globo"
+                    aria-label="Reset globe view"
                     onClick={() => {
                       setZoom(1.02);
                       setLevel('countries');
@@ -569,9 +567,9 @@ export default function EarthHealth() {
               <div className="map-bottomline">
                 <span>
                   <Move size={13} />
-                  Trascina per esplorare · Scorri per zoomare
+                  Drag to explore · Scroll to zoom
                 </span>
-                <span>GEOGRAFIA NATURAL EARTH</span>
+                <span>NATURAL EARTH GEOGRAPHY</span>
               </div>
             </section>
             {page === 'community' ? (
@@ -602,10 +600,10 @@ export default function EarthHealth() {
                   <div>
                     <span className="overline">
                       {selected.countryId
-                        ? 'VICINO ALLE PERSONE'
+                        ? 'CLOSE TO PEOPLE'
                         : continents.some((c) => c.id === selected.id)
-                          ? 'UNO SGUARDO AL CONTINENTE'
-                          : 'UN TERRITORIO, TANTE STORIE'}
+                          ? 'A LOOK AT THE CONTINENT'
+                          : 'ONE TERRITORY, MANY STORIES'}
                     </span>
                     <h2>{selected.name}</h2>
                   </div>
@@ -625,21 +623,21 @@ export default function EarthHealth() {
                         }
                       >
                         <span />
-                        {needLabel(selected.score)} priorità
+                        {needLabel(selected.score)} priority
                       </span>
-                      <span className="data-caption">Scenario demo</span>
+                      <span className="data-caption">Demo scenario</span>
                     </div>
                     <p className="territory-description">
-                      Ogni persona merita acqua, cibo, cure e un luogo sicuro.
-                      Scopri dove il tuo aiuto può arrivare.
+                      Everyone deserves water, food, healthcare, and a safe
+                      place. Discover where your contribution can reach.
                     </p>
                     <div className="needs-header">
                       <h3>
                         {mode === 'needs'
-                          ? 'Di cosa c’è bisogno'
-                          : 'Come si distribuiscono gli aiuti'}
+                          ? 'What is needed'
+                          : 'How aid is distributed'}
                       </h3>
-                      <span>5 categorie</span>
+                      <span>5 categories</span>
                     </div>
                     <div className="need-list">
                       {categories.map((c) => {
@@ -688,14 +686,14 @@ export default function EarthHealth() {
                     </div>
                     <div className="funding-card">
                       <div className="funding-label">
-                        <span>Insieme, fin qui</span>
+                        <span>Together, so far</span>
                         <HandHeart size={17} />
                       </div>
                       <div className="funding-value">
                         {money(
                           selected.raised + (extraRaised[selected.id] ?? 0),
                         )}
-                        <span> su {money(selected.goal)}</span>
+                        <span> of {money(selected.goal)}</span>
                       </div>
                       <Progress
                         value={Math.min(
@@ -704,7 +702,7 @@ export default function EarthHealth() {
                             selected.goal) *
                             100,
                         )}
-                        aria-label="Percentuale obiettivo raccolta dimostrativa"
+                        aria-label="Percentage of demo fundraising goal"
                       />
                       <div className="funding-foot">
                         <span>
@@ -714,9 +712,9 @@ export default function EarthHealth() {
                               selected.goal) *
                               100,
                           )}
-                          % dell’obiettivo demo
+                          % of the demo goal
                         </span>
-                        <span>Ogni gesto conta</span>
+                        <span>Every contribution counts</span>
                       </div>
                     </div>
                     <button
@@ -726,19 +724,19 @@ export default function EarthHealth() {
                       }
                     >
                       <Heart size={18} />
-                      Porta il tuo aiuto qui
+                      Bring your help here
                       <ArrowUpRight size={19} />
                     </button>
                     <div className="trust-line">
                       <ShieldCheck size={13} />
-                      Anonimo per gli altri. Visibile nell’impatto.
+                      Anonymous to others. Visible through your impact.
                     </div>
                     {cityOptions.length > 0 && (
                       <button
                         className="explore-cities"
                         onClick={() => navigate(cityOptions[0])}
                       >
-                        Esplora le città di{' '}
+                        Explore cities in{' '}
                         {selected.countryName ?? selected.name}
                         <ArrowRight size={15} />
                       </button>
@@ -747,45 +745,44 @@ export default function EarthHealth() {
                 ) : (
                   <div className="no-territory-data">
                     <Globe2 size={36} />
-                    <h3>Questo luogo merita attenzione.</h3>
+                    <h3>This place deserves attention.</h3>
                     <p>
-                      Non abbiamo ancora inserito uno scenario dimostrativo per{' '}
-                      {selected.name}. Il bianco indica dati mancanti, non
-                      assenza di bisogni.
+                      We have not added a demo scenario for {selected.name}.
+                      White indicates missing data, not an absence of need.
                     </p>
                     <button
                       className="primary-button"
                       onClick={() => navigate(territories[0])}
                     >
-                      Esplora un territorio demo
+                      Explore a demo territory
                       <ArrowRight size={17} />
                     </button>
                   </div>
                 )}
                 <button className="panel-source" onClick={() => setInfo(true)}>
                   <Info size={13} />
-                  Da dove arrivano questi dati?
+                  Where does this data come from?
                 </button>
               </aside>
             )}
           </div>
           <div className="explorer-footer">
             <div className="level-select">
-              <span>Esplora per</span>
+              <span>Explore by</span>
               <Tabs
                 value={level}
                 onValueChange={(v) => changeLevel(v as MapLevel)}
               >
                 <TabsList>
-                  <TabsTrigger value="continents">Continenti</TabsTrigger>
-                  <TabsTrigger value="countries">Nazioni</TabsTrigger>
-                  <TabsTrigger value="cities">Città</TabsTrigger>
+                  <TabsTrigger value="continents">Continents</TabsTrigger>
+                  <TabsTrigger value="countries">Countries</TabsTrigger>
+                  <TabsTrigger value="cities">Cities</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
             <span className="footer-note">
               <ShieldCheck size={15} />
-              Il bene si vede. Ogni passo è documentato.
+              Kindness is visible. Every step is documented.
             </span>
           </div>
           <section className="collective-impact">
@@ -794,8 +791,8 @@ export default function EarthHealth() {
                 <Sprout size={23} />
               </span>
               <div>
-                <h3>Piccoli gesti. Impatto collettivo.</h3>
-                <p>Una community che accorcia le distanze.</p>
+                <h3>Small acts. Collective impact.</h3>
+                <p>A community bringing people closer.</p>
               </div>
             </div>
             <div className="impact-stat">
@@ -804,23 +801,23 @@ export default function EarthHealth() {
                   territories.reduce((s, t) => s + t.raised, 0) + totalDonated,
                 )}
               </strong>
-              <span>aiuti simulati nel mondo</span>
+              <span>simulated aid worldwide</span>
             </div>
             <div className="impact-stat">
               <strong>
                 {profile ? 7 : 6}
-                {!profile && <span>+ te</span>}
+                {!profile && <span>+ you</span>}
               </strong>
-              <span>donatori nella community demo</span>
+              <span>donors in the demo community</span>
             </div>
             <div className="impact-stat">
               <strong>{territories.length}</strong>
-              <span>territori con scenari demo</span>
+              <span>territories with demo scenarios</span>
             </div>
             <button
               className="circle-arrow"
               onClick={() => setMode('impact')}
-              aria-label="Esplora la mappa degli aiuti"
+              aria-label="Explore the aid map"
             >
               <ArrowUpRight size={23} />
             </button>
@@ -828,39 +825,40 @@ export default function EarthHealth() {
         </div>
         <footer className="site-footer">
           <span>© 2026 earthealth</span>
-          <span>Un mondo migliore comincia da un gesto.</span>
+          <span>A better world starts with an act of kindness.</span>
           <button onClick={() => setInfo(true)}>
-            Trasparenza e metodologia
+            Transparency and methodology
             <ArrowUpRight size={13} />
           </button>
         </footer>
       </main>
       <Dialog open={info} onOpenChange={setInfo}>
         <DialogContent className="eh-dialog">
-          <DialogTitle>Un prototipo, con trasparenza.</DialogTitle>
+          <DialogTitle>A transparent prototype.</DialogTitle>
           <DialogDescription>
-            earthealth collega le persone ai bisogni del mondo. Questa è una
-            prima esperienza dimostrativa.
+            earthealth connects people with needs around the world. This is an
+            early demonstration.
           </DialogDescription>
           <div className="info-block">
-            <h3>Dati di esempio</h3>
+            <h3>Example data</h3>
             <p>
-              Punteggi, raccolte, classifica e impatto sono inventati per
-              esplorare l’interfaccia. La classifica mostra sei profili di
-              esempio più il tuo profilo locale; non è una community online. Non
-              rappresentano valutazioni reali né aggiornamenti umanitari.
+              Scores, fundraising totals, rankings, and impact are fictional
+              examples for exploring the interface. The leaderboard shows six
+              sample profiles plus your local profile; this is not an online
+              community. These figures do not represent real assessments or
+              humanitarian updates.
             </p>
-            <h3>Come leggere il globo</h3>
+            <h3>How to read the globe</h3>
             <p>
-              Indice sintetico 0–100: rosso scuro 85–100, arancio 70–84, sabbia
-              50–69, verde 30–49, blu 0–29. La vista Aiuti indica la quota
-              dell’obiettivo demo sostenuta. Bianco: dati non disponibili. I
-              continenti aggregano soltanto i paesi demo; le aree cittadine sono
-              indicative, non confini comunali.
+              Synthetic index from 0–100: dark red 85–100, orange 70–84, sand
+              50–69, green 30–49, blue 0–29. The Aid view shows the funded share
+              of the demo goal. White means data is unavailable. Continents
+              aggregate demo countries only; city areas are approximate project
+              areas, not municipal boundaries.
             </p>
-            <h3>Geografia e canali ufficiali</h3>
+            <h3>Geography and official channels</h3>
             <p>
-              Confini da{' '}
+              Boundaries from{' '}
               <a
                 href="https://github.com/topojson/world-atlas"
                 target="_blank"
@@ -868,8 +866,8 @@ export default function EarthHealth() {
               >
                 Natural Earth / World Atlas
               </a>
-              . I canali esterni sono siti ufficiali delle organizzazioni, senza
-              partnership o tracciamento automatico da parte di earthealth.
+              . External links lead to official organization websites, with no
+              partnership or automatic tracking by earthealth.
             </p>
           </div>
         </DialogContent>
@@ -908,15 +906,17 @@ export default function EarthHealth() {
         <DialogContent className="eh-dialog">
           {impactSelected && (
             <>
-              <span className="dialog-eyebrow">GLI AIUTI NEL MONDO · DEMO</span>
+              <span className="dialog-eyebrow">
+                AID AROUND THE WORLD · DEMO
+              </span>
               <DialogTitle>
-                {impactSelected.name}: ogni gesto si somma.
+                {impactSelected.name}: every contribution adds up.
               </DialogTitle>
               <DialogDescription>
                 {money(
                   impactSelected.raised + (extraRaised[impactSelected.id] ?? 0),
                 )}{' '}
-                di contributi dimostrativi, su un obiettivo di{' '}
+                in demo contributions, towards a goal of{' '}
                 {money(impactSelected.goal)}.
               </DialogDescription>
               <div className="impact-distribution">
@@ -948,7 +948,7 @@ export default function EarthHealth() {
                                 (extraRaised[impactSelected.id] ?? 0))) *
                             100
                           }
-                          aria-label={`Quota demo ${c.label}`}
+                          aria-label={`Demo share ${c.label}`}
                         />
                       </div>
                       <b>{money(funds)}</b>
@@ -958,8 +958,8 @@ export default function EarthHealth() {
                 })}
               </div>
               <p className="fine-print">
-                La ripartizione è illustrativa. Le tue donazioni simulate si
-                aggiungono alla categoria e al territorio scelti.
+                The allocation is illustrative. Your simulated donations are
+                added to the selected category and territory.
               </p>
             </>
           )}
@@ -967,19 +967,19 @@ export default function EarthHealth() {
       </Dialog>
       <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
         <DialogContent className="eh-dialog search-dialog">
-          <DialogTitle>Dove vuoi portare il tuo aiuto?</DialogTitle>
+          <DialogTitle>Where would you like to help?</DialogTitle>
           <DialogDescription>
-            Cerca un continente, una nazione o una città dimostrativa.
+            Search for a continent, country, or demo city.
           </DialogDescription>
           <Command shouldFilter={false} className="place-command">
             <CommandInput
-              placeholder="Cerca un luogo…"
+              placeholder="Search for a place…"
               value={query}
               onValueChange={setQuery}
             />
             <CommandList>
               <CommandEmpty>
-                Nessun luogo trovato. Prova una nazione o una città demo.
+                No places found. Try a country or a demo city.
               </CommandEmpty>
               {searchResults.map((t) => (
                 <CommandItem
@@ -992,7 +992,7 @@ export default function EarthHealth() {
                     {t.name}
                     <small>
                       {t.countryName ?? t.continent}
-                      {t.score < 0 ? ' · senza dati demo' : ''}
+                      {t.score < 0 ? ' · no demo data' : ''}
                     </small>
                   </span>
                   <ChevronRight size={17} />
