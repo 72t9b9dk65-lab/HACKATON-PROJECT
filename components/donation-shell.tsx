@@ -6,7 +6,6 @@ import {
   Camera,
   Check,
   LocateFixed,
-  MapPin,
   Minus,
   Plus,
 } from 'lucide-react';
@@ -19,13 +18,15 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from '@/components/ui/carousel';
 import {
   careAllocation,
   careKinds,
   DEMO_GIFT_ORE,
   exampleGifts,
-  giftsForDog,
+  fundingSummary,
+  SHARED_CARE_ID,
   kronor,
   profileDogs,
   readDemoGifts,
@@ -36,6 +37,7 @@ import { MAX_SWEDEN_ZOOM } from '@/lib/sweden-map';
 
 export default function DonationShell() {
   const [selectedId, setSelectedId] = useState('ake');
+  const [dogsCarousel, setDogsCarousel] = useState<CarouselApi>();
   const [gifts, setGifts] = useState<DemoGift[]>(exampleGifts);
   const [ready, setReady] = useState(false);
   const [sessionOnly, setSessionOnly] = useState(false);
@@ -66,16 +68,22 @@ export default function DonationShell() {
   }, [gifts, ready]);
 
   const dog = profileDogs.find((item) => item.id === selectedId)!;
-  const amountOre = giftsForDog(gifts, dog.id);
-  const allocation = careAllocation(amountOre);
-  const myGifts = gifts.filter(
-    (gift) => gift.dogId === dog.id && gift.id !== 'example',
-  );
+  const funding = fundingSummary(gifts);
+  const { amountOre, allocation } = funding;
+  const myGifts = gifts.filter((gift) => gift.id !== 'example');
   const latestGift = myGifts.at(-1);
+  const helpedDogs = profileDogs.filter(
+    (item) => funding.byDog[item.id].amountOre > 0,
+  );
   const markers = profileDogs.map((item) => ({
     ...item,
-    amountOre: giftsForDog(gifts, item.id),
+    ...funding.byDog[item.id],
   }));
+
+  useEffect(() => {
+    const index = helpedDogs.findIndex((item) => item.id === selectedId);
+    if (index >= 0) dogsCarousel?.scrollTo(index);
+  }, [selectedId, dogsCarousel, helpedDogs.map((item) => item.id).join(',')]);
 
   function selectDog(id: string) {
     setSelectedId(id);
@@ -86,13 +94,13 @@ export default function DonationShell() {
     if (!ready || gifts.length >= 1000) return;
     const gift = {
       id: crypto.randomUUID(),
-      dogId: dog.id,
+      dogId: SHARED_CARE_ID,
       amountOre: DEMO_GIFT_ORE,
       createdAt: new Date().toISOString(),
     };
     setGifts((current) => [...current, gift]);
     setNotice(
-      `250 SEK added for ${dog.name} · 125 food, 75 vet care, 50 daily care. Demo only.`,
+      '250 SEK added to shared care for the dogs.',
     );
     setCelebrate(true);
     if (timer.current) clearTimeout(timer.current);
@@ -117,11 +125,156 @@ export default function DonationShell() {
 
       <main className="donation-workspace">
         <section className="donation-main" aria-label="Map and donation">
+          <aside
+            className="donation-panel donation-panel-total"
+            aria-label="Your giving"
+          >
+            <div className="donation-balance">
+              <div className="donation-balance-label">
+                <h1>Your total donated</h1>
+                <span className="donation-demo-label">DEMO</span>
+              </div>
+              <div
+                className={`donation-value ${celebrate ? 'donation-value-pop' : ''}`}
+              >
+                <strong>{kronor(amountOre)}</strong>
+                <span>SEK</span>
+                {celebrate && (
+                  <span className="donation-float">
+                    +250 <PixelCareIcon kind="heart" width="18" height="18" />
+                  </span>
+                )}
+              </div>
+              <div className="donation-allocation-bar" aria-hidden="true">
+                {careKinds.map((kind) => (
+                  <span
+                    key={kind.id}
+                    style={{
+                      width: `${kind.share}%`,
+                      background: kind.color,
+                      opacity: amountOre ? 1 : 0.22,
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="donation-breakdown">
+                {careKinds.map((kind) => (
+                  <div
+                    key={kind.id}
+                    className={`donation-care donation-care-${kind.id}`}
+                  >
+                    <PixelCareIcon kind={kind.id} width="36" height="36" />
+                    <strong>
+                      {kronor(allocation[kind.id])}
+                      <small> SEK</small>
+                    </strong>
+                    <span>{kind.label}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="donation-allocation-note">
+                Illustrative split · food 50% / vet 30% / daily care 20%
+              </p>
+            </div>
+
+            <Carousel
+              setApi={setDogsCarousel}
+              opts={{ align: 'start', containScroll: 'trimSnaps' }}
+              className="donation-helped-carousel"
+              aria-label="Dogs helped through shared care"
+            >
+              <div className="donation-helped-heading">
+                <h2>Dogs you’re helping</h2>
+                <div className="donation-carousel-controls">
+                  <CarouselPrevious aria-label="Previous helped dog" />
+                  <CarouselNext aria-label="Next helped dog" />
+                </div>
+              </div>
+              {helpedDogs.length ? (
+                <CarouselContent className="donation-helped-track">
+                  {helpedDogs.map((item) => (
+                    <CarouselItem
+                      key={item.id}
+                      className="donation-helped-item"
+                    >
+                      <button
+                        className="donation-helped-dog"
+                        aria-pressed={item.id === dog.id}
+                        aria-label={`Follow ${item.name}’s journey`}
+                        onClick={() => selectDog(item.id)}
+                      >
+                        <span className="donation-sprite-frame">
+                          <img
+                            src={item.sprite}
+                            alt={item.spriteDescription}
+                            width="160"
+                            height="160"
+                            draggable="false"
+                          />
+                        </span>
+                        <strong>{item.name}</strong>
+                        <span>{item.location}</span>
+                      </button>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              ) : (
+                <p className="donation-helped-empty">
+                  Your first donation will start a shared care trail.
+                </p>
+              )}
+              <p className="donation-helped-note">
+                One donation, shared care. Illustrated avatars · demo
+                beneficiaries.
+              </p>
+            </Carousel>
+
+            <Button
+              className="donation-primary"
+              onClick={donate}
+              disabled={!ready || gifts.length >= 1000}
+            >
+              <PixelCareIcon kind="heart" width="23" height="23" /> Donate 250
+              SEK <span>↗</span>
+            </Button>
+            <p className="donation-payment-note">
+              Try it out. No payment is taken.
+            </p>
+            <div className="donation-receipt" aria-live="polite" role="status">
+              {notice ? (
+                <>
+                  <Check size={17} />
+                  <span>{notice}</span>
+                </>
+              ) : (
+                <>
+                  <span className="donation-status-dot" />
+                  <span>
+                    {amountOre
+                      ? `${kronor(amountOre)} SEK supporting ${helpedDogs.length} dogs through shared care`
+                      : 'Your first gift starts a shared care trail'}
+                  </span>
+                </>
+              )}
+            </div>
+            <div className="donation-ledger-meta">
+              <span>
+                {latestGift
+                  ? `${myGifts.length} demo ${myGifts.length === 1 ? 'gift' : 'gifts'}${gifts.some((gift) => gift.id === 'example') ? ' + 500 SEK example' : ''}`
+                  : amountOre
+                    ? '500 SEK example included'
+                    : 'No demo gifts yet'}
+              </span>
+              <span>
+                {sessionOnly ? 'This session only' : 'Saved on this device'}
+              </span>
+            </div>
+          </aside>
           <div className="donation-map">
             <div className="donation-map-heading">
               <span className="donation-eyebrow">A SECOND CHANCE, MAPPED</span>
-              <h1>Small gifts. Real dogs.</h1>
-              <p>Pick a dog. Follow the care.</p>
+              <h2>Your kindness, across Sweden.</h2>
+              <p>Follow the dogs your giving helps.</p>
             </div>
             <SwedenMap
               selectedId={dog.shelterId}
@@ -186,123 +339,6 @@ export default function DonationShell() {
               Geography: Natural Earth
             </a>
           </div>
-
-          <aside className="donation-panel" aria-label={`Support ${dog.name}`}>
-            <div className="donation-dog-intro">
-              <img
-                src={dog.photos[0].src}
-                alt={`${dog.name}, photographed by Hundstallet`}
-                width="84"
-                height="84"
-              />
-              <div>
-                <span className="donation-eyebrow">YOU’RE HERE FOR</span>
-                <h2>{dog.name}</h2>
-                <p>
-                  <MapPin size={14} />
-                  {dog.location} <span>· {dog.age}</span>
-                </p>
-              </div>
-            </div>
-            <p className="donation-dog-description">{dog.description}</p>
-            <a
-              className="donation-profile-link"
-              href={dog.source}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Meet {dog.name} on Hundstallet <ArrowUpRight size={15} />
-            </a>
-
-            <div className="donation-balance">
-              <div className="donation-balance-label">
-                <span>Your support for {dog.name}</span>
-                <span className="donation-demo-label">DEMO</span>
-              </div>
-              <div
-                className={`donation-value ${celebrate ? 'donation-value-pop' : ''}`}
-              >
-                <strong>{kronor(amountOre)}</strong>
-                <span>SEK</span>
-                {celebrate && (
-                  <span className="donation-float">
-                    +250 <PixelCareIcon kind="heart" width="18" height="18" />
-                  </span>
-                )}
-              </div>
-              <div className="donation-allocation-bar" aria-hidden="true">
-                {careKinds.map((kind) => (
-                  <span
-                    key={kind.id}
-                    style={{
-                      width: `${kind.share}%`,
-                      background: kind.color,
-                      opacity: amountOre ? 1 : 0.22,
-                    }}
-                  />
-                ))}
-              </div>
-              <div className="donation-breakdown">
-                {careKinds.map((kind) => (
-                  <div
-                    key={kind.id}
-                    className={`donation-care donation-care-${kind.id}`}
-                  >
-                    <PixelCareIcon kind={kind.id} width="36" height="36" />
-                    <strong>
-                      {kronor(allocation[kind.id])}
-                      <small> SEK</small>
-                    </strong>
-                    <span>{kind.id === 'food' ? dog.food : kind.label}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="donation-allocation-note">
-                Illustrative split · food 50% / vet 30% / daily care 20%
-              </p>
-            </div>
-
-            <Button
-              className="donation-primary"
-              onClick={donate}
-              disabled={!ready || gifts.length >= 1000}
-            >
-              <PixelCareIcon kind="heart" width="23" height="23" /> Donate 250
-              SEK <span>↗</span>
-            </Button>
-            <p className="donation-payment-note">
-              Try it out. No payment is taken.
-            </p>
-            <div className="donation-receipt" aria-live="polite" role="status">
-              {notice ? (
-                <>
-                  <Check size={17} />
-                  <span>{notice}</span>
-                </>
-              ) : (
-                <>
-                  <span className="donation-status-dot" />
-                  <span>
-                    {amountOre
-                      ? `${kronor(amountOre)} SEK mapped to ${dog.name}’s care`
-                      : `Your first gift starts ${dog.name}’s care trail`}
-                  </span>
-                </>
-              )}
-            </div>
-            <div className="donation-ledger-meta">
-              <span>
-                {latestGift
-                  ? `${myGifts.length} demo ${myGifts.length === 1 ? 'gift' : 'gifts'}${dog.id === 'ake' && gifts.some((gift) => gift.id === 'example') ? ' + 500 SEK example' : ''}`
-                  : amountOre
-                    ? '500 SEK example included'
-                    : 'No demo gifts yet'}
-              </span>
-              <span>
-                {sessionOnly ? 'This session only' : 'Saved on this device'}
-              </span>
-            </div>
-          </aside>
         </section>
 
         <section
@@ -318,7 +354,9 @@ export default function DonationShell() {
               <div>
                 <span className="donation-eyebrow">THE LITTLE MOMENTS</span>
                 <h2>{dog.name}’s journey</h2>
-                <p>Photos from Hundstallet. A space for every next step.</p>
+                <p>
+                  {dog.location} · {dog.breed} · Photos from Hundstallet
+                </p>
               </div>
               <div className="donation-carousel-controls">
                 <CarouselPrevious />
@@ -369,15 +407,21 @@ export default function DonationShell() {
                   <figure>
                     <div className="donation-photo donation-photo-placeholder donation-gift-moment">
                       <PixelCareIcon kind="heart" width="46" height="46" />
-                      <strong>You added 250 SEK</strong>
+                      <strong>
+                        You added {kronor(latestGift.amountOre)} SEK
+                      </strong>
                       <p>
-                        125 for {dog.food.toLowerCase()}, 75 for vet care, and
-                        50 for daily care.
+                        {kronor(careAllocation(latestGift.amountOre).food)} for
+                        food,{' '}
+                        {kronor(careAllocation(latestGift.amountOre).health)}{' '}
+                        for vet care, and{' '}
+                        {kronor(careAllocation(latestGift.amountOre).comfort)}{' '}
+                        for daily care.
                       </p>
                       <span>Simulated allocation · awaiting a care update</span>
                     </div>
                     <figcaption>
-                      <h3>A little more care for {dog.name}</h3>
+                      <h3>A little more shared care</h3>
                       <p>
                         {myGifts.length} demo{' '}
                         {myGifts.length === 1 ? 'gift' : 'gifts'} on this device

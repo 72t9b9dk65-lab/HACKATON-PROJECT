@@ -1,0 +1,713 @@
+{
+  "generatedAt": "2026-09-07",
+  "generator": "Built-in image_gen",
+  "atlas": "/dogs/pixel-breeds/atlas.png",
+  "atlasSize": [
+    1254,
+    1254
+  ],
+  "description": "AI-generated breed illustrations, not photographs or assertions of an individual dog's ancestry. Ove is listed as mixed breed and uses a spaniel-style avatar.",
+  "processing": "Connected-component bounds locate each complete dog; original RGBA pixels are cropped with padding and resized using nearest-neighbor onto transparent 256 x 256 canvases.",
+  "sprites": [
+    {
+      "id": "french-bulldog",
+      "breed": "French Bulldog",
+      "src": "/dogs/pixel-breeds/french-bulldog.png",
+      "row": 1,
+      "column": 1,
+      "sourceBox": [
+        40,
+        24,
+        229,
+        249
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        40,
+        24,
+        214,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "eda394936f5f511894a2ea42337b6ed82351f36838b1d3f25f2b92f7315facd2"
+    },
+    {
+      "id": "long-haired-chihuahua",
+      "breed": "Long-haired Chihuahua",
+      "src": "/dogs/pixel-breeds/long-haired-chihuahua.png",
+      "row": 1,
+      "column": 2,
+      "sourceBox": [
+        277,
+        28,
+        470,
+        247
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        36,
+        26,
+        219,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "7e4183261db29c00ce013093277b28b5adc4b8072efa2a2494a3d9ee4161b0ca"
+    },
+    {
+      "id": "tibetan-spaniel",
+      "breed": "Tibetan Spaniel",
+      "src": "/dogs/pixel-breeds/tibetan-spaniel.png",
+      "row": 1,
+      "column": 3,
+      "sourceBox": [
+        515,
+        43,
+        734,
+        247
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        24,
+        38,
+        232,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "c1d7fd592f812348f1b9e88565f27d049623e3a61c543678c5800cd3dfc75e98"
+    },
+    {
+      "id": "golden-retriever",
+      "breed": "Golden Retriever",
+      "src": "/dogs/pixel-breeds/golden-retriever.png",
+      "row": 1,
+      "column": 4,
+      "sourceBox": [
+        757,
+        19,
+        973,
+        252
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        31,
+        24,
+        224,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "2cd07944d402861bf25a875bf7ee2a52955987a95de04e549fb27cab8d077606"
+    },
+    {
+      "id": "labrador-retriever",
+      "breed": "Labrador Retriever",
+      "src": "/dogs/pixel-breeds/labrador-retriever.png",
+      "row": 1,
+      "column": 5,
+      "sourceBox": [
+        1020,
+        28,
+        1226,
+        252
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        32,
+        26,
+        223,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "471b355f75da53939e5c8e7aa2a69500194ab3ba34157440562e18d4075a5b9d"
+    },
+    {
+      "id": "german-shepherd",
+      "breed": "German Shepherd",
+      "src": "/dogs/pixel-breeds/german-shepherd.png",
+      "row": 2,
+      "column": 1,
+      "sourceBox": [
+        26,
+        253,
+        223,
+        504
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        46,
+        24,
+        209,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "db06daa4c378eda4ab78219fa9dc7c64b0d99c1e86cc079d5f4e3117006084ef"
+    },
+    {
+      "id": "beagle",
+      "breed": "Beagle",
+      "src": "/dogs/pixel-breeds/beagle.png",
+      "row": 2,
+      "column": 2,
+      "sourceBox": [
+        288,
+        291,
+        481,
+        501
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        32,
+        24,
+        223,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "f138e1750e0aad066811be2cd291df1b334ad0e1fc3862c8c1c57ade798a4fc8"
+    },
+    {
+      "id": "dalmatian",
+      "breed": "Dalmatian",
+      "src": "/dogs/pixel-breeds/dalmatian.png",
+      "row": 2,
+      "column": 3,
+      "sourceBox": [
+        532,
+        272,
+        723,
+        502
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        41,
+        24,
+        214,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "52f54e1f9bb93081892455f843c91b7ea9b091c9f677e2ef907573e5d97b7b38"
+    },
+    {
+      "id": "dachshund",
+      "breed": "Dachshund",
+      "src": "/dogs/pixel-breeds/dachshund.png",
+      "row": 2,
+      "column": 4,
+      "sourceBox": [
+        771,
+        328,
+        985,
+        504
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        24,
+        61,
+        231,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "7a45e554dd10dc73084d14beb02e1a1f23c7fd39c5949c9ecc1693b981071236"
+    },
+    {
+      "id": "poodle",
+      "breed": "Poodle",
+      "src": "/dogs/pixel-breeds/poodle.png",
+      "row": 2,
+      "column": 5,
+      "sourceBox": [
+        1022,
+        273,
+        1228,
+        502
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        34,
+        24,
+        221,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "3aeffdd4d3a1da0472249f017d19a25e8b7077dbcba3790fa5462ca8dbcf1ab9"
+    },
+    {
+      "id": "siberian-husky",
+      "breed": "Siberian Husky",
+      "src": "/dogs/pixel-breeds/siberian-husky.png",
+      "row": 3,
+      "column": 1,
+      "sourceBox": [
+        22,
+        507,
+        227,
+        747
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        39,
+        24,
+        217,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "66dccb36ccf7ee2c3456dd66adb229cc505d5c0abae868dfe787340b10b3da59"
+    },
+    {
+      "id": "border-collie",
+      "breed": "Border Collie",
+      "src": "/dogs/pixel-breeds/border-collie.png",
+      "row": 3,
+      "column": 2,
+      "sourceBox": [
+        270,
+        513,
+        483,
+        744
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        32,
+        24,
+        224,
+        231
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "93b3f9d93ddc37b26ecbac96b98c32e3e5a4ebfe27d5e229503fd2488aba9c1b"
+    },
+    {
+      "id": "pembroke-welsh-corgi",
+      "breed": "Pembroke Welsh Corgi",
+      "src": "/dogs/pixel-breeds/pembroke-welsh-corgi.png",
+      "row": 3,
+      "column": 3,
+      "sourceBox": [
+        533,
+        534,
+        724,
+        744
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        33,
+        24,
+        222,
+        231
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "daa1d81723b238aae9cfb1dfef14b92a10fe37be0e432fc531a1448341ae34cd"
+    },
+    {
+      "id": "shiba-inu",
+      "breed": "Shiba Inu",
+      "src": "/dogs/pixel-breeds/shiba-inu.png",
+      "row": 3,
+      "column": 4,
+      "sourceBox": [
+        770,
+        514,
+        967,
+        744
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        39,
+        24,
+        217,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "2868859ae3245fd9de15aabefc8e5216328d8856e960dda128562fdb8558110e"
+    },
+    {
+      "id": "pug",
+      "breed": "Pug",
+      "src": "/dogs/pixel-breeds/pug.png",
+      "row": 3,
+      "column": 5,
+      "sourceBox": [
+        1029,
+        543,
+        1224,
+        744
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        30,
+        31,
+        225,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "19c6b12e8f9d5ce344f83537c86cf59458e061eab99c48234906ab7f26439c8c"
+    },
+    {
+      "id": "rottweiler",
+      "breed": "Rottweiler",
+      "src": "/dogs/pixel-breeds/rottweiler.png",
+      "row": 4,
+      "column": 1,
+      "sourceBox": [
+        30,
+        757,
+        238,
+        989
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        35,
+        24,
+        221,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "0c3b6dda9b7568f43efa45bbdbbb726bb0ad2404a2f5523f49a11ae34cac68de"
+    },
+    {
+      "id": "doberman",
+      "breed": "Doberman",
+      "src": "/dogs/pixel-breeds/doberman.png",
+      "row": 4,
+      "column": 2,
+      "sourceBox": [
+        285,
+        757,
+        481,
+        984
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        38,
+        24,
+        218,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "c91db661290794a8f52ed8dd3dacefe61b00cb36f4db78746cc8367b70649dd8"
+    },
+    {
+      "id": "boxer",
+      "breed": "Boxer",
+      "src": "/dogs/pixel-breeds/boxer.png",
+      "row": 4,
+      "column": 3,
+      "sourceBox": [
+        538,
+        760,
+        725,
+        985
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        41,
+        24,
+        214,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "3033abb54394378e077f13824cfbcf81cf8cd006248009082ef705bf1dfb27f3"
+    },
+    {
+      "id": "cocker-spaniel",
+      "breed": "Cocker Spaniel",
+      "src": "/dogs/pixel-breeds/cocker-spaniel.png",
+      "row": 4,
+      "column": 4,
+      "sourceBox": [
+        757,
+        761,
+        985,
+        989
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        24,
+        24,
+        232,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "62a3209c01d9e85b87276595cc332e92966bc82e3fa66803dab9ffaf38897394"
+    },
+    {
+      "id": "miniature-schnauzer",
+      "breed": "Miniature Schnauzer",
+      "src": "/dogs/pixel-breeds/miniature-schnauzer.png",
+      "row": 4,
+      "column": 5,
+      "sourceBox": [
+        1035,
+        755,
+        1217,
+        989
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        47,
+        24,
+        209,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "87485f7785448b548608938469259800b7714dcc16b1b2af72f2f23fb7a6813a"
+    },
+    {
+      "id": "great-dane",
+      "breed": "Great Dane",
+      "src": "/dogs/pixel-breeds/great-dane.png",
+      "row": 5,
+      "column": 1,
+      "sourceBox": [
+        29,
+        989,
+        224,
+        1239
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        47,
+        24,
+        209,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "bec133ef41a3d0cf20ab967ee66cb6d4663985c6ad0295783b508848d0d9a048"
+    },
+    {
+      "id": "saint-bernard",
+      "breed": "Saint Bernard",
+      "src": "/dogs/pixel-breeds/saint-bernard.png",
+      "row": 5,
+      "column": 2,
+      "sourceBox": [
+        254,
+        989,
+        498,
+        1237
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        25,
+        24,
+        230,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "43fcf502b913710a1bf6b606f03cadfa6855b03a6cc3e4319ed2e30dde13cd02"
+    },
+    {
+      "id": "samoyed",
+      "breed": "Samoyed",
+      "src": "/dogs/pixel-breeds/samoyed.png",
+      "row": 5,
+      "column": 3,
+      "sourceBox": [
+        509,
+        992,
+        733,
+        1239
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        33,
+        24,
+        222,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "67d32036f0c833bb0575e4282ea9f4f258b11f156ef336377cff0a40983b723a"
+    },
+    {
+      "id": "west-highland-white-terrier",
+      "breed": "West Highland White Terrier",
+      "src": "/dogs/pixel-breeds/west-highland-white-terrier.png",
+      "row": 5,
+      "column": 4,
+      "sourceBox": [
+        781,
+        1011,
+        981,
+        1240
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        37,
+        25,
+        219,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "2a759a5d1a57087afe4747818c7a3ac5bf15197ac1e156159ed17924feb8a682"
+    },
+    {
+      "id": "yorkshire-terrier",
+      "breed": "Yorkshire Terrier",
+      "src": "/dogs/pixel-breeds/yorkshire-terrier.png",
+      "row": 5,
+      "column": 5,
+      "sourceBox": [
+        1029,
+        1009,
+        1212,
+        1240
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        45,
+        25,
+        210,
+        232
+      ],
+      "alphaRange": [
+        0,
+        254
+      ],
+      "sha256": "f30414f2fd8453758d58c9d9b8845a194d9cfc805d942f74f05eaa6cbce3810a"
+    }
+  ]
+}

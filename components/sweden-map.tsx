@@ -35,7 +35,10 @@ export default function SwedenMap({
   resetKey: number;
   raised: Record<string, number>;
   onSelect: (id: string) => void;
-  dogMarkers?: (ProfileDog & { amountOre: number })[];
+  dogMarkers?: (ProfileDog & {
+    amountOre: number;
+    allocation?: ReturnType<typeof careAllocation>;
+  })[];
 }) {
   const container = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 800, height: 770 });
@@ -538,7 +541,7 @@ export default function SwedenMap({
                       : 16),
               ),
             );
-            const allocation = careAllocation(dog.amountOre);
+            const allocation = dog.allocation ?? careAllocation(dog.amountOre);
             return (
               <g
                 key={dog.id}
@@ -575,13 +578,14 @@ export default function SwedenMap({
                   <circle cx={x} cy={y} r="20" />
                 </clipPath>
                 <image
-                  href={dog.photos[0].src}
+                  href={dog.sprite}
                   x={x - 20}
                   y={y - 20}
                   width="40"
                   height="40"
                   clipPath={`url(#dog-photo-${dog.id})`}
-                  preserveAspectRatio="xMidYMid slice"
+                  preserveAspectRatio="xMidYMid meet"
+                  className="donation-pixel-map-avatar"
                 />
                 <rect
                   className="donation-pin-card"

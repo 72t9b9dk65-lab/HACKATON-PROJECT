@@ -7,6 +7,8 @@ export type ProfileDog = {
   coordinates: [number, number];
   age: string;
   breed: string;
+  sprite: string;
+  spriteDescription: string;
   description: string;
   food: string;
   source: string;
@@ -24,6 +26,8 @@ export const profileDogs: ProfileDog[] = [
     coordinates: [12.53, 57.93],
     age: '3 years',
     breed: 'French bulldog',
+    sprite: '/dogs/pixel-breeds/french-bulldog.png',
+    spriteDescription: 'French bulldog pixel avatar',
     description:
       'A playful little character who loves company. His profile notes that he currently eats allergy food.',
     food: 'Allergy food',
@@ -46,6 +50,8 @@ export const profileDogs: ProfileDog[] = [
     coordinates: [18.06, 59.33],
     age: '5 years',
     breed: 'Chihuahua mix',
+    sprite: '/dogs/pixel-breeds/long-haired-chihuahua.png',
+    spriteDescription: 'Long-haired Chihuahua pixel avatar for a Chihuahua mix',
     description:
       'A gentle, affectionate dog finding his confidence, one small step at a time.',
     food: 'Daily meals',
@@ -67,6 +73,9 @@ export const profileDogs: ProfileDog[] = [
     coordinates: [13.28, 56.28],
     age: '2 years',
     breed: 'Mixed breed',
+    sprite: '/dogs/pixel-breeds/tibetan-spaniel.png',
+    spriteDescription:
+      'Spaniel-style pixel avatar for Ove, whose profile lists mixed breed',
     description:
       'A quiet, loving companion who needs patience, reassurance, and time to feel at home.',
     food: 'Daily meals',
@@ -93,6 +102,7 @@ export const careKinds: {
   { id: 'comfort', label: 'Daily care', color: '#c3a6df', share: 20 },
 ];
 export const DEMO_GIFT_ORE = 25_000;
+export const SHARED_CARE_ID = 'shared-care';
 export const SHELL_STORAGE_KEY = 'hundstallet.donation-shell.v1';
 export type DemoGift = {
   id: string;
@@ -103,7 +113,7 @@ export type DemoGift = {
 export const exampleGifts: DemoGift[] = [
   {
     id: 'example',
-    dogId: 'ake',
+    dogId: SHARED_CARE_ID,
     amountOre: 50_000,
     createdAt: '2026-09-07T08:00:00Z',
   },
@@ -122,9 +132,44 @@ export function careAllocation(amountOre: number) {
 }
 
 export function giftsForDog(gifts: DemoGift[], dogId: string) {
-  return gifts
-    .filter((gift) => gift.dogId === dogId)
-    .reduce((total, gift) => total + gift.amountOre, 0);
+  return fundingSummary(gifts).byDog[dogId]?.amountOre ?? 0;
+}
+
+// Divide each care category in integer öre, so both the map and overall bars
+// reconcile. Shared allocation is a demo model, not a claim about shelter costs.
+export function fundingSummary(gifts: DemoGift[]) {
+  const byDog: Record<
+    string,
+    { amountOre: number; allocation: ReturnType<typeof careAllocation> }
+  > = Object.fromEntries(
+    profileDogs.map((dog) => [
+      dog.id,
+      { amountOre: 0, allocation: careAllocation(0) },
+    ]),
+  );
+  const allocation = careAllocation(0);
+  let amountOre = 0;
+  for (const gift of gifts) {
+    const recipients =
+      gift.dogId === SHARED_CARE_ID
+        ? profileDogs.map((dog) => dog.id)
+        : [gift.dogId];
+    if (!recipients.every((id) => byDog[id]))
+      throw new Error('Unknown demo recipient.');
+    const care = careAllocation(gift.amountOre);
+    amountOre += gift.amountOre;
+    for (const kind of careKinds) {
+      allocation[kind.id] += care[kind.id];
+      const each = Math.floor(care[kind.id] / recipients.length);
+      const remainder = care[kind.id] % recipients.length;
+      recipients.forEach((id, index) => {
+        const share = each + (index < remainder ? 1 : 0);
+        byDog[id].allocation[kind.id] += share;
+        byDog[id].amountOre += share;
+      });
+    }
+  }
+  return { amountOre, allocation, byDog };
 }
 
 export function readDemoGifts(raw: string | null): DemoGift[] {
@@ -141,7 +186,8 @@ export function readDemoGifts(raw: string | null): DemoGift[] {
         typeof g.id !== 'string' ||
         !g.id ||
         seen.has(g.id) ||
-        !profileDogs.some((dog) => dog.id === g.dogId) ||
+        (g.dogId !== SHARED_CARE_ID &&
+          !profileDogs.some((dog) => dog.id === g.dogId)) ||
         !Number.isSafeInteger(g.amountOre) ||
         g.amountOre <= 0 ||
         g.amountOre > 50_000 ||
@@ -152,7 +198,13 @@ export function readDemoGifts(raw: string | null): DemoGift[] {
       seen.add(g.id);
       return true;
     });
-    return valid ? (parsed as DemoGift[]) : [...exampleGifts];
+    // Only move the built-in example into shared care. User-created legacy
+    // gifts keep their original recipient, amount, and timestamp.
+    return valid
+      ? (parsed as DemoGift[]).map((gift) =>
+          gift.id === 'example' ? { ...gift, dogId: SHARED_CARE_ID } : gift,
+        )
+      : [...exampleGifts];
   } catch {
     return [...exampleGifts];
   }

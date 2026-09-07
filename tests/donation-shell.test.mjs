@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import {
   careAllocation,
   DEMO_GIFT_ORE,
@@ -8,10 +9,12 @@ import {
   giftsForDog,
   profileDogs,
   readDemoGifts,
+  fundingSummary,
+  SHARED_CARE_ID,
 } from '../lib/donation-shell.ts';
 import { prepareSwedenMap } from '../lib/sweden-map.ts';
 
-test('Demo allocations conserve every öre and remain specific to the selected dog', () => {
+test('Care allocations conserve every öre and legacy gifts retain their recipient', () => {
   for (const amount of [0, 1, 99, 101, 25_000, 50_001]) {
     const parts = Object.values(careAllocation(amount));
     assert.equal(
@@ -35,12 +38,95 @@ test('Demo allocations conserve every öre and remain specific to the selected d
     amountOre: DEMO_GIFT_ORE,
     createdAt: '2026-09-07T10:00:00Z',
   };
-  const gifts = [...exampleGifts, gift];
+  const gifts = [{ ...exampleGifts[0], id: 'legacy', dogId: 'ake' }, gift];
   assert.equal(giftsForDog(gifts, 'ake'), 50_000);
   assert.equal(giftsForDog(gifts, 'koby'), 25_000);
   assert.equal(giftsForDog(gifts, 'ove'), 0);
   assert.deepEqual(readDemoGifts(JSON.stringify(gifts)), gifts);
   assert.deepEqual(readDemoGifts('[]'), []);
+});
+
+test('Shared support reconciles across dogs and care categories without changing the overall total', () => {
+  const gifts = [1, 99, 101, 25_000, 50_000].map((amountOre, index) => ({
+    id: `shared-${index}`,
+    dogId: SHARED_CARE_ID,
+    amountOre,
+    createdAt: '2026-09-07T10:00:00Z',
+  }));
+  const summary = fundingSummary(gifts);
+  assert.equal(
+    summary.amountOre,
+    gifts.reduce((sum, gift) => sum + gift.amountOre, 0),
+  );
+  assert.equal(
+    Object.values(summary.byDog).reduce((sum, dog) => sum + dog.amountOre, 0),
+    summary.amountOre,
+  );
+  for (const category of ['food', 'health', 'comfort']) {
+    assert.equal(
+      Object.values(summary.byDog).reduce(
+        (sum, dog) => sum + dog.allocation[category],
+        0,
+      ),
+      summary.allocation[category],
+    );
+  }
+  for (const dog of profileDogs) {
+    assert.ok(summary.byDog[dog.id].amountOre > 0);
+    assert.equal(giftsForDog(gifts, dog.id), summary.byDog[dog.id].amountOre);
+    assert.equal(
+      Object.values(summary.byDog[dog.id].allocation).reduce((a, b) => a + b),
+      summary.byDog[dog.id].amountOre,
+    );
+  }
+  assert.deepEqual(readDemoGifts(JSON.stringify(gifts)), gifts);
+});
+
+test('The original sample moves into shared care while preserving user-created records', () => {
+  const oldSample = { ...exampleGifts[0], dogId: 'ake' };
+  const oldGift = {
+    id: 'user-gift',
+    dogId: 'koby',
+    amountOre: 25_000,
+    createdAt: '2026-09-07T09:00:00Z',
+  };
+  const migrated = readDemoGifts(JSON.stringify([oldSample, oldGift]));
+  assert.equal(migrated[0].dogId, SHARED_CARE_ID);
+  assert.deepEqual(migrated[1], oldGift);
+  assert.equal(fundingSummary(migrated).amountOre, 75_000);
+  assert.deepEqual(readDemoGifts(JSON.stringify(migrated)), migrated);
+});
+
+test('All 25 breed sprites exist as transparent PNGs and every active avatar maps to the atlas', () => {
+  const manifest = JSON.parse(
+    readFileSync(
+      new URL('../public/dogs/pixel-breeds/manifest.json', import.meta.url),
+    ),
+  );
+  assert.equal(manifest.sprites.length, 25);
+  assert.equal(new Set(manifest.sprites.map((sprite) => sprite.id)).size, 25);
+  assert.equal(
+    new Set(manifest.sprites.map((sprite) => `${sprite.row}:${sprite.column}`))
+      .size,
+    25,
+  );
+  for (const sprite of manifest.sprites) {
+    const bytes = readFileSync(
+      new URL(`../public${sprite.src}`, import.meta.url),
+    );
+    assert.equal(bytes.subarray(1, 4).toString(), 'PNG');
+    assert.equal(bytes.readUInt32BE(16), 256);
+    assert.equal(bytes.readUInt32BE(20), 256);
+    assert.equal(bytes[25], 6, 'RGBA PNG color type');
+    assert.equal(
+      createHash('sha256').update(bytes).digest('hex'),
+      sprite.sha256,
+    );
+    assert.equal(sprite.alphaRange[0], 0);
+    assert.ok(sprite.visibleBounds.every((value) => value > 0 && value < 256));
+  }
+  for (const dog of profileDogs)
+    assert.ok(manifest.sprites.some((sprite) => sprite.src === dog.sprite));
 });
 
 test('Corrupt or unknown persisted gifts do not enter the displayed ledger', () => {
