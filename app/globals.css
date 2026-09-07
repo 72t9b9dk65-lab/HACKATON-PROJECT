@@ -7683,11 +7683,13 @@ button:not([data-slot]) {
   margin-top: 0;
   padding-top: 0;
   border-top: 0;
-  align-items: start;
+  align-items: stretch;
 }
 .personal-giving-sidebar {
   min-width: 0;
+  min-height: 0;
   display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
   gap: 24px;
 }
 .donation-launch[data-slot='button'] {
@@ -8031,6 +8033,9 @@ button:not([data-slot]) {
   border-top: 1px solid var(--donation-line);
   padding-top: 22px;
   min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 .expense-transactions h2 {
   font-size: 19px;
@@ -8044,8 +8049,12 @@ button:not([data-slot]) {
 }
 .expense-transaction-list {
   display: grid;
+  align-content: start;
   gap: 8px;
-  max-height: 480px;
+  flex: 1;
+  min-height: 240px;
+  /* The shelter sets the column height, rather than all 100 expense rows. */
+  contain: size;
   overflow-y: auto;
   margin-top: 15px;
   padding: 3px;
@@ -8173,7 +8182,11 @@ button:not([data-slot]) {
     font-size: 38px;
   }
   .expense-transaction-list {
+    flex: none;
+    height: 300px;
+    min-height: 0;
     max-height: 300px;
+    contain: none;
   }
 }
 @media (max-width: 560px) {
