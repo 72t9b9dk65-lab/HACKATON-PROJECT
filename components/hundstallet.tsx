@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   PawPrint,
-  Globe2,
+  Map,
   Heart,
   ArrowUpRight,
   ArrowRight,
@@ -24,7 +24,7 @@ import {
   ChevronRight,
   CircleCheck,
 } from 'lucide-react';
-import EarthGlobe from './earth-globe';
+import SwedenMap from './sweden-map';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
@@ -62,11 +62,8 @@ import type { MapMode } from '@/lib/earth-data';
 export default function Hundstallet() {
   const [page, setPage] = useState('explore');
   const [dogId, setDogId] = useState('luna');
-  const [zoom, setZoom] = useState(1.06);
-  const [focus, setFocus] = useState({
-    coords: [15, 56] as [number, number],
-    key: 0,
-  });
+  const [zoom, setZoom] = useState(1);
+  const [mapReset, setMapReset] = useState(0);
   const [mode, setMode] = useState<MapMode>('needs');
   const [state, setState] = useState<SupporterState>(emptySupporter);
   const stateRef = useRef(state);
@@ -140,17 +137,13 @@ export default function Hundstallet() {
       setStorageError(e instanceof Error ? e.message : 'Unable to save.');
     }
   }
-  function chooseDog(id: string, fly = true) {
+  function chooseDog(id: string) {
     const selected = dogs.find((d) => d.id === id);
     if (!selected) return;
     setDogId(id);
     setError('');
-    if (fly) {
-      const s = shelters.find((s) => s.id === selected.shelterId)!;
-      setZoom(7);
-      setFocus({ coords: s.coordinates, key: Date.now() });
-    }
   }
+
   function readUpdate() {
     update((s) => ({ ...s, read: [...new Set([...s.read, dog.id])] }));
     setUpdateOpen(true);
@@ -224,7 +217,7 @@ export default function Hundstallet() {
         >
           <TabsList variant="line">
             <TabsTrigger value="explore">
-              <Globe2 />
+              <Map />
               Explore shelters
             </TabsTrigger>
             <TabsTrigger value="impact">
@@ -282,7 +275,7 @@ export default function Hundstallet() {
             <div className="explorer hs-explorer">
               <section
                 className="map-stage hs-map"
-                aria-label="Explore Hundstallet shelter locations on the globe"
+                aria-label="Explore Hundstallet shelter locations on the Sweden map"
               >
                 <div className="map-topbar">
                   <Tabs
@@ -304,8 +297,8 @@ export default function Hundstallet() {
                   <button
                     className="hs-sweden"
                     onClick={() => {
-                      setZoom(4);
-                      setFocus({ coords: [15, 58], key: Date.now() });
+                      setZoom(1);
+                      setMapReset((v) => v + 1);
                     }}
                   >
                     <MapPin size={15} />
@@ -316,30 +309,16 @@ export default function Hundstallet() {
                 <div className="map-context">
                   <span className="live-dot" />A safe place. A fresh start.
                 </div>
-                <EarthGlobe
+                <SwedenMap
                   mode={mode}
-                  level="countries"
-                  category="all"
-                  selected={shelter}
+                  selectedId={shelter.id}
                   zoom={zoom}
-                  onZoom={(z) => setZoom(Math.max(0.82, Math.min(14, z)))}
-                  focus={focus}
-                  locations={{ countries: [sweden], points: shelters }}
-                  markerIcon={PawPrint}
+                  onZoom={setZoom}
+                  resetKey={mapReset}
                   raised={funds}
-                  onSelect={(t) => {
-                    if (t.id === '752') {
-                      setZoom(4);
-                      setFocus({ coords: [15, 58], key: Date.now() });
-                    } else {
-                      const d = dogs.find((d) => d.shelterId === t.id);
-                      if (d) chooseDog(d.id);
-                    }
-                  }}
-                  onCategory={(_, t) => {
-                    const d = dogs.find((d) => d.shelterId === t.id);
-                    if (d) chooseDog(d.id, false);
-                    setDonateOpen(true);
+                  onSelect={(id) => {
+                    const d = dogs.find((d) => d.shelterId === id);
+                    if (d) chooseDog(d.id);
                   }}
                 />
                 <div className="hs-map-note">
@@ -349,7 +328,7 @@ export default function Hundstallet() {
                     <br />
                     starts somewhere.
                   </strong>
-                  <p>Zoom into Sweden to explore the shelters.</p>
+                  <p>Three shelters. One shared mission.</p>
                 </div>
                 <div
                   className="hs-shelter-picker"
@@ -380,23 +359,23 @@ export default function Hundstallet() {
                 <div className="hs-globe-controls">
                   <button
                     aria-label="Zoom in"
-                    disabled={zoom >= 14}
-                    onClick={() => setZoom(Math.min(14, zoom * 1.5))}
+                    disabled={zoom >= 3}
+                    onClick={() => setZoom(Math.min(3, zoom * 1.5))}
                   >
                     <Plus />
                   </button>
                   <button
                     aria-label="Zoom out"
-                    disabled={zoom <= 0.82}
-                    onClick={() => setZoom(Math.max(0.82, zoom / 1.5))}
+                    disabled={zoom <= 1}
+                    onClick={() => setZoom(Math.max(1, zoom / 1.5))}
                   >
                     <Minus />
                   </button>
                   <button
-                    aria-label="Reset globe"
+                    aria-label="Show all of Sweden"
                     onClick={() => {
-                      setZoom(1.06);
-                      setFocus({ coords: [15, 56], key: Date.now() });
+                      setZoom(1);
+                      setMapReset((v) => v + 1);
                     }}
                   >
                     <RotateCcw size={18} />
@@ -405,7 +384,7 @@ export default function Hundstallet() {
                 <div className="map-bottomline">
                   <span>
                     <Move size={13} />
-                    Drag to explore · Scroll to zoom
+                    Drag to pan · Scroll to zoom
                   </span>
                   <span>SAMPLE FUNDING · NATURAL EARTH</span>
                 </div>

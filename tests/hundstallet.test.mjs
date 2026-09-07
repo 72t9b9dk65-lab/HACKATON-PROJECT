@@ -88,3 +88,31 @@ test('Every demo dog maps to an official shelter location and aggregate funds co
     assert.ok(dog.stage >= 0 && dog.stage < 4);
   }
 });
+
+test('The active map contains Sweden only and projects every shelter at desktop and mobile sizes', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { prepareSwedenMap } = await import('../lib/sweden-map.ts');
+  const boundary = JSON.parse(
+    readFileSync(
+      new URL('../public/data/sweden.json', import.meta.url),
+      'utf8',
+    ),
+  );
+  assert.equal(boundary.type, 'Feature');
+  assert.equal(String(boundary.id), '752');
+  for (const [width, height] of [
+    [800, 770],
+    [360, 570],
+  ]) {
+    const { projection, outline } = prepareSwedenMap(boundary, width, height);
+    assert.ok(outline && !outline.includes('NaN'));
+    for (const shelter of shelters) {
+      const [x, y] = projection(shelter.coordinates);
+      assert.ok(
+        x > 0 && x < width && y > 0 && y < height,
+        `${shelter.name} stays within the map at ${width}px`,
+      );
+    }
+  }
+  assert.throws(() => prepareSwedenMap({ ...boundary, id: '840' }, 800, 770));
+});

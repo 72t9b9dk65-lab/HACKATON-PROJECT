@@ -1,6 +1,6 @@
 # Hundstallet — A second chance, together
 
-An independent hackathon prototype for engaging supporters in care, rehabilitation, and rehoming for vulnerable dogs. The globe remains the main interface: explore Swedish shelter locations, meet fictional dogs, follow their stories, and understand an illustrative contribution allocation.
+An independent hackathon prototype for engaging supporters in care, rehabilitation, and rehoming for vulnerable dogs. A Sweden-only map is the main interface: explore Swedish shelter locations, meet fictional dogs, follow their stories, and understand an illustrative contribution allocation.
 
 ## Run locally
 
@@ -13,7 +13,7 @@ Both launchers install missing dependencies and open your browser. Keep the term
 
 ## Prototype experience
 
-- **Explore shelters:** a draggable, zoomable globe with approximate city-level markers for Stockholm, Alingsås, and Örkelljunga. Click Sweden to zoom in, or choose a shelter directly.
+- **Explore shelters:** a draggable, zoomable map showing only Sweden, with approximate city-level markers for Stockholm, Alingsås, and Örkelljunga. Choose a shelter directly, pan and zoom, or reset to show all of Sweden.
 - **Follow a dog:** three fictional stories connect care, rehabilitation, and rehoming. Bookmark a journey and read example care updates. The next-chapter control is an explicit demo action; donating does not advance rehabilitation or guarantee adoption.
 - **Try a contribution:** simulate SEK 10–25,000. Amounts are stored as integer öre and allocated without rounding losses across veterinary care (40%), food and daily care (30%), training and rehabilitation (20%), and rehoming support (10%). These are proposed demo percentages, not Hundstallet’s accounts.
 - **My impact:** see your simulated contributions, allocations, followed dogs, and downloadable JSON receipts.
@@ -52,9 +52,11 @@ Consulted September 7, 2026:
 
 Run `npm test`, `npm run typecheck`, and `npm run build`. Tests cover contribution validation, exact allocation, local receipt integrity, persistence, badge eligibility, shelter totals, and the retained globe and original donation model.
 
-- `components/hundstallet.tsx`: active globe, stories, donation flow, dashboard, community, and dialogs.
+- `components/hundstallet.tsx`: active map, stories, donation flow, dashboard, community, and dialogs.
 - `lib/hundstallet-data.ts`: locations, fictional dogs, stages, and proposed allocations.
 - `lib/hundstallet-model.ts`: currency validation, allocation, local receipts, reload validation, and badges.
-- `components/earth-globe.tsx`: reused globe, with optional location data and marker icons.
+- `components/sweden-map.tsx` and `lib/sweden-map.ts`: Sweden-only projection, panning, zooming, and accessible shelter markers.
+- `public/data/sweden.json`: Sweden boundary extracted from the bundled Natural Earth atlas.
+- `components/earth-globe.tsx`: retained original globe implementation; not used by the active homepage.
 
 Automated tests and builds do not establish that every browser interaction, touch gesture, or Windows launcher works. Live payments, blockchain integration, and real-time shelter data are not implemented.

@@ -4183,3 +4183,66 @@ button:not([data-slot]) {
     font-size: 11px;
   }
 }
+
+/* A country map replaces the rotating globe in the Hundstallet experience. */
+.hs-sweden-map {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.hs-sweden-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.hs-sweden-svg:active {
+  cursor: grabbing;
+}
+.hs-sweden-land {
+  filter: drop-shadow(0 8px 12px #071d1580);
+}
+.hs-country-label {
+  fill: #3e5b3b;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-anchor: middle;
+  pointer-events: none;
+}
+.hs-water-label {
+  fill: #8da995;
+  font-size: 10px;
+  letter-spacing: 3px;
+  opacity: 0.65;
+  pointer-events: none;
+}
+.hs-shelter-marker {
+  cursor: pointer;
+  outline: none;
+}
+.hs-shelter-marker:focus-visible .hs-pin-circle {
+  stroke: #f0ffaf;
+  stroke-width: 5px;
+}
+.hs-shelter-marker:hover .hs-pin-circle {
+  stroke: #cee5a1;
+  stroke-width: 3px;
+}
+.hs-pin-label {
+  font-size: 13px;
+  font-weight: 550;
+  fill: #e8efd9;
+}
+.hs-pin-label.active {
+  fill: #345438;
+}
+.hs-pin-caption {
+  font-size: 10px;
+  fill: #b2c3a3;
+}
+.hs-pin-caption.active {
+  fill: #688253;
+}
