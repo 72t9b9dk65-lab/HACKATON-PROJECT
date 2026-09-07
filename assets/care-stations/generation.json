@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-07",
+  "reference": "/Users/ale/Documents/ChatGPT/EarthHealth/public/shelters/pixel-shelter.png (viewed for style; no image input/edit)",
+  "assets": [
+    {
+      "name": "food-enrichment",
+      "prompt": "Use case: stylized-concept. Asset type: isolated pixel-art game sprite for a personal virtual dog shelter UI, legible at about 100 px. Style: crisp chunky pixel clusters, hard dark brown outlines, limited warm cream and light brown palette with muted blue accents. Match the friendly detailed front three-quarter Swedish pixel shelter illustration already inspected: clean stepped edges, small highlights and 16-bit game-object character, not vector art, not smooth 3D. Composition: single compact cohesive station centered, fully contained in a square canvas with modest transparent padding, front three-quarter view. TRUE TRANSPARENT BACKGROUND with real alpha. No floor tile, no room, no scenery, no ground plane, no cast shadow outside the objects, no dog, no person, no labels, no text, no watermark. Subject: a friendly low wooden feeding station containing a small kibble bowl, a water bowl, a cream food sack with a simple brown paw icon (no lettering), a small ball and a knotted rope toy. Kibble bowl and toys are clearly visible at the front. The food sack sits behind the bowls. Keep forms bold and readable rather than many tiny decorations.",
+      "tool": "image_gen.imagegen (built-in)",
+      "path": "/Users/ale/.codex/generated_images/01a07b99-df27-7990-b521-a968838f1e1e/exec-07493c14-73a4-42de-8f70-7ec8120e9983.png",
+      "validation": "Visually inspected. RGBA 1254x1254, true transparent alpha; four corners alpha 0. Most object pixels alpha 253.",
+      "workspace_path": "/Users/ale/Documents/ChatGPT/EarthHealth/public/care/pixel/food-enrichment.png"
+    },
+    {
+      "name": "care-rehabilitation",
+      "prompt": "Use case: stylized-concept. Asset type: isolated pixel-art game sprite for a personal virtual dog shelter UI, legible at about 100 px. Style: crisp chunky pixel clusters, hard dark brown outlines, limited warm cream and light brown palette with muted blue accents. Match the friendly detailed front three-quarter Swedish pixel shelter illustration already inspected: clean stepped edges, small highlights and 16-bit game-object character, not vector art, not smooth 3D. Composition: single compact cohesive station centered, fully contained in a square canvas with modest transparent padding, front three-quarter view. TRUE TRANSPARENT BACKGROUND with real alpha. No floor tile, no room, no scenery, no ground plane, no cast shadow outside the objects, no dog, no person, no labels, no text, no watermark. Subject: a cozy dog care and rehabilitation station containing a muted blue therapy mat, a very low wooden balance/physio ramp for a dog to step onto, a neatly rolled cream towel, and a small closed muted blue medicine kit with a simple medical cross. A compact inviting arrangement of rehabilitation equipment, with the low ramp and mat clearly visible at the front. No animals, no injury imagery.",
+      "tool": "image_gen.imagegen (built-in)",
+      "path": "/Users/ale/.codex/generated_images/01a07b99-df27-7990-b521-a968838f1e1e/exec-8f18af98-a94b-472c-bd41-d60c6eacfea4.png",
+      "validation": "Visually inspected. RGBA 1254x1254, true transparent alpha; four corners alpha 0. Most object pixels alpha 253.",
+      "workspace_path": "/Users/ale/Documents/ChatGPT/EarthHealth/public/care/pixel/care-rehabilitation.png"
+    },
+    {
+      "name": "examination-vaccination",
+      "prompt": "Use case: stylized-concept. Asset type: isolated pixel-art game sprite for a personal virtual dog shelter UI, legible at about 100 px. Style: crisp chunky pixel clusters, hard dark brown outlines, limited warm cream and light brown palette with muted blue accents. Match the friendly detailed front three-quarter Swedish pixel shelter illustration already inspected: clean stepped edges, small highlights and 16-bit game-object character, not vector art, not smooth 3D. Composition: single compact cohesive station centered, fully contained in a square canvas with modest transparent padding, front three-quarter view. TRUE TRANSPARENT BACKGROUND with real alpha. No floor tile, no room, no scenery, no ground plane, no cast shadow outside the objects, no dog, no person, no labels, no text, no watermark. Subject: a compact veterinary examination and vaccination station containing a low exam table with a muted blue padded top and warm wood legs, a stethoscope draped on the table, a tiny vaccine vial and capped syringe lying on a tray, and a small cream medicine cabinet behind it marked with a simple blue medical cross. Compact friendly arrangement, table clear in front, cabinet lower than twice table height. Syringe small and capped, no needle point, no animals, no injury imagery.",
+      "tool": "image_gen.imagegen (built-in)",
+      "path": "/Users/ale/.codex/generated_images/01a07b99-df27-7990-b521-a968838f1e1e/exec-9d5941f1-761a-46d0-a3a4-2c535de22cc0.png",
+      "validation": "Visually inspected. RGBA 1254x1254, true transparent alpha; four corners alpha 0. Most object pixels alpha 253.",
+      "workspace_path": "/Users/ale/Documents/ChatGPT/EarthHealth/public/care/pixel/examination-vaccination.png"
+    }
+  ]
+}

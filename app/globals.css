@@ -6361,3 +6361,677 @@ button:not([data-slot]) {
     min-height: 780px;
   }
 }
+
+/* A personal profile and a source-based care forecast own the main workspace. */
+.donation-main-personal {
+  grid-template-columns: minmax(0, 1fr);
+}
+.donation-main-personal > .donation-map {
+  min-height: 660px;
+  border-top: 1px solid var(--donation-line);
+}
+.donation-panel-personal {
+  padding: 28px 32px;
+}
+.donation-panel-personal .donation-balance {
+  grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1.3fr);
+}
+.donation-balance-label h2 {
+  font-size: 16px;
+  font-weight: 450;
+}
+.personal-profile-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 22px;
+}
+.personal-profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  border-radius: 18px;
+  color: var(--donation-accent);
+  background: var(--donation-selected);
+}
+.personal-profile-heading > div {
+  min-width: 0;
+  flex: 1;
+}
+.personal-profile-heading h1 {
+  font-size: clamp(24px, 2.6vw, 36px);
+  font-weight: 650;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  margin: 4px 0;
+}
+.personal-profile-heading p {
+  color: var(--donation-muted);
+  font-size: 12px;
+}
+.personal-profile-heading [data-slot='button'] {
+  height: 38px;
+  border-color: var(--donation-line);
+  background: var(--donation-paper);
+  color: var(--donation-ink);
+}
+.personal-profile-dialog form {
+  display: grid;
+  gap: 10px;
+}
+.personal-profile-dialog label {
+  font-size: 14px;
+  margin-top: 6px;
+}
+.personal-profile-dialog [data-slot='input'] {
+  height: 42px;
+  border-color: var(--donation-line);
+}
+.care-planner {
+  margin-top: 24px;
+  border-top: 1px solid var(--donation-line);
+  padding-top: 22px;
+}
+.care-planner-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin-bottom: 14px;
+}
+.care-planner-heading h2 {
+  font-size: 21px;
+  font-weight: 650;
+}
+.care-planner-heading > span {
+  color: var(--donation-muted);
+  font-size: 14px;
+}
+.care-plan-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.care-plan-option[data-slot='button'] {
+  display: flex;
+  gap: 12px;
+  text-align: left;
+  white-space: normal;
+  justify-content: flex-start;
+  height: auto;
+  min-height: 105px;
+  padding: 12px;
+  border: 1px solid var(--donation-line);
+  background: var(--donation-paper);
+  color: var(--donation-ink);
+}
+.care-plan-option[data-slot='button'][aria-pressed='true'] {
+  background: var(--donation-soft);
+  border-color: var(--donation-accent);
+  box-shadow: inset 0 0 0 1px var(--donation-accent);
+}
+.care-plan-option > img {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+.care-plan-option > span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.care-plan-option strong {
+  font-size: 23px;
+  font-weight: 700;
+}
+.care-plan-option > span > span {
+  font-size: 14px;
+  line-height: 1.4;
+}
+.care-plan-option small {
+  font-size: 12px;
+  color: var(--donation-muted);
+}
+.care-planner-action-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) auto minmax(220px, 1fr);
+  gap: 14px;
+  align-items: end;
+  margin-top: 18px;
+}
+.care-amount-field > label {
+  display: block;
+  font-size: 13px;
+  color: var(--donation-muted);
+  margin-bottom: 6px;
+}
+.giving-frequency {
+  display: flex;
+  padding: 3px;
+  border: 1px solid var(--donation-line);
+  border-radius: 10px;
+  background: var(--donation-soft);
+}
+.giving-frequency [data-slot='button'] {
+  height: 36px;
+  padding: 0 13px;
+  border: 0;
+  background: transparent;
+  color: var(--donation-muted);
+}
+.giving-frequency [data-slot='button'][aria-pressed='true'] {
+  color: var(--donation-ink);
+  background: var(--donation-paper);
+  box-shadow: 0 1px 4px #49362618;
+}
+.care-planner-action-row .donation-primary[data-slot='button'] {
+  height: 44px;
+  margin: 0;
+  font-size: 15px;
+}
+.care-planner-note {
+  color: var(--donation-muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 10px;
+}
+.saved-monthly-plan {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: var(--donation-soft);
+  color: var(--donation-muted);
+  font-size: 13px;
+  margin-top: 12px;
+}
+.saved-monthly-plan > span {
+  flex: 1;
+}
+.saved-monthly-plan [data-slot='button'] {
+  color: var(--donation-accent);
+  text-decoration: underline;
+  font-size: 12px;
+}
+.care-timeline {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid var(--donation-line);
+  border-radius: 14px;
+  background: var(--donation-canvas);
+}
+.care-timeline-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.care-timeline-heading h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 6px 0 4px;
+}
+.care-timeline-heading h3 small {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--donation-muted);
+}
+.care-day-controls {
+  display: flex;
+  gap: 6px;
+}
+.care-day-controls [data-slot='button'] {
+  color: var(--donation-accent);
+  background: var(--donation-paper);
+  border-color: var(--donation-line);
+  height: 34px;
+  width: 34px;
+}
+.care-day-slider {
+  margin-top: 12px;
+  padding: 14px 0;
+}
+.care-day-slider [data-slot='slider-track'] {
+  background: var(--donation-selected);
+  height: 6px;
+}
+.care-day-slider [data-slot='slider-range'] {
+  background: var(--donation-accent);
+}
+.care-day-slider [data-slot='slider-thumb'] {
+  width: 20px;
+  height: 20px;
+  background: var(--donation-paper);
+  border: 2px solid var(--donation-accent);
+}
+.care-month-ticks {
+  display: flex;
+  justify-content: space-between;
+  gap: 2px;
+}
+.care-month-ticks button {
+  min-width: 0;
+  font-size: 12px;
+  color: var(--donation-muted);
+  padding: 5px 0;
+}
+.care-month-ticks button[aria-current='date'] {
+  color: var(--donation-accent);
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.care-projection-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+  padding-top: 16px;
+  border-top: 1px solid var(--donation-line);
+}
+.care-projection-stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.care-projection-stats strong {
+  font-size: clamp(24px, 2.4vw, 34px);
+  font-weight: 650;
+  line-height: 1.1;
+}
+.care-projection-stats small {
+  color: var(--donation-muted);
+  font-size: 15px;
+  font-weight: 400;
+}
+.care-projection-stats > div > span {
+  color: var(--donation-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.care-forecast-source {
+  color: var(--donation-muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 16px;
+}
+.care-forecast-source a {
+  display: inline;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.care-forecast-source a > svg {
+  display: inline;
+  vertical-align: middle;
+}
+.virtual-service-yard {
+  display: block;
+  height: 520px;
+  padding: 0;
+}
+.virtual-service-scene {
+  position: relative;
+  width: 100%;
+  isolation: isolate;
+}
+.care-stations {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 18px 10px;
+  height: 245px;
+  gap: 8px;
+  border-bottom: 1px dashed var(--donation-line);
+}
+.care-station {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  opacity: 0.35;
+  gap: 5px;
+  min-width: 0;
+  transition: opacity 0.2s;
+}
+.care-station[data-active='true'] {
+  opacity: 1;
+}
+.care-station > strong {
+  font-size: 14px;
+  line-height: 1.3;
+  text-align: center;
+}
+.care-station > span {
+  font-size: 12px;
+  color: var(--donation-muted);
+}
+.care-station > img {
+  width: 148px;
+  height: 148px;
+  max-width: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.virtual-service-dog-space {
+  position: absolute;
+  width: 72px;
+  height: 108px;
+  display: block;
+  z-index: 1;
+}
+.virtual-service-dog-space .virtual-roaming-dog {
+  width: 72px;
+}
+.virtual-service-visitor {
+  animation-name: virtual-service-visit;
+  z-index: 3;
+}
+.virtual-service-visitor > img {
+  animation: virtual-service-use var(--roam-duration) ease-in-out
+    var(--roam-delay) infinite;
+}
+.virtual-service-visitor .virtual-dog-activity {
+  animation: virtual-service-label var(--roam-duration) linear var(--roam-delay)
+    infinite;
+}
+.virtual-dog-activity {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  width: max-content;
+  max-width: 115px;
+  border-radius: 7px;
+  padding: 4px 7px;
+  background: var(--donation-paper);
+  border: 1px solid var(--donation-line);
+  color: var(--donation-accent);
+  font-size: 11px;
+  font-weight: 600;
+  pointer-events: none;
+}
+.virtual-service-yard:is(:hover, :focus-within, [data-paused='true'])
+  .virtual-service-visitor
+  > img,
+.virtual-service-yard:is(:hover, :focus-within, [data-paused='true'])
+  .virtual-dog-activity {
+  animation-play-state: paused;
+}
+.virtual-service-future-dog > span:not(.virtual-dog-activity) {
+  font-size: 12px;
+  font-weight: 650;
+}
+.virtual-service-future-dog > small {
+  font-size: 10px;
+}
+.virtual-service-scene > .virtual-shelter-empty {
+  position: absolute;
+  top: 280px;
+  width: 100%;
+}
+@keyframes virtual-service-visit {
+  0%,
+  12%,
+  100% {
+    transform: translate(0, 0);
+  }
+  35%,
+  64% {
+    transform: translate(var(--service-x), var(--service-y));
+  }
+  84% {
+    transform: translate(0, 0);
+  }
+}
+@keyframes virtual-service-use {
+  0%,
+  32%,
+  68%,
+  100% {
+    transform: rotate(0);
+  }
+  38%,
+  48%,
+  58% {
+    transform: translateY(3px) rotate(-6deg);
+  }
+  43%,
+  53%,
+  63% {
+    transform: translateY(0) rotate(3deg);
+  }
+}
+@keyframes virtual-service-label {
+  0%,
+  30%,
+  70%,
+  100% {
+    opacity: 0;
+  }
+  36%,
+  65% {
+    opacity: 1;
+  }
+}
+@media (max-width: 900px) {
+  .care-plan-option[data-slot='button'] {
+    flex-direction: column;
+    text-align: center;
+    gap: 4px;
+  }
+  .care-plan-option > img {
+    width: 64px;
+    height: 64px;
+  }
+  .care-plan-option strong {
+    font-size: 20px;
+  }
+  .care-planner-action-row {
+    grid-template-columns: minmax(150px, 1fr) auto;
+  }
+  .care-planner-action-row .donation-primary {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 560px) {
+  .personal-profile-heading {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .personal-profile-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+  }
+  .personal-profile-heading > div {
+    flex-basis: calc(100% - 60px);
+  }
+  .personal-profile-heading [data-slot='button'] {
+    margin-left: 54px;
+  }
+  .donation-panel-personal {
+    padding: 20px 14px;
+  }
+  .donation-panel-personal .donation-balance {
+    display: block;
+  }
+  .care-plan-options {
+    gap: 6px;
+  }
+  .care-plan-option[data-slot='button'] {
+    padding: 8px 4px;
+  }
+  .care-plan-option > img {
+    width: 54px;
+    height: 54px;
+  }
+  .care-plan-option strong {
+    font-size: 17px;
+  }
+  .care-plan-option > span > span {
+    font-size: 12px;
+  }
+  .care-plan-option small {
+    font-size: 11px;
+  }
+  .care-planner-action-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .giving-frequency {
+    justify-content: stretch;
+  }
+  .giving-frequency > button {
+    flex: 1;
+  }
+  .care-timeline {
+    padding: 14px 10px;
+  }
+  .care-timeline-heading h3 {
+    font-size: 17px;
+  }
+  .care-timeline-heading h3 small {
+    display: block;
+    margin-top: 5px;
+  }
+  .care-projection-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .care-projection-stats strong {
+    font-size: 27px;
+  }
+  .care-station > strong {
+    font-size: 12px;
+  }
+  .care-station > span {
+    font-size: 10px;
+    text-align: center;
+  }
+  .care-station > img {
+    width: 110px;
+    height: 130px;
+  }
+  .virtual-service-yard {
+    height: 510px;
+    padding: 0;
+  }
+  .saved-monthly-plan {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .donation-main-personal > .donation-map {
+    min-height: 780px;
+  }
+}
+
+.personal-care-workspace {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 26px;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--donation-line);
+}
+.personal-care-workspace .care-planner {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.personal-care-workspace .care-planner-heading {
+  display: block;
+}
+.personal-care-workspace .care-planner-heading h2 {
+  font-size: 20px;
+  line-height: 1.35;
+  margin-bottom: 7px;
+}
+.personal-care-workspace .care-plan-options {
+  grid-template-columns: minmax(0, 1fr);
+}
+.personal-care-workspace .care-plan-option[data-slot='button'] {
+  flex-direction: row;
+  text-align: left;
+  min-height: 96px;
+}
+.personal-care-workspace .care-planner-action-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+.personal-care-workspace .giving-frequency > button {
+  flex: 1;
+}
+.personal-care-workspace .saved-monthly-plan {
+  flex-wrap: wrap;
+}
+.personal-care-scene {
+  min-width: 0;
+}
+.personal-care-scene .virtual-shelter {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.personal-care-scene .virtual-service-yard {
+  height: 420px;
+}
+.personal-care-scene .virtual-shelter-heading > img {
+  width: 60px;
+  height: 60px;
+}
+.personal-care-scene .care-timeline {
+  margin-top: 16px;
+}
+.virtual-service-yard:hover .virtual-roaming-dog,
+.virtual-service-yard:hover .virtual-service-visitor > img,
+.virtual-service-yard:hover .virtual-dog-activity {
+  animation-play-state: running;
+}
+.virtual-service-yard:is([data-paused='true'], :focus-within)
+  .virtual-roaming-dog,
+.virtual-service-yard:is([data-paused='true'], :focus-within)
+  .virtual-service-visitor
+  > img,
+.virtual-service-yard:is([data-paused='true'], :focus-within)
+  .virtual-dog-activity,
+.virtual-service-yard .virtual-roaming-dog:hover,
+.virtual-service-yard .virtual-roaming-dog:hover > img,
+.virtual-service-yard .virtual-roaming-dog:hover .virtual-dog-activity {
+  animation-play-state: paused;
+}
+@media (max-width: 1000px) {
+  .personal-care-workspace {
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 16px;
+  }
+  .personal-care-workspace .care-plan-option > img {
+    width: 60px;
+    height: 60px;
+  }
+  .personal-care-scene .virtual-shelter-heading > img {
+    display: none;
+  }
+  .personal-care-scene .care-projection-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .personal-care-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .personal-care-workspace .care-plan-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .personal-care-workspace .care-plan-option[data-slot='button'] {
+    flex-direction: column;
+    text-align: center;
+  }
+  .personal-care-scene .virtual-shelter-heading > img {
+    display: block;
+    width: 50px;
+    height: 50px;
+  }
+}

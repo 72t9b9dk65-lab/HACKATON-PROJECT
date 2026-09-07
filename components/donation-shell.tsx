@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Camera, Check } from 'lucide-react';
 import ShelterMap from '@/components/shelter-map';
 import { VirtualShelter } from '@/components/virtual-shelter';
+import { CarePlanner, CareTimeline } from '@/components/care-planner';
+import { ShelterProfile } from '@/components/shelter-profile';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Carousel,
   CarouselContent,
@@ -15,7 +15,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import {
-  careAllocation,
+  giftAllocation,
   careKinds,
   exampleGifts,
   fundingSummary,
@@ -30,10 +30,30 @@ import {
   parseDonationAmount,
   previewCareRecipients,
 } from '@/lib/virtual-shelter';
+import {
+  daysBetween,
+  forecastDays,
+  projectCare,
+  type CarePlanId,
+  type GivingFrequency,
+} from '@/lib/care-impact';
+import {
+  defaultShelterProfile,
+  PROFILE_STORAGE_KEY,
+  readShelterProfile,
+  type ShelterProfile as Profile,
+} from '@/lib/shelter-profile';
 
 export default function DonationShell() {
   const [selectedId, setSelectedId] = useState('ake');
-  const [draftAmount, setDraftAmount] = useState('250');
+  const [draftAmount, setDraftAmount] = useState('500');
+  const [careId, setCareId] = useState<CarePlanId>('food');
+  const [frequency, setFrequency] = useState<GivingFrequency>('once');
+  const [timelineDay, setTimelineDay] = useState(0);
+  const [startDate, setStartDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
+  const [profile, setProfile] = useState<Profile>(defaultShelterProfile);
   const [gifts, setGifts] = useState<DemoGift[]>(exampleGifts);
   const [ready, setReady] = useState(false);
   const [sessionOnly, setSessionOnly] = useState(false);
@@ -44,6 +64,29 @@ export default function DonationShell() {
   useEffect(() => {
     try {
       setGifts(readDemoGifts(localStorage.getItem(SHELL_STORAGE_KEY)));
+      const savedProfile = readShelterProfile(
+        localStorage.getItem(PROFILE_STORAGE_KEY),
+      );
+      setProfile(savedProfile);
+      if (savedProfile.monthlyPlan) {
+        const plan = savedProfile.monthlyPlan;
+        setDraftAmount(String(plan.amountOre / 100));
+        setCareId(plan.careId);
+        setFrequency('monthly');
+        setStartDate(plan.startDate);
+        setTimelineDay(
+          Math.min(
+            forecastDays(plan.startDate),
+            Math.max(
+              0,
+              daysBetween(
+                plan.startDate,
+                new Date().toISOString().slice(0, 10),
+              ),
+            ),
+          ),
+        );
+      }
     } catch {
       setSessionOnly(true);
     }
@@ -60,6 +103,14 @@ export default function DonationShell() {
       setSessionOnly(true);
     }
   }, [gifts, ready]);
+  useEffect(() => {
+    if (!ready) return;
+    try {
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+    } catch {
+      setSessionOnly(true);
+    }
+  }, [profile, ready]);
 
   const dog = profileDogs.find((item) => item.id === selectedId)!;
   const funding = fundingSummary(gifts);
@@ -70,8 +121,34 @@ export default function DonationShell() {
     (item) => funding.byDog[item.id].amountOre > 0,
   );
   const draftOre = parseDonationAmount(draftAmount);
-  const previewIds = previewCareRecipients(draftOre, funding);
-  const invalidAmount = draftAmount !== '' && draftOre === null;
+  const confirmedScene =
+    draftAmount === '' &&
+    frequency === 'once' &&
+    latestGift?.carePlanId === careId;
+  const projection = projectCare({
+    amountOre: draftOre ?? (confirmedScene ? latestGift.amountOre : null),
+    careId,
+    frequency,
+    startDate,
+    day: timelineDay,
+  });
+  const previewIds = confirmedScene
+    ? (latestGift.recipientIds ?? [latestGift.dogId])
+    : previewCareRecipients(projection.dogCount, funding);
+
+  function changeAmount(value: string) {
+    setDraftAmount(value);
+    setNotice('');
+  }
+  function changeCare(id: CarePlanId) {
+    setCareId(id);
+    setTimelineDay(0);
+  }
+  function changeFrequency(value: GivingFrequency) {
+    setFrequency(value);
+    setStartDate(new Date().toISOString().slice(0, 10));
+    setTimelineDay(0);
+  }
 
   function selectDog(id: string) {
     setSelectedId(id);
@@ -79,26 +156,37 @@ export default function DonationShell() {
     setCelebrate(false);
   }
   function donate() {
-    if (
-      !ready ||
-      gifts.length >= 1000 ||
-      draftOre === null ||
-      !previewIds.length
-    )
+    if (!ready || draftOre === null) return;
+    if (frequency === 'monthly') {
+      setProfile((current) => ({
+        ...current,
+        monthlyPlan: { amountOre: draftOre, careId, startDate },
+      }));
+      setNotice(
+        'Monthly forecast saved to your profile. No payments or automatic charges are scheduled.',
+      );
       return;
+    }
+    if (gifts.length >= 1000) return;
+    const recipients = previewIds.length
+      ? previewIds
+      : previewCareRecipients(1, funding);
     const gift = {
       id: crypto.randomUUID(),
       dogId: SHARED_CARE_ID,
-      recipientIds: [...previewIds],
+      recipientIds: [...recipients],
       amountOre: draftOre,
+      carePlanId: careId,
       createdAt: new Date().toISOString(),
     };
     setGifts((current) => [...current, gift]);
     setNotice(
-      `${kronor(draftOre)} SEK added to demo care for ${previewIds.length} ${previewIds.length === 1 ? 'profile' : 'profiles'}.`,
+      `${kronor(draftOre)} SEK added to demo care. ${projection.totalUnits ? 'Your care companions are now part of your shelter.' : 'This contribution is below the cost of a full care unit.'}`,
     );
-    setSelectedId(previewIds[0]);
+    setSelectedId(recipients[0]);
     setDraftAmount('');
+    setTimelineDay(0);
+    setStartDate(new Date().toISOString().slice(0, 10));
     setCelebrate(true);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setCelebrate(false), 1800);
@@ -121,6 +209,12 @@ export default function DonationShell() {
       </header>
 
       <main className="donation-workspace">
+        <ShelterProfile
+          profile={profile}
+          onSave={setProfile}
+          ready={ready}
+          sessionOnly={sessionOnly}
+        />
         <section
           className="donation-main donation-main-personal"
           aria-label="Your virtual shelter and real shelters"
@@ -131,7 +225,7 @@ export default function DonationShell() {
           >
             <div className="donation-balance">
               <div className="donation-balance-label">
-                <h1>Your total donated</h1>
+                <h2>Your total donated</h2>
                 <span className="donation-demo-label">DEMO</span>
               </div>
               <div
@@ -151,7 +245,7 @@ export default function DonationShell() {
                   <span
                     key={kind.id}
                     style={{
-                      width: `${kind.share}%`,
+                      width: `${amountOre ? (allocation[kind.id] / amountOre) * 100 : kind.share}%`,
                       background: kind.color,
                       opacity: amountOre ? 1 : 0.22,
                     }}
@@ -174,99 +268,46 @@ export default function DonationShell() {
                 ))}
               </div>
               <p className="donation-allocation-note">
-                Illustrative split · food 50% / vet 30% / daily care 20%
+                Demo giving by category · includes earlier illustrative splits
               </p>
             </div>
 
-            <VirtualShelter
-              funding={funding}
-              previewIds={previewIds}
-              onSelectDog={selectDog}
-            />
+            <div className="personal-care-workspace">
+              <CarePlanner
+                amount={draftAmount}
+                careId={careId}
+                frequency={frequency}
+                onAmount={changeAmount}
+                onCare={changeCare}
+                onFrequency={changeFrequency}
+                onConfirm={donate}
+                ready={ready}
+                atLimit={gifts.length >= 1000}
+                monthlyPlan={profile.monthlyPlan}
+                onCancelMonthly={() => {
+                  setProfile((current) => ({ ...current, monthlyPlan: null }));
+                  setNotice(
+                    'Monthly preview removed. Your donation history is unchanged.',
+                  );
+                }}
+              />
+              <div className="personal-care-scene">
+                <VirtualShelter
+                  funding={funding}
+                  previewIds={previewIds}
+                  projection={projection}
+                  confirmed={confirmedScene}
+                  shelterName={profile.shelterName}
+                  onSelectDog={selectDog}
+                />
+                <CareTimeline
+                  projection={projection}
+                  startDate={startDate}
+                  onDay={setTimelineDay}
+                />
+              </div>
+            </div>
 
-            <form
-              className="shelter-donation-form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                donate();
-              }}
-            >
-              <div className="shelter-donation-heading">
-                <label htmlFor="shelter-donation-amount">
-                  Add a little care
-                </label>
-                <span>Choose an amount to preview its reach</span>
-              </div>
-              <div className="shelter-donation-controls">
-                <div
-                  className="shelter-amount-presets"
-                  aria-label="Suggested donation amounts"
-                >
-                  {[100, 250, 500].map((amount) => (
-                    <Button
-                      key={amount}
-                      type="button"
-                      variant="outline"
-                      aria-pressed={draftOre === amount * 100}
-                      onClick={() => {
-                        setDraftAmount(String(amount));
-                        setNotice('');
-                      }}
-                    >
-                      {amount}
-                    </Button>
-                  ))}
-                </div>
-                <div className="shelter-custom-amount">
-                  <Input
-                    id="shelter-donation-amount"
-                    type="number"
-                    min="1"
-                    max="10000"
-                    step="1"
-                    inputMode="numeric"
-                    placeholder="Your amount"
-                    value={draftAmount}
-                    aria-invalid={invalidAmount}
-                    aria-describedby="shelter-preview-model shelter-amount-error"
-                    onChange={(event) => {
-                      setDraftAmount(event.target.value);
-                      setNotice('');
-                    }}
-                  />
-                  <span>SEK</span>
-                </div>
-                <Button
-                  type="submit"
-                  className="donation-primary"
-                  disabled={!ready || gifts.length >= 1000 || draftOre === null}
-                >
-                  <PixelCareIcon kind="heart" width="23" height="23" />
-                  {draftOre === null
-                    ? 'Choose an amount'
-                    : `Donate ${kronor(draftOre)} SEK`}
-                  <span>↗</span>
-                </Button>
-              </div>
-              <p
-                id="shelter-amount-error"
-                className="shelter-amount-error"
-                role="status"
-              >
-                {invalidAmount
-                  ? 'Enter a whole amount from 1 to 10,000 SEK.'
-                  : gifts.length >= 1000
-                    ? 'This device has reached its limit of 1,000 demo gifts.'
-                    : ''}
-              </p>
-              <p id="shelter-preview-model" className="shelter-preview-model">
-                Illustrative preview: 100 SEK per profile, rounded up and capped
-                at available profiles. Actual reach depends on shelter needs.
-              </p>
-              <p className="donation-payment-note">
-                Try it out. No payment is taken.
-              </p>
-            </form>
             <div className="donation-receipt" aria-live="polite" role="status">
               {notice ? (
                 <>
@@ -376,11 +417,9 @@ export default function DonationShell() {
                         You added {kronor(latestGift.amountOre)} SEK
                       </strong>
                       <p>
-                        {kronor(careAllocation(latestGift.amountOre).food)} for
-                        food,{' '}
-                        {kronor(careAllocation(latestGift.amountOre).health)}{' '}
-                        for vet care, and{' '}
-                        {kronor(careAllocation(latestGift.amountOre).comfort)}{' '}
+                        {kronor(giftAllocation(latestGift).food)} for food,{' '}
+                        {kronor(giftAllocation(latestGift).health)} for vet
+                        care, and {kronor(giftAllocation(latestGift).comfort)}{' '}
                         for daily care.
                       </p>
                       <span>Simulated allocation · awaiting a care update</span>

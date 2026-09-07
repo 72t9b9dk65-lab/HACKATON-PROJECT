@@ -19,18 +19,36 @@ import {
   profileDogs,
   type fundingSummary,
 } from '@/lib/donation-shell';
+import { carePlans, carePlan, type CareProjection } from '@/lib/care-impact';
+import { shelterSceneLayout } from '@/lib/shelter-scene';
 
 export function VirtualShelter({
   funding,
   previewIds,
+  projection,
+  confirmed,
+  shelterName,
   onSelectDog,
 }: {
   funding: ReturnType<typeof fundingSummary>;
   previewIds: string[];
+  projection: CareProjection;
+  confirmed: boolean;
+  shelterName: string;
   onSelectDog: (id: string) => void;
 }) {
   const [paused, setPaused] = useState(false);
   const yardRef = useRef<HTMLDivElement>(null);
+  const [yardWidth, setYardWidth] = useState(900);
+  useEffect(() => {
+    const yard = yardRef.current;
+    if (!yard) return;
+    const observer = new ResizeObserver(([entry]) =>
+      setYardWidth(entry.contentRect.width),
+    );
+    observer.observe(yard);
+    return () => observer.disconnect();
+  }, []);
   const previewKey = previewIds.join(',');
   useEffect(() => {
     if (previewKey && yardRef.current) yardRef.current.scrollTop = 0;
@@ -49,9 +67,25 @@ export function VirtualShelter({
     ? profileDogs.find((item) => item.id === inspected.id)!
     : null;
   const population = [
-    ...previewDogs.map((item) => ({ dog: item, preview: true })),
-    ...residents.map((item) => ({ dog: item, preview: false })),
+    ...previewDogs.map((item) => ({
+      dog: item,
+      preview: !confirmed,
+      visitor: true,
+    })),
+    ...residents
+      .filter((item) => !confirmed || !previewIds.includes(item.id))
+      .map((item) => ({ dog: item, preview: false, visitor: false })),
   ];
+  const unmatchedCount = Math.max(0, projection.dogCount - previewIds.length);
+  const stationIndex = carePlans.findIndex(
+    (plan) => plan.id === projection.careId,
+  );
+  const scene = shelterSceneLayout(
+    yardWidth,
+    population.length + unmatchedCount,
+    stationIndex,
+  );
+  const plan = carePlan(projection.careId);
 
   return (
     <Dialog
@@ -74,8 +108,8 @@ export function VirtualShelter({
           />
           <div>
             <span className="donation-eyebrow">CONNECTED TO REAL DOGS</span>
-            <h2 id="virtual-shelter-title">Your virtual shelter</h2>
-            <p>Click a dog to meet the real friend behind the pixels.</p>
+            <h2 id="virtual-shelter-title">{shelterName}</h2>
+            <p>Watch care take shape. Click a dog to meet them.</p>
           </div>
           <Button
             variant="outline"
@@ -98,67 +132,158 @@ export function VirtualShelter({
           </span>
           {previewIds.length > 0 && (
             <span>
-              <i className="virtual-preview-dot" /> +{previewIds.length} care
-              previews
+              <i className="virtual-preview-dot" /> {projection.dogCount}{' '}
+              {confirmed
+                ? 'dogs in this demo gift'
+                : 'estimated care recipients'}
             </span>
           )}
         </div>
 
         <div
           ref={yardRef}
-          className="virtual-shelter-yard"
+          className="virtual-shelter-yard virtual-service-yard"
           data-paused={paused || inspected !== null}
           aria-label="Your virtual shelter. Choose a dog to see its profile."
           tabIndex={0}
         >
-          {population.length ? (
-            population.map(({ dog: item, preview }, index) => (
-              <div
-                className="virtual-dog-space"
-                key={`${preview ? 'preview' : 'resident'}-${item.id}`}
-              >
-                <DialogTrigger
-                  render={<button type="button" />}
-                  className={`virtual-roaming-dog ${preview ? 'virtual-roaming-preview' : ''}`}
-                  style={
-                    {
-                      '--roam-duration': `${8 + (index % 5) * 2}s`,
-                      '--roam-delay': `${-index * 1.7}s`,
-                      '--roam-x': `${index % 2 ? -12 : 12}px`,
-                      '--roam-y': `${index % 3 ? 8 : -8}px`,
-                    } as CSSProperties
+          <div
+            className="virtual-service-scene"
+            style={{ height: scene.height }}
+          >
+            <div className="care-stations">
+              {carePlans.map((station) => (
+                <div
+                  className="care-station"
+                  data-active={
+                    projection.careId === station.id &&
+                    projection.totalUnits > 0
                   }
-                  onClick={() => {
-                    setInspected({ id: item.id, preview });
-                    onSelectDog(item.id);
-                  }}
-                  aria-label={`${preview ? 'Preview care for' : 'Meet'} ${item.name}, ${item.breed}`}
+                  key={station.id}
                 >
-                  <img
-                    src={item.sprite}
-                    width="72"
-                    height="72"
-                    alt=""
-                    draggable="false"
-                    loading="lazy"
-                  />
-                  <span className="virtual-dog-name">
-                    <DogName name={item.name} />
+                  <strong>{station.name}</strong>
+                  <span>
+                    {projection.careId === station.id
+                      ? projection.totalUnits
+                      : 0}{' '}
+                    {station.unit} planned
                   </span>
-                  {preview && <small>Preview</small>}
-                </DialogTrigger>
-              </div>
-            ))
-          ) : (
-            <p className="virtual-shelter-empty">
-              Choose an amount below to imagine your first care companions.
-            </p>
-          )}
+                  <img
+                    src={station.asset}
+                    alt={station.name}
+                    width="148"
+                    height="148"
+                  />
+                </div>
+              ))}
+            </div>
+            {population.length ? (
+              population.map(({ dog: item, preview, visitor }, index) => (
+                <div
+                  className="virtual-dog-space virtual-service-dog-space"
+                  style={{
+                    left: scene.positions[index].x,
+                    top: scene.positions[index].y,
+                  }}
+                  key={`${preview ? 'preview' : 'resident'}-${item.id}`}
+                >
+                  <DialogTrigger
+                    render={<button type="button" />}
+                    className={`virtual-roaming-dog ${preview ? 'virtual-roaming-preview' : ''} ${visitor && index >= projection.activeStartIndex && index < projection.activeStartIndex + projection.activeDogs ? 'virtual-service-visitor' : ''}`}
+                    style={
+                      {
+                        '--roam-duration': `${8 + (index % 5) * 2}s`,
+                        '--roam-delay': `${-index * 1.7}s`,
+                        '--roam-x': `${index % 2 ? -12 : 12}px`,
+                        '--roam-y': `${index % 3 ? 8 : -8}px`,
+                        '--service-x': `${scene.positions[index].dx}px`,
+                        '--service-y': `${scene.positions[index].dy}px`,
+                      } as CSSProperties
+                    }
+                    onClick={() => {
+                      setInspected({ id: item.id, preview });
+                      onSelectDog(item.id);
+                    }}
+                    aria-label={`${preview ? 'Preview care for' : 'Meet'} ${item.name}, ${item.breed}`}
+                  >
+                    <img
+                      src={item.sprite}
+                      width="72"
+                      height="72"
+                      alt=""
+                      draggable="false"
+                      loading="lazy"
+                    />
+                    {visitor &&
+                      index >= projection.activeStartIndex &&
+                      index <
+                        projection.activeStartIndex + projection.activeDogs && (
+                        <span className="virtual-dog-activity">
+                          {plan.activity}
+                        </span>
+                      )}
+                    <span className="virtual-dog-name">
+                      <DogName name={item.name} />
+                    </span>
+                    {preview && <small>Preview</small>}
+                  </DialogTrigger>
+                </div>
+              ))
+            ) : (
+              <p className="virtual-shelter-empty">
+                Choose a care example to welcome your first companions.
+              </p>
+            )}
+            {Array.from({ length: unmatchedCount }, (_, index) => {
+              const position = scene.positions[population.length + index];
+              const visiting =
+                previewDogs.length + index >= projection.activeStartIndex &&
+                previewDogs.length + index <
+                  projection.activeStartIndex + projection.activeDogs;
+              return (
+                <div
+                  className="virtual-service-dog-space"
+                  key={`future-${index}`}
+                  style={{ left: position.x, top: position.y }}
+                >
+                  <div
+                    className={`virtual-roaming-dog virtual-roaming-preview virtual-service-future-dog ${visiting ? 'virtual-service-visitor' : ''}`}
+                    style={
+                      {
+                        '--service-x': `${position.dx}px`,
+                        '--service-y': `${position.dy}px`,
+                        '--roam-duration': '14s',
+                        '--roam-delay': `${-index * 2}s`,
+                        '--roam-x': '8px',
+                        '--roam-y': '6px',
+                      } as CSSProperties
+                    }
+                  >
+                    <img
+                      src="/dogs/pixel-breeds/mixed-medium.png"
+                      alt="Illustrative future dog, not yet matched to a real profile"
+                      width="72"
+                      height="72"
+                    />
+                    <span>Future dog</span>
+                    <small>Not yet matched</small>
+                    {visiting && (
+                      <span className="virtual-dog-activity">
+                        {plan.activity}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
         <p className="virtual-shelter-note">
-          Every companion links to a real Hundstallet profile. Faded dogs
-          preview possible shared care, including extra care for dogs already
-          here.
+          {projection.activeDogs
+            ? `${projection.activeDogs} ${projection.activeDogs === 1 ? 'dog uses' : 'dogs use'} ${plan.name.toLowerCase()} on this forecast day. `
+            : 'No care use scheduled on this forecast day. '}
+          Named dogs link to real profiles; matching and care timing are
+          simulated. Faded dogs are estimates, not verified recipients.
         </p>
       </section>
 
@@ -183,7 +308,8 @@ export function VirtualShelter({
           {inspected.preview ? (
             <p className="virtual-profile-preview-note">
               This is an illustrative match for your chosen amount. No donation
-              has been added for this preview.
+              has been added for this preview. The selected plan could
+              contribute to {plan.name.toLowerCase()}.
             </p>
           ) : (
             <div className="virtual-profile-care">

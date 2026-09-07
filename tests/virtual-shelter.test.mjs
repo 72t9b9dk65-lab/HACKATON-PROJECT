@@ -44,20 +44,18 @@ test('Changing an illustrative preview never changes confirmed giving or directo
   const funding = fundingSummary(gifts);
   const before = JSON.stringify({ gifts, funding, profileDogs });
   for (const [amount, count] of [
-    [null, 0],
     [0, 0],
-    [100, 1],
-    [10_000, 1],
-    [25_000, 3],
-    [50_000, 5],
-    [MAX_DEMO_GIFT_ORE, profileDogs.length],
+    [1, 1],
+    [3, 3],
+    [5, 5],
+    [100, profileDogs.filter((dog) => !dog.group).length],
   ]) {
     const ids = previewCareRecipients(amount, funding);
     assert.equal(ids.length, count);
     assert.equal(new Set(ids).size, count);
     assert.ok(ids.every((id) => profileDogs.some((dog) => dog.id === id)));
   }
-  for (const amount of [-1, 1.2, NaN, Infinity, MAX_DEMO_GIFT_ORE + 1]) {
+  for (const amount of [-1, 1.2, NaN, Infinity]) {
     assert.deepEqual(previewCareRecipients(amount, funding), []);
   }
   assert.equal(JSON.stringify({ gifts, funding, profileDogs }), before);
@@ -71,14 +69,14 @@ test('Preview prioritizes unsupported dogs and then those with the least demo ca
     createdAt: '2026-09-07T12:00:00Z',
   }));
   const funding = fundingSummary(gifts);
-  const small = previewCareRecipients(25_000, funding);
+  const small = previewCareRecipients(3, funding);
   assert.ok(small.every((id) => funding.byDog[id].amountOre === 0));
-  const all = previewCareRecipients(MAX_DEMO_GIFT_ORE, funding);
+  const all = previewCareRecipients(100, funding);
   assert.deepEqual(
     all.slice(-3),
     profileDogs.slice(0, 3).map((dog) => dog.id),
   );
-  assert.deepEqual(previewCareRecipients(25_000, funding), small);
+  assert.deepEqual(previewCareRecipients(3, funding), small);
 });
 
 test('Confirming a custom amount funds exactly the preview and survives reload without redistributing history', () => {
@@ -91,7 +89,7 @@ test('Confirming a custom amount funds exactly the preview and survives reload w
   const original = readDemoGifts(JSON.stringify([legacy]));
   const before = fundingSummary(original);
   const amountOre = parseDonationAmount('1275');
-  const recipientIds = previewCareRecipients(amountOre, before);
+  const recipientIds = previewCareRecipients(3, before);
   const gift = {
     id: 'custom',
     dogId: SHARED_CARE_ID,

@@ -1,0 +1,45 @@
+{
+  "source": "https://hundstallet.se/stod-oss/",
+  "verified_on": "2026-09-07",
+  "examples": [
+    {
+      "amount_sek": 100,
+      "care": "food and enrichment",
+      "dogs": 1,
+      "days": 2
+    },
+    {
+      "amount_sek": 240,
+      "care": "veterinary care and rehabilitation",
+      "days": 2,
+      "dogs": null
+    },
+    {
+      "amount_sek": 500,
+      "care": "food and enrichment",
+      "dogs": 1,
+      "days": 10
+    },
+    {
+      "amount_sek": 1100,
+      "care": "veterinary examination and vaccination",
+      "dogs": 1,
+      "visits": 1
+    }
+  ],
+  "derived_rates_sek": {
+    "food_dog_day": 50,
+    "rehabilitation_day": 120,
+    "examination_and_vaccination": 1100
+  },
+  "prototype_assumptions": [
+    "Only the selected care option consumes the preview budget; alternatives are not additive.",
+    "Money is converted into complete care days or complete visits. Any remainder carries forward to the next projected monthly gift.",
+    "Food is planned in cohorts with at most ten days per dog per monthly gift; veterinary care and rehabilitation uses two-day cohorts. Recipient counts and matching are illustrative.",
+    "Food and rehabilitation repeat for the same cohort each month instead of claiming new unique recipients every month.",
+    "Each examination/vaccination equivalent uses a different illustrative recipient; unknown future recipients have no invented real profile.",
+    "One day of care per recipient is scheduled per day from each projected contribution date; examinations occur on the projected funding date. This is not a clinical schedule or actual shelter reporting.",
+    "Monthly contributions start on the plan date and repeat on the same calendar day, clamped to the end of shorter months. The timeline covers twelve contributions at most.",
+    "The profile and optional monthly plan are device-local. Forecasts never create actual payments, future donation receipts, or verified care events."
+  ]
+}

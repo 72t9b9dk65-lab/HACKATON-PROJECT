@@ -13,13 +13,15 @@ Both launchers install missing dependencies and open your browser. Keep the term
 
 ## Prototype experience
 
-The homepage centers on a wide personal virtual shelter, with the donated total and spending bars above it and the warm white Sweden map alongside. Amount selection previews possible shared care before the user confirms a demo gift.
+The homepage centers on a personal shelter profile, care choices, and a virtual shelter with a daily impact timeline. The confirmed demo total and category bars remain above the workspace; the Sweden map and real photo journey remain below it.
 
-- Pixel dogs roam in the personal shelter. Clicking one opens an accessible dialog with its real photo, breed, age, status, shelter, demo support, and official profile link. Motion pauses during interaction, has a pause control, and respects reduced-motion preferences. The real photo journey below still scrolls horizontally.
+- Edit the supporter name and shelter name in the personal profile. Profile details and the optional monthly plan persist on this device without creating an online account.
+- Pixel dogs roam in the personal shelter and approach generated food/enrichment, rehabilitation, and examination/vaccination stations on forecast care days. Faded dogs are potential recipients. Clicking a named dog opens its real photo, breed, age, status, shelter, demo support, and official profile link. Motion can be paused and respects reduced-motion preferences. Future recipients beyond the individual directory are explicitly anonymous illustrations, not invented profiles.
 - Click a pixel shelter to fly from Sweden to its real facility location, showing nearby OpenStreetMap roads and buildings. A rectangular, scrollable grid shows its published dog profiles. **All profiles** includes all 43 listings from the official directory on 7 September 2026, including two group listings and two trial adoptions. The single “Rehoming team” listing remains visible without an invented shelter location.
 - Selecting a grid avatar shows its published photo, official profile link, and simulated care allocation. Selecting a profile at another shelter moves the map there. Escape or **Sweden** returns to the overview.
-- Choose 100, 250, or 500 SEK, or enter any whole amount from 1 to 10,000 SEK. Translucent dogs preview possible care using an explicit prototype assumption of 100 SEK per profile, rounded up and capped at the 43 available profiles. This is not a verified cost or promise of reach. Unsupported profiles are previewed first, then profiles with the least demo support; existing dogs can receive more care.
-- Press **Donate** to confirm that amount for exactly the previewed profiles. Pending previews never affect totals or storage. The illustrative split is **50% food / 30% vet care / 20% daily care**, divided in integer öre among the recorded recipients. New gifts snapshot their recipient IDs; older shared gifts retain their original three beneficiaries. Totals and category allocations reconcile exactly, including after reload.
+- Choose one of three care examples (100 SEK food/enrichment, 240 SEK veterinary care/rehabilitation, or 1,100 SEK examination/vaccination), or enter a whole amount from 1 to 10,000 SEK for the selected option. The official 500 SEK example becomes ten food/enrichment dog-days for one dog. Costs are based on the official giving page checked on 7 September 2026, with source data and modeling assumptions in `public/data/hundstallet/care-examples.json`.
+- Select **Every month** and move the daily slider across twelve months. Forecast contributions accumulate on calendar-month anniversaries, complete care units are scheduled day by day, and unused balances carry toward the next unit. Repeated food/rehabilitation care does not inflate unique recipient counts. Examination/vaccination equivalents use different illustrative recipients. Save, update, or remove a monthly preview without changing donation history or scheduling any automatic charges.
+- For a one-time gift, **Donate** records the entered amount for the matched profiles; a sub-unit contribution is recorded as partial demo support, not a completed purchase. New choices allocate to their selected food or veterinary category. Earlier receipts retain their historical 50/30/20 illustrative allocation and original recipients. Only confirmed one-time demo gifts enter the ledger; forecasts never create future receipts. All amounts reconcile in integer öre after reload.
 - A fresh session starts with a labeled 500 SEK example shared among all 43 profiles. Existing user records retain their dates, amounts, and recipient allocations. The map does not claim that every dog lives at its listed shelter continuously.
 - Published photos have no verified event dates. New demo gifts add a dated entry; the final card reserves space for an organization-posted care update.
 - Sweden’s coastline, counties, lakes, rivers, city labels, panning, zoom, and reset remain available. Both map views use warm white backgrounds, light brown geographic details, and cream shelter cards.
@@ -61,11 +63,15 @@ Consulted September 7, 2026:
 
 ## Validation and code
 
-Run `npm test`, `npm run typecheck`, and `npm run build`. Tests cover exact allocations, per-dog isolation, reload validation, sourced photo availability, map projection, and the retained earlier models.
+Run `npm test`, `npm run typecheck`, and `npm run build`. Tests cover the four official care examples, every day of twelve-month forecasts, exact allocations, carryover, short months and leap years, repeat-care recipient counts, local profile/plan persistence, scene bounds, asset alpha, photo availability, map projection, and the retained earlier models.
 
 - `components/donation-shell.tsx`: contribution totals, custom demo donations, and horizontal photo timeline.
-- `components/virtual-shelter.tsx`: roaming supported and preview dogs, motion controls, and real-profile dialogs.
-- `lib/virtual-shelter.ts`: custom amount validation and the explicitly illustrative preview model.
+- `components/virtual-shelter.tsx`: care stations, supported and preview dogs, movement to services, and real-profile dialogs.
+- `components/care-planner.tsx` and `components/shelter-profile.tsx`: care choices, monthly preview, daily timeline, and personal profile editing.
+- `lib/care-impact.ts`: sourced care units, calendar schedule, cumulative capacity/use, reserve handling, and estimated recipients.
+- `lib/shelter-profile.ts` and `lib/virtual-shelter.ts`: device-local profile/plan validation, custom amount parsing, and matched profile selection.
+- `lib/shelter-scene.ts`: responsive dog home and care-station coordinates.
+- `public/care/pixel/` and `assets/care-stations/generation.json`: three generated transparent care stations, exact prompts, provenance, and saved paths.
 - `components/shelter-map.tsx`: pixel shelter markers, animated close-up, full dog directory, and selected-dog care.
 - `lib/shelter-camera.ts`: geographic camera interpolation and facility centering.
 - `public/data/hundstallet/directory.json` and `lib/hundstallet-directory.ts`: complete sourced snapshot and typed data.

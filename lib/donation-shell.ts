@@ -1,5 +1,6 @@
 import { directoryProfiles } from './hundstallet-directory.ts';
 import { realShelters } from './hundstallet-shelters.ts';
+import { isCarePlanId, type CarePlanId } from './care-impact.ts';
 
 export type CareKind = 'food' | 'health' | 'comfort';
 export type ProfileDog = {
@@ -133,6 +134,7 @@ export type DemoGift = {
   amountOre: number;
   createdAt: string;
   recipientIds?: string[];
+  carePlanId?: CarePlanId;
 };
 export const LEGACY_SHARED_RECIPIENTS = ['ake', 'koby', 'ove'];
 export const exampleGifts: DemoGift[] = [
@@ -161,6 +163,14 @@ export function giftsForDog(gifts: DemoGift[], dogId: string) {
   return fundingSummary(gifts).byDog[dogId]?.amountOre ?? 0;
 }
 
+export function giftAllocation(gift: DemoGift) {
+  if (!gift.carePlanId) return careAllocation(gift.amountOre);
+  if (!isCarePlanId(gift.carePlanId)) throw new Error('Unknown care plan.');
+  const allocation = careAllocation(0);
+  allocation[gift.carePlanId === 'food' ? 'food' : 'health'] = gift.amountOre;
+  return allocation;
+}
+
 // Divide each care category in integer öre, so both the map and overall bars
 // reconcile. Shared allocation is a demo model, not a claim about shelter costs.
 export function fundingSummary(gifts: DemoGift[]) {
@@ -186,7 +196,7 @@ export function fundingSummary(gifts: DemoGift[]) {
       !recipients.every((id) => byDog[id])
     )
       throw new Error('Unknown demo recipient.');
-    const care = careAllocation(gift.amountOre);
+    const care = giftAllocation(gift);
     amountOre += gift.amountOre;
     for (const kind of careKinds) {
       allocation[kind.id] += care[kind.id];
@@ -221,6 +231,7 @@ export function readDemoGifts(raw: string | null): DemoGift[] {
         !Number.isSafeInteger(g.amountOre) ||
         g.amountOre <= 0 ||
         g.amountOre > MAX_DEMO_GIFT_ORE ||
+        (g.carePlanId !== undefined && !isCarePlanId(g.carePlanId)) ||
         (g.recipientIds !== undefined &&
           (!Array.isArray(g.recipientIds) ||
             !g.recipientIds.length ||
