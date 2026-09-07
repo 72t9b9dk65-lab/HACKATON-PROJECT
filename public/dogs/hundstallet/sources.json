@@ -1,0 +1,77 @@
+{
+  "retrievedAt": "2026-09-07",
+  "publisher": "Hundstallet",
+  "usage": "Published dog profile photographs for this independent prototype. Copyright remains with the original rights holders. These photos are not donation evidence; no event dates or purchase links are asserted.",
+  "images": [
+    {
+      "dog": "koby",
+      "profile": "https://hundstallet.se/hundar/koby/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/2026/08/Koby-1-1.jpg",
+      "local": "/dogs/hundstallet/koby-1.jpg",
+      "sha256": "2b8c9c4ad95012827647f7fd096676523dd1fdb96fec6eb8be51d65134ba43d6"
+    },
+    {
+      "dog": "koby",
+      "profile": "https://hundstallet.se/hundar/koby/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/2026/08/Koby-2.jpg",
+      "local": "/dogs/hundstallet/koby-2.jpg",
+      "sha256": "211805a37f683ebfa95002b9d85efa2c642b31b0ce77ec229e47014a3acfd32c"
+    },
+    {
+      "dog": "koby",
+      "profile": "https://hundstallet.se/hundar/koby/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/2026/08/Koby-3.jpg",
+      "local": "/dogs/hundstallet/koby-3.jpg",
+      "sha256": "2f69d51063bbaa42a34ac862e990533018e04e7b8e13394af4ac687e50fedc1b"
+    },
+    {
+      "dog": "ake",
+      "profile": "https://hundstallet.se/hundar/ake/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/2026/08/Ake-1-1.jpg",
+      "local": "/dogs/hundstallet/ake-1.jpg",
+      "sha256": "1b6b1de683f70bc6375ed3d2b24c5c36ca33708cd9095cc556883feb3875137f"
+    },
+    {
+      "dog": "ake",
+      "profile": "https://hundstallet.se/hundar/ake/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/2026/08/Ake-2.jpg",
+      "local": "/dogs/hundstallet/ake-2.jpg",
+      "sha256": "431ac887dc5f24dcb836e53e7479ab981b387af6619b4a71492e518de46b43d6"
+    },
+    {
+      "dog": "ake",
+      "profile": "https://hundstallet.se/hundar/ake/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/2026/08/Ake-4.jpg",
+      "local": "/dogs/hundstallet/ake-3.jpg",
+      "sha256": "568cf8ac4c8bcb1db0b0ca059c38a48438f7148c954259703e8bc696bdbee585"
+    },
+    {
+      "dog": "ake",
+      "profile": "https://hundstallet.se/hundar/ake/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/2026/08/Ake-3.jpg",
+      "local": "/dogs/hundstallet/ake-4.jpg",
+      "sha256": "49c8069eeb18f1d4e9b298977f98fe9094e914905fc4eea2291e495018a1bd4d"
+    },
+    {
+      "dog": "ove",
+      "profile": "https://hundstallet.se/hundar/ove/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/2026/09/Hund-2-1.jpg",
+      "local": "/dogs/hundstallet/ove-1.jpg",
+      "sha256": "eab3dc5d0aab0f61dcd77afd2950e344071232e10d258dd80a366cda0f87c30b"
+    },
+    {
+      "dog": "ove",
+      "profile": "https://hundstallet.se/hundar/ove/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/2026/09/Hund-2-2.jpg",
+      "local": "/dogs/hundstallet/ove-2.jpg",
+      "sha256": "741e8faa3b171daade319f1b7a3b98e0c47f56bc316b44e46a1ab79eeb16fea2"
+    },
+    {
+      "dog": "ove",
+      "profile": "https://hundstallet.se/hundar/ove/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/2026/09/hund2.jpg",
+      "local": "/dogs/hundstallet/ove-3.jpg",
+      "sha256": "188e87edc3c348bfea2c83296b7aa6841fb7dcfb682e39a0691baa377ac0cf6e"
+    }
+  ]
+}
