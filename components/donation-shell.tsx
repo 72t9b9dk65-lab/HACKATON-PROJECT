@@ -6,6 +6,20 @@ import ShelterMap from '@/components/shelter-map';
 import { VirtualShelter } from '@/components/virtual-shelter';
 import { CarePlanner, CareTimeline } from '@/components/care-planner';
 import { ShelterProfile } from '@/components/shelter-profile';
+import {
+  DonationBalance,
+  ExpenseTransactions,
+  SpendingBreakdown,
+} from '@/components/donation-spending';
+import {
+  exampleExpenses,
+  firstCareExpenses,
+  GIVING_STORAGE_KEY,
+  readGivingLedger,
+  spendingSummary,
+  type DemoExpense,
+  type GivingLedger,
+} from '@/lib/donation-spending';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
 import {
   Carousel,
@@ -16,13 +30,10 @@ import {
 } from '@/components/ui/carousel';
 import {
   giftAllocation,
-  careKinds,
   exampleGifts,
-  fundingSummary,
   SHARED_CARE_ID,
   kronor,
   profileDogs,
-  readDemoGifts,
   SHELL_STORAGE_KEY,
   type DemoGift,
 } from '@/lib/donation-shell';
@@ -54,16 +65,30 @@ export default function DonationShell() {
     new Date().toISOString().slice(0, 10),
   );
   const [profile, setProfile] = useState<Profile>(defaultShelterProfile);
-  const [gifts, setGifts] = useState<DemoGift[]>(exampleGifts);
+  const [ledger, setLedger] = useState<GivingLedger>(() => ({
+    gifts: exampleGifts,
+    expenses: exampleExpenses(exampleGifts),
+  }));
+  const { gifts, expenses } = ledger;
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const [replay, setReplay] = useState<{
+    expense: DemoExpense;
+    key: number;
+  } | null>(null);
+  const replayCounter = useRef(0);
+  const sceneAnchor = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
   const [sessionOnly, setSessionOnly] = useState(false);
   const [notice, setNotice] = useState('');
-  const [celebrate, setCelebrate] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     try {
-      setGifts(readDemoGifts(localStorage.getItem(SHELL_STORAGE_KEY)));
+      setLedger(
+        readGivingLedger(
+          localStorage.getItem(GIVING_STORAGE_KEY),
+          localStorage.getItem(SHELL_STORAGE_KEY),
+        ),
+      );
       const savedProfile = readShelterProfile(
         localStorage.getItem(PROFILE_STORAGE_KEY),
       );
@@ -91,18 +116,15 @@ export default function DonationShell() {
       setSessionOnly(true);
     }
     setReady(true);
-    return () => {
-      if (timer.current) clearTimeout(timer.current);
-    };
   }, []);
   useEffect(() => {
     if (!ready) return;
     try {
-      localStorage.setItem(SHELL_STORAGE_KEY, JSON.stringify(gifts));
+      localStorage.setItem(GIVING_STORAGE_KEY, JSON.stringify(ledger));
     } catch {
       setSessionOnly(true);
     }
-  }, [gifts, ready]);
+  }, [ledger, ready]);
   useEffect(() => {
     if (!ready) return;
     try {
@@ -113,24 +135,20 @@ export default function DonationShell() {
   }, [profile, ready]);
 
   const dog = profileDogs.find((item) => item.id === selectedId)!;
-  const funding = fundingSummary(gifts);
-  const { amountOre, allocation } = funding;
+  const spending = spendingSummary(ledger);
+  const { funding, residentIds } = spending;
+  const amountOre = spending.totalOre;
   const myGifts = gifts.filter((gift) => gift.id !== 'example');
-  const personalFunding = fundingSummary(myGifts);
-  const residentIds = profileDogs
-    .filter(
-      (item) => !item.group && personalFunding.byDog[item.id].amountOre > 0,
-    )
-    .map((item) => item.id);
   const latestGift = myGifts.at(-1);
-  const helpedDogs = profileDogs.filter(
-    (item) => funding.byDog[item.id].amountOre > 0,
+  const latestExpenses = expenses.filter(
+    (expense) => expense.giftId === latestGift?.id,
   );
   const draftOre = parseDonationAmount(draftAmount);
   const confirmedScene =
     draftAmount === '' &&
     frequency === 'once' &&
-    latestGift?.carePlanId === careId;
+    latestGift?.carePlanId === careId &&
+    latestExpenses.length > 0;
   const projection = projectCare({
     amountOre: draftOre ?? (confirmedScene ? latestGift.amountOre : null),
     careId,
@@ -139,18 +157,21 @@ export default function DonationShell() {
     day: timelineDay,
   });
   const previewIds = confirmedScene
-    ? (latestGift.recipientIds ?? [latestGift.dogId])
-    : previewCareRecipients(projection.dogCount, personalFunding, careId);
+    ? [...new Set(latestExpenses.map((expense) => expense.dogId))]
+    : previewCareRecipients(projection.dogCount, funding, careId);
 
   function changeAmount(value: string) {
+    setReplay(null);
     setDraftAmount(value);
     setNotice('');
   }
   function changeCare(id: CarePlanId) {
+    setReplay(null);
     setCareId(id);
     setTimelineDay(0);
   }
   function changeFrequency(value: GivingFrequency) {
+    setReplay(null);
     setFrequency(value);
     setStartDate(new Date().toISOString().slice(0, 10));
     setTimelineDay(0);
@@ -159,8 +180,21 @@ export default function DonationShell() {
   function selectDog(id: string) {
     setSelectedId(id);
     setNotice('');
-    setCelebrate(false);
   }
+  function replayExpense(expense: DemoExpense) {
+    setSelectedId(expense.dogId);
+    setReplay({ expense, key: ++replayCounter.current });
+  }
+  useEffect(() => {
+    if (!replay) return;
+    sceneAnchor.current?.scrollIntoView({
+      block: 'start',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+    });
+  }, [replay]);
+
   function donate() {
     if (!ready || draftOre === null) return;
     if (frequency === 'monthly') {
@@ -176,8 +210,8 @@ export default function DonationShell() {
     if (gifts.length >= 1000) return;
     const recipients = previewIds.length
       ? previewIds
-      : previewCareRecipients(1, personalFunding, careId);
-    const gift = {
+      : previewCareRecipients(1, funding, careId);
+    const gift: DemoGift = {
       id: crypto.randomUUID(),
       dogId: SHARED_CARE_ID,
       recipientIds: [...recipients],
@@ -185,17 +219,23 @@ export default function DonationShell() {
       carePlanId: careId,
       createdAt: new Date().toISOString(),
     };
-    setGifts((current) => [...current, gift]);
+    const careExpenses = firstCareExpenses(gift);
+    const spent = careExpenses.reduce(
+      (sum, expense) => sum + expense.amountOre,
+      0,
+    );
+    setLedger((current) => ({
+      gifts: [...current.gifts, gift],
+      expenses: [...current.expenses, ...careExpenses],
+    }));
+    setReplay(null);
     setNotice(
-      `${kronor(draftOre)} SEK added to demo care. ${projection.totalUnits ? 'Your care companions are now part of your shelter.' : 'This contribution is below the cost of a full care unit.'}`,
+      `${kronor(draftOre)} SEK donated. ${kronor(spent)} SEK used in first-care demo expenses; ${kronor(draftOre - spent)} SEK pending.`,
     );
     setSelectedId(recipients[0]);
     setDraftAmount('');
     setTimelineDay(0);
     setStartDate(new Date().toISOString().slice(0, 10));
-    setCelebrate(true);
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setCelebrate(false), 1800);
   }
 
   return (
@@ -229,90 +269,77 @@ export default function DonationShell() {
             className="donation-panel donation-panel-total donation-panel-personal"
             aria-label="Your giving and personal shelter"
           >
-            <div className="donation-balance">
-              <div className="donation-balance-label">
-                <h2>Your total donated</h2>
-                <span className="donation-demo-label">DEMO</span>
-              </div>
-              <div
-                className={`donation-value ${celebrate ? 'donation-value-pop' : ''}`}
+            <div className="personal-care-workspace personal-giving-workspace">
+              <aside
+                className="personal-giving-sidebar"
+                aria-label="Your donations and care transactions"
               >
-                <strong>{kronor(amountOre)}</strong>
-                <span>SEK</span>
-                {celebrate && (
-                  <span className="donation-float">
-                    +{kronor(latestGift?.amountOre ?? 0)}{' '}
-                    <PixelCareIcon kind="heart" width="18" height="18" />
-                  </span>
-                )}
-              </div>
-              <div className="donation-allocation-bar" aria-hidden="true">
-                {careKinds.map((kind) => (
-                  <span
-                    key={kind.id}
-                    style={{
-                      width: `${amountOre ? (allocation[kind.id] / amountOre) * 100 : kind.share}%`,
-                      background: kind.color,
-                      opacity: amountOre ? 1 : 0.22,
-                    }}
-                  />
-                ))}
-              </div>
-              <div className="donation-breakdown">
-                {careKinds.map((kind) => (
-                  <div
-                    key={kind.id}
-                    className={`donation-care donation-care-${kind.id}`}
-                  >
-                    <PixelCareIcon kind={kind.id} width="36" height="36" />
-                    <strong>
-                      {kronor(allocation[kind.id])}
-                      <small> SEK</small>
-                    </strong>
-                    <span>{kind.label}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="donation-allocation-note">
-                Demo giving by category · includes earlier illustrative splits
-              </p>
-            </div>
-
-            <div className="personal-care-workspace">
-              <CarePlanner
-                amount={draftAmount}
-                careId={careId}
-                frequency={frequency}
-                onAmount={changeAmount}
-                onCare={changeCare}
-                onFrequency={changeFrequency}
-                onConfirm={donate}
-                ready={ready}
-                atLimit={gifts.length >= 1000}
-                monthlyPlan={profile.monthlyPlan}
-                onCancelMonthly={() => {
-                  setProfile((current) => ({ ...current, monthlyPlan: null }));
-                  setNotice(
-                    'Monthly preview removed. Your donation history is unchanged.',
-                  );
-                }}
-              />
+                <DonationBalance
+                  spending={spending}
+                  open={breakdownOpen}
+                  onToggle={() => setBreakdownOpen((value) => !value)}
+                />
+                <CarePlanner
+                  amount={draftAmount}
+                  careId={careId}
+                  frequency={frequency}
+                  onAmount={changeAmount}
+                  onCare={changeCare}
+                  onFrequency={changeFrequency}
+                  onConfirm={donate}
+                  ready={ready}
+                  atLimit={gifts.length >= 1000}
+                  monthlyPlan={profile.monthlyPlan}
+                  onCancelMonthly={() => {
+                    setProfile((current) => ({
+                      ...current,
+                      monthlyPlan: null,
+                    }));
+                    setNotice(
+                      'Monthly preview removed. Your donation history is unchanged.',
+                    );
+                  }}
+                />
+                <ExpenseTransactions
+                  expenses={expenses}
+                  selectedId={replay?.expense.id}
+                  onReplay={replayExpense}
+                />
+              </aside>
               <div className="personal-care-scene">
-                <VirtualShelter
-                  funding={funding}
-                  residentIds={residentIds}
-                  previewIds={previewIds}
-                  projection={projection}
-                  confirmed={confirmedScene}
-                  shelterName={profile.shelterName}
-                  onSelectDog={selectDog}
-                >
-                  <CareTimeline
+                <SpendingBreakdown
+                  spending={spending}
+                  open={breakdownOpen}
+                  onClose={() => setBreakdownOpen(false)}
+                  onSelectDog={(id) => {
+                    const expense = [...expenses]
+                      .reverse()
+                      .find((item) => item.dogId === id);
+                    if (expense) replayExpense(expense);
+                  }}
+                />
+                <div ref={sceneAnchor} className="shelter-scene-anchor">
+                  <VirtualShelter
+                    funding={funding}
+                    residentIds={residentIds}
+                    previewIds={previewIds}
                     projection={projection}
-                    startDate={startDate}
-                    onDay={setTimelineDay}
-                  />
-                </VirtualShelter>
+                    confirmed={confirmedScene}
+                    shelterName={profile.shelterName}
+                    onSelectDog={selectDog}
+                    replay={replay}
+                    onExitReplay={() => setReplay(null)}
+                  >
+                    <CareTimeline
+                      projection={projection}
+                      startDate={startDate}
+                      onDay={(day) => {
+                        setReplay(null);
+                        setTimelineDay(day);
+                      }}
+                    />
+                  </VirtualShelter>
+                </div>
               </div>
             </div>
 
@@ -327,7 +354,7 @@ export default function DonationShell() {
                   <span className="donation-status-dot" />
                   <span>
                     {amountOre
-                      ? `${kronor(amountOre)} SEK supporting ${helpedDogs.length} profiles through shared care`
+                      ? `${kronor(spending.usedOre)} SEK used for ${residentIds.length} shelter companions · ${kronor(spending.pendingOre)} SEK pending`
                       : 'Your first gift starts a shared care trail'}
                   </span>
                 </>

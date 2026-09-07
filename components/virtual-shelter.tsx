@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { ArrowUp, ArrowUpRight, MapPin, Pause, Play } from 'lucide-react';
 import { DogName } from '@/components/dog-name';
 import { DogNeedBadge } from '@/components/dog-need-badge';
@@ -21,6 +21,7 @@ import {
   type fundingSummary,
 } from '@/lib/donation-shell';
 import { carePlan, type CareProjection } from '@/lib/care-impact';
+import type { ExpenseReplay } from '@/lib/donation-spending';
 import {
   ShelterLifeScene,
   type ShelterCompanion,
@@ -41,6 +42,8 @@ export function VirtualShelter({
   shelterName,
   onSelectDog,
   children,
+  replay,
+  onExitReplay,
 }: {
   funding: ReturnType<typeof fundingSummary>;
   residentIds: string[];
@@ -50,19 +53,28 @@ export function VirtualShelter({
   shelterName: string;
   onSelectDog: (id: string) => void;
   children?: ReactNode;
+  replay: ExpenseReplay | null;
+  onExitReplay: () => void;
 }) {
   const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    if (replay) setPaused(false);
+  }, [replay?.key]);
   const [inspected, setInspected] = useState<{
     id: string;
     preview: boolean;
     waiting?: boolean;
   } | null>(null);
-  const residents = profileDogs.filter((dog) => residentIds.includes(dog.id));
-  const waitingIds = waitingDogIds(profileDogs, residentIds, previewIds);
+  const residents = profileDogs.filter(
+    (dog) =>
+      residentIds.includes(dog.id) && funding.byDog[dog.id].amountOre > 0,
+  );
+  const visiblePreviewIds = replay ? [] : previewIds;
+  const waitingIds = waitingDogIds(profileDogs, residentIds, visiblePreviewIds);
   const waitingDogs = waitingIds.map((id) =>
     profileDogs.find((item) => item.id === id)!,
   );
-  const previewDogs = previewIds.map((id) =>
+  const previewDogs = visiblePreviewIds.map((id) =>
     profileDogs.find((dog) => dog.id === id)!,
   );
   const dog = inspected
@@ -75,10 +87,13 @@ export function VirtualShelter({
       visitor: true,
     })),
     ...residents
-      .filter((item) => !previewIds.includes(item.id))
+      .filter((item) => !visiblePreviewIds.includes(item.id))
       .map((item) => ({ dog: item, preview: false, visitor: false })),
   ];
-  const unmatchedCount = Math.max(0, projection.dogCount - previewIds.length);
+  const unmatchedCount =
+    replay || confirmed
+      ? 0
+      : Math.max(0, projection.dogCount - visiblePreviewIds.length);
   const companions: ShelterCompanion[] = [
     ...population.map(({ dog: item, preview, visitor }, index) => ({
       key: item.id,
@@ -152,9 +167,10 @@ export function VirtualShelter({
           <span>
             <i /> {residents.length} shelter companions
           </span>
-          {previewIds.length > 0 && (
+          {visiblePreviewIds.length > 0 && (
             <span>
-              <i className="virtual-preview-dot" /> {projection.dogCount}{' '}
+              <i className="virtual-preview-dot" />{' '}
+              {confirmed ? visiblePreviewIds.length : projection.dogCount}{' '}
               {confirmed
                 ? 'dogs in this demo gift'
                 : 'estimated care recipients in preview'}
@@ -166,15 +182,19 @@ export function VirtualShelter({
           companions={companions}
           projection={projection}
           paused={paused || inspected !== null}
+          replay={replay}
+          onExitReplay={onExitReplay}
           onInspect={(id, preview) => {
             setInspected({ id, preview });
             onSelectDog(id);
           }}
         />
         <p className="virtual-shelter-note">
-          {projection.activeDogs
-            ? `${projection.activeDogs} ${projection.activeDogs === 1 ? 'dog has' : 'dogs have'} ${plan.name.toLowerCase()} scheduled on this forecast day. `
-            : 'No care use scheduled on this forecast day. '}
+          {replay
+            ? 'Replaying a recorded demo expense. '
+            : projection.activeDogs
+              ? `${projection.activeDogs} ${projection.activeDogs === 1 ? 'dog has' : 'dogs have'} ${plan.name.toLowerCase()} scheduled on this forecast day. `
+              : 'No care use scheduled on this forecast day. '}
           Daily routines and need labels are illustrative. Faded dogs preview
           possible care; they are not verified recipients.
         </p>
@@ -190,10 +210,13 @@ export function VirtualShelter({
             </h2>
             <p>Real dog profiles with illustrative care needs.</p>
           </div>
-          {!confirmed && previewIds.length > 0 && (
+          {!confirmed && visiblePreviewIds.length > 0 && (
             <span className="dogs-in-need-transfer" role="status">
               <ArrowUp size={16} />{' '}
-              {previewIds.filter((id) => !residentIds.includes(id)).length}{' '}
+              {
+                visiblePreviewIds.filter((id) => !residentIds.includes(id))
+                  .length
+              }{' '}
               moved into your preview
             </span>
           )}
@@ -305,7 +328,7 @@ export function VirtualShelter({
             <div className="virtual-profile-care">
               <strong>
                 {kronor(funding.byDog[dog.id].amountOre)} SEK{' '}
-                <small>in shared demo care</small>
+                <small>used in recorded demo care</small>
               </strong>
               <div>
                 {careKinds.map((kind) => (
