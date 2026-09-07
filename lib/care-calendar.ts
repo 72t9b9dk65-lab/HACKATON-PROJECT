@@ -1,5 +1,9 @@
 import { profileDogs } from './donation-shell.ts';
-import { expenseCategories, type DemoExpense } from './donation-spending.ts';
+import {
+  expenseActivity,
+  expenseCategories,
+  type DemoExpense,
+} from './donation-spending.ts';
 import {
   shelterActivities,
   type ShelterActivity,
@@ -33,6 +37,7 @@ export type CareUpdate = {
   publishedAt: string | null;
   completedAt: string | null;
   expenseId: string | null;
+  liveHours?: 1 | 2;
   photos: { src: string; caption: string }[];
 };
 
@@ -85,6 +90,7 @@ export function validCareUpdate(value: unknown): value is CareUpdate {
         Date.parse(e.completedAt) >= Date.parse(e.startsAt))) &&
     (e.expenseId === null ||
       (typeof e.expenseId === 'string' && e.expenseId.length <= 200)) &&
+    (e.liveHours === undefined || e.liveHours === 1 || e.liveHours === 2) &&
     Array.isArray(e.photos) &&
     e.photos.length <= 3 &&
     e.photos.every(
@@ -119,6 +125,53 @@ export function visibleCareUpdates(updates: CareUpdate[], now: number) {
     (entry) =>
       entry.publishedAt !== null && Date.parse(entry.publishedAt) <= now,
   );
+}
+
+export function livePhotoExpiry(entry: CareUpdate) {
+  return entry.publishedAt
+    ? Date.parse(entry.publishedAt) + (entry.liveHours ?? 2) * 3_600_000
+    : 0;
+}
+
+// Live moments come only from published staff photos, never from a routine,
+// a donation estimate, or an undated directory image. Completion does not
+// remove a photo: it stays visible for its chosen window after publication.
+export function livePhotoUpdates(
+  updates: CareUpdate[],
+  now: number,
+  dogIds?: string[],
+) {
+  return visibleCareUpdates(updates, now)
+    .filter(
+      (entry) =>
+        entry.photos.length > 0 &&
+        Date.parse(entry.startsAt) <= now &&
+        now < livePhotoExpiry(entry) &&
+        (!dogIds || dogIds.includes(entry.dogId)),
+    )
+    .sort((a, b) => Date.parse(b.publishedAt!) - Date.parse(a.publishedAt!));
+}
+
+// One dog has one current photo moment. A newer post replaces the previous
+// activity; once that post expires, the dog returns to its kennel.
+export function liveDogPhoto(
+  updates: CareUpdate[],
+  dogId: string,
+  now: number,
+) {
+  const latest = visibleCareUpdates(updates, now)
+    .filter(
+      (entry) =>
+        entry.dogId === dogId &&
+        entry.photos.length > 0 &&
+        Date.parse(entry.startsAt) <= now,
+    )
+    .sort(
+      (a, b) =>
+        Date.parse(b.publishedAt!) - Date.parse(a.publishedAt!) ||
+        b.id.localeCompare(a.id),
+    )[0];
+  return latest && now < livePhotoExpiry(latest) ? latest : undefined;
 }
 
 export function activeDogUpdate(
@@ -189,8 +242,48 @@ export function dogCareBasket(expenses: DemoExpense[], dogId: string) {
 export function linkedCareExpense(entry: CareUpdate, expenses: DemoExpense[]) {
   return expenses.find(
     (expense) =>
-      expense.id === entry.expenseId && expense.dogId === entry.dogId,
+      expense.id === entry.expenseId && careExpenseMatches(entry, expense),
   );
+}
+
+export function careExpenseMatches(
+  entry: Pick<CareUpdate, 'dogId' | 'activity'>,
+  expense: DemoExpense,
+) {
+  return (
+    expense.dogId === entry.dogId &&
+    (expenseActivity(expense) === entry.activity ||
+      (expense.category === 'comfort' && entry.activity === 'home'))
+  );
+}
+
+export function carePhotoLinkError(entry: CareUpdate, expenses: DemoExpense[]) {
+  if (
+    (entry.photos.length || entry.expenseId) &&
+    !linkedCareExpense(entry, expenses)
+  )
+    return 'Link a recorded transaction for this dog and category before saving photos.';
+  return null;
+}
+
+// Transaction photos remain available after their short live-update window.
+export function expensePhotoUpdate(
+  updates: CareUpdate[],
+  expense: DemoExpense,
+  now: number,
+) {
+  return visibleCareUpdates(updates, now)
+    .filter(
+      (entry) =>
+        entry.photos.length > 0 &&
+        Date.parse(entry.startsAt) <= now &&
+        linkedCareExpense(entry, [expense]),
+    )
+    .sort(
+      (a, b) =>
+        Date.parse(b.publishedAt!) - Date.parse(a.publishedAt!) ||
+        b.id.localeCompare(a.id),
+    )[0];
 }
 
 export function stockholmInput(instant: Date | number) {

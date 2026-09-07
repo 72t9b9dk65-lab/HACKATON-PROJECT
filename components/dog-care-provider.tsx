@@ -2,7 +2,6 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import { CalendarDays } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   DogCareContext,
   useDogCare,
@@ -12,7 +11,7 @@ import {
   CARE_CALENDAR_KEY,
   readCareCalendar,
   validCareUpdate,
-  linkedCareExpense,
+  carePhotoLinkError,
   type CareUpdate,
 } from '@/lib/care-calendar';
 import type { DemoExpense } from '@/lib/donation-spending';
@@ -23,10 +22,12 @@ import { StaffCareCalendar } from '@/components/staff-care-calendar';
 export function DogCareProvider({
   children,
   expenses,
+  externalEvents = [],
   onReplay,
 }: {
   children: ReactNode;
   expenses: DemoExpense[];
+  externalEvents?: CareUpdate[];
   onReplay: (expense: DemoExpense) => void;
 }) {
   const [events, setEvents] = useState<CareUpdate[]>([]);
@@ -101,7 +102,7 @@ export function DogCareProvider({
   return (
     <DogCareContext.Provider
       value={{
-        events,
+        events: [...events, ...externalEvents],
         expenses,
         now,
         ready,
@@ -114,19 +115,25 @@ export function DogCareProvider({
         closeDog: () => setInspected(null),
         openCalendar: () => setCalendarOpen(true),
         saveEvent: (event) => {
+          if (event.id.startsWith('staff:'))
+            return 'Manage receipt photos in the staff workspace.';
           if (!validCareUpdate(event))
             return 'Check the dog, activity, dates and photos.';
+          if (event.publishedAt && event.photos.length === 0)
+            return 'A published activity needs a staff photo. Save it as a draft until a photo is available.';
           if (event.completedAt && Date.parse(event.completedAt) > Date.now())
             return 'An activity can only be marked completed after it happens.';
-          if (event.expenseId && !linkedCareExpense(event, expenses))
-            return 'Choose a recorded expense belonging to this dog.';
+          const linkError = carePhotoLinkError(event, expenses);
+          if (linkError) return linkError;
           return persist((latest) => [
             ...latest.filter((item) => item.id !== event.id),
             event,
           ]);
         },
         deleteEvent: (id) =>
-          persist((latest) => latest.filter((event) => event.id !== id)),
+          id.startsWith('staff:')
+            ? 'Manage receipt photos in the staff workspace.'
+            : persist((latest) => latest.filter((event) => event.id !== id)),
         replayExpense: (expense) => {
           setInspected(null);
           onReplay(expense);
@@ -141,15 +148,14 @@ export function DogCareProvider({
 }
 
 export function StaffCalendarButton() {
-  const { openCalendar } = useDogCare();
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      onClick={openCalendar}
+    <a
+      href="/staff"
+      target="_blank"
+      rel="noreferrer"
       className="staff-calendar-launch"
     >
-      <CalendarDays size={17} /> Staff calendar
-    </Button>
+      <CalendarDays size={17} /> Staff workspace
+    </a>
   );
 }

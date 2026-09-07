@@ -291,9 +291,9 @@ export function VirtualShelter({
                 : projection.activeDogs
                   ? `${projection.activeDogs} ${projection.activeDogs === 1 ? 'dog has' : 'dogs have'} ${plan.name.toLowerCase()} scheduled on this forecast day. `
                   : 'No care use scheduled on this forecast day. '}
-          Published calendar activities guide the scene; unscheduled routines
-          and need labels are illustrative. Faded dogs preview possible care;
-          they are not verified recipients.
+          Live updates show only staff photo posts. Donation forecasts and care
+          replays are illustrative. Faded dogs preview possible care; they are
+          not verified recipients.
         </p>
       </section>
 

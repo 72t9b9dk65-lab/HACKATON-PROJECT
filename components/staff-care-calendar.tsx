@@ -12,6 +12,8 @@ import {
   X,
 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { StaffPhotoComposer } from '@/components/staff-photo-composer';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -23,6 +25,7 @@ import { CarePhoto } from '@/components/dog-profile-dialog';
 import { useDogCare } from '@/hooks/use-dog-care';
 import {
   calendarActivities,
+  careExpenseMatches,
   careUpdateStatus,
   safeCarePhoto,
   stockholmInput,
@@ -44,15 +47,25 @@ export function StaffCareCalendar({
       {open && (
         <DialogContent className="donation-shell staff-care-calendar">
           <DialogTitle>
-            <CalendarDays size={22} /> Care calendar{' '}
+            <CalendarDays size={22} /> Staff updates{' '}
             <span>Staff workspace</span>
           </DialogTitle>
           <DialogDescription>
-            Add a dog, an activity and its time. Publish the plan, then attach
-            photos and confirm care when it happens. The shelter and dog
-            profiles follow automatically.
+            Add a photo and link its dog, category and transaction. Your photo
+            appears in live updates for one or two hours. Local prototype only.
           </DialogDescription>
-          <CalendarEditor />
+          <Tabs defaultValue="photo" className="staff-update-tabs">
+            <TabsList>
+              <TabsTrigger value="photo">Post a photo</TabsTrigger>
+              <TabsTrigger value="calendar">Care calendar</TabsTrigger>
+            </TabsList>
+            <TabsContent value="photo">
+              <StaffPhotoComposer />
+            </TabsContent>
+            <TabsContent value="calendar">
+              <CalendarEditor />
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       )}
     </Dialog>
@@ -97,7 +110,9 @@ function CalendarEditor() {
     .filter((entry) => stockholmInput(new Date(entry.startsAt)).startsWith(day))
     .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
   const dog = profileDogs.find((item) => item.id === form.dogId)!;
-  const dogExpenses = expenses.filter((expense) => expense.dogId === dog.id);
+  const dogExpenses = expenses.filter((expense) =>
+    careExpenseMatches(form, expense),
+  );
 
   function newUpdate(date = day) {
     setForm(fresh(date, form.dogId));
@@ -121,6 +136,10 @@ function CalendarEditor() {
     setError('');
     setMessage('');
     try {
+      if (publish && form.photos.length === 0)
+        throw new Error(
+          'Add a photo to publish this activity. You can save the plan as a draft.',
+        );
       if (photoUrl.trim())
         throw new Error('Add the photo link or clear it before saving.');
       const startsAt = stockholmInstant(form.startsAt);
@@ -358,6 +377,7 @@ function CalendarEditor() {
                   setForm({
                     ...form,
                     activity: event.target.value as CareUpdate['activity'],
+                    expenseId: null,
                   })
                 }
               >
@@ -426,15 +446,15 @@ function CalendarEditor() {
             This care has happened
           </label>
           <label>
-            Link a recorded expense{' '}
-            <span className="care-field-optional">Optional</span>
+            Transaction{' '}
+            <span className="care-field-optional">Required for photos</span>
             <select
               value={form.expenseId ?? ''}
               onChange={(event) =>
                 setForm({ ...form, expenseId: event.target.value || null })
               }
             >
-              <option value="">No linked expense</option>
+              <option value="">Choose a transaction for this category</option>
               {dogExpenses.map((expense) => (
                 <option key={expense.id} value={expense.id}>
                   {expenseLabel(expense)} · {kronor(expense.amountOre)} SEK ·{' '}

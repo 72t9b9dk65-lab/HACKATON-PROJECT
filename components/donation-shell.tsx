@@ -16,15 +16,10 @@ import {
   ExpenseTransactions,
   SpendingBreakdown,
 } from '@/components/donation-spending';
-import {
-  firstCareExpenses,
-  GIVING_STORAGE_KEY,
-  readGivingLedger,
-  spendingSummary,
-  type DemoExpense,
-  type GivingLedger,
-} from '@/lib/donation-spending';
-import { WORKBOOK_GIFT_ID, workbookLedger } from '@/lib/workbook-transactions';
+import { type DemoExpense } from '@/lib/donation-spending';
+import { WORKBOOK_GIFT_ID } from '@/lib/workbook-transactions';
+import { useStaffLedger } from '@/hooks/use-staff-ledger';
+import { projectDonor } from '@/lib/staff-portal';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,7 +34,6 @@ import {
   SHARED_CARE_ID,
   kronor,
   profileDogs,
-  SHELL_STORAGE_KEY,
   type DemoGift,
 } from '@/lib/donation-shell';
 import {
@@ -70,8 +64,11 @@ export default function DonationShell() {
     new Date().toISOString().slice(0, 10),
   );
   const [profile, setProfile] = useState<Profile>(defaultShelterProfile);
-  const [ledger, setLedger] = useState<GivingLedger>(workbookLedger);
-  const { gifts, expenses } = ledger;
+  const staffStore = useStaffLedger();
+  const ledger = staffStore.base;
+  const { gifts } = ledger;
+  const donorView = projectDonor(staffStore.staff, ledger);
+  const { expenses, spending } = donorView;
   const [breakdownOpen, setBreakdownOpen] = useState(false);
   const [donationOpen, setDonationOpen] = useState(false);
   const [fullImpact, setFullImpact] = useState(true);
@@ -89,12 +86,6 @@ export default function DonationShell() {
 
   useEffect(() => {
     try {
-      setLedger(
-        readGivingLedger(
-          localStorage.getItem(GIVING_STORAGE_KEY),
-          localStorage.getItem(SHELL_STORAGE_KEY),
-        ),
-      );
       const savedProfile = readShelterProfile(
         localStorage.getItem(PROFILE_STORAGE_KEY),
       );
@@ -126,14 +117,6 @@ export default function DonationShell() {
   useEffect(() => {
     if (!ready) return;
     try {
-      localStorage.setItem(GIVING_STORAGE_KEY, JSON.stringify(ledger));
-    } catch {
-      setSessionOnly(true);
-    }
-  }, [ledger, ready]);
-  useEffect(() => {
-    if (!ready) return;
-    try {
       localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
     } catch {
       setSessionOnly(true);
@@ -141,7 +124,6 @@ export default function DonationShell() {
   }, [profile, ready]);
 
   const dog = profileDogs.find((item) => item.id === selectedId)!;
-  const spending = spendingSummary(ledger);
   const { funding, residentIds } = spending;
   const amountOre = spending.totalOre;
   const myGifts = gifts.filter(
@@ -219,8 +201,9 @@ export default function DonationShell() {
     });
   }, [replay]);
 
-  function donate() {
-    if (!ready || draftOre === null) return;
+  async function donate() {
+    if (!ready || !staffStore.ready || staffStore.busy || draftOre === null)
+      return;
     if (frequency === 'monthly') {
       setProfile((current) => ({
         ...current,
@@ -244,18 +227,17 @@ export default function DonationShell() {
       carePlanId: careId,
       createdAt: new Date().toISOString(),
     };
-    const careExpenses = firstCareExpenses(gift);
-    const spent = careExpenses.reduce(
-      (sum, expense) => sum + expense.amountOre,
-      0,
-    );
-    setLedger((current) => ({
+    const failure = await staffStore.updateBase((current) => ({
       gifts: [...current.gifts, gift],
-      expenses: [...current.expenses, ...careExpenses],
+      expenses: current.expenses,
     }));
+    if (failure) {
+      setNotice(failure);
+      return;
+    }
     setReplay(null);
     setNotice(
-      `${kronor(draftOre)} SEK donated. ${kronor(spent)} SEK used in first-care demo expenses; ${kronor(draftOre - spent)} SEK pending.`,
+      `${kronor(draftOre)} SEK donated and pending. Staff receipts will record how it is used.`,
     );
     setSelectedId(recipients[0]);
     setDraftAmount('');
@@ -265,7 +247,11 @@ export default function DonationShell() {
   }
 
   return (
-    <DogCareProvider expenses={expenses} onReplay={replayExpense}>
+    <DogCareProvider
+      expenses={expenses}
+      externalEvents={donorView.events}
+      onReplay={replayExpense}
+    >
       <div className="donation-shell">
         <header className="donation-header">
           <a href="/" className="donation-brand" aria-label="Hundstallet home">
@@ -362,7 +348,7 @@ export default function DonationShell() {
                         onFrequency={changeFrequency}
                         onConfirm={donate}
                         onPreview={() => closeDonationToShelter(true)}
-                        ready={ready}
+                        ready={ready && staffStore.ready && !staffStore.busy}
                         atLimit={gifts.length >= 1000}
                         monthlyPlan={profile.monthlyPlan}
                         onCancelMonthly={() => {
@@ -384,6 +370,7 @@ export default function DonationShell() {
                   />
                   <ExpenseTransactions
                     expenses={expenses}
+                    transactions={donorView.transactions}
                     selectedId={replay?.expense.id}
                     onReplay={replayExpense}
                   />
@@ -445,17 +432,17 @@ export default function DonationShell() {
                 aria-live="polite"
                 role="status"
               >
-                {notice ? (
+                {notice || staffStore.error ? (
                   <>
                     <Check size={17} />
-                    <span>{notice}</span>
+                    <span>{notice || staffStore.error}</span>
                   </>
                 ) : (
                   <>
                     <span className="donation-status-dot" />
                     <span>
                       {amountOre
-                        ? `${kronor(spending.usedOre)} SEK used for ${residentIds.length} shelter companions · ${kronor(spending.pendingOre)} SEK pending`
+                        ? `${kronor(spending.usedOre)} SEK used · ${residentIds.length} shelter companions · ${kronor(spending.pendingOre)} SEK pending`
                         : 'Your first gift starts a shared care trail'}
                     </span>
                   </>

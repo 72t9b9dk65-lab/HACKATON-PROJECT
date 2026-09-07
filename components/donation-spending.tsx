@@ -3,11 +3,14 @@
 import { useDogCare } from '@/hooks/use-dog-care';
 
 import { useState } from 'react';
-import { ArrowLeft, ArrowUpRight, ChevronDown, Play } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DogPortrait } from '@/components/dog-portrait';
 import { DogName } from '@/components/dog-name';
+import { ShelterPhotoDialog } from '@/components/shelter-photo-updates';
+import { expensePhotoUpdate, type CareUpdate } from '@/lib/care-calendar';
+import type { DonorTransaction } from '@/lib/staff-portal';
 import {
   expenseCategories,
   expenseDateLabel,
@@ -204,9 +207,10 @@ export function SpendingBreakdown({
         </TabsContent>
       </Tabs>
       <p className="spending-breakdown-note">
-        Pending: {kronor(spending.pendingOre)} SEK awaiting expenses. Both views
-        show the same recorded demo spending; forecasts are separate. Imported
-        expenses use simulated dog assignments.
+        Pending: {kronor(spending.pendingOre)} SEK awaiting expenses. Categories
+        include every recorded cost. Dogs are linked when staff attach a care
+        photo and identify the recipients. Imported expenses use simulated dog
+        assignments.
       </p>
     </section>
   );
@@ -214,14 +218,24 @@ export function SpendingBreakdown({
 
 export function ExpenseTransactions({
   expenses,
+  transactions,
   selectedId,
   onReplay,
 }: {
   expenses: DemoExpense[];
+  transactions: DonorTransaction[];
   selectedId?: string;
   onReplay: (expense: DemoExpense) => void;
 }) {
-  const sorted = [...expenses].sort(
+  const { events, now } = useDogCare();
+  const [photoExpenseId, setPhotoExpenseId] = useState<string | null>(null);
+  const photoExpense = expenses.find(
+    (expense) => expense.id === photoExpenseId,
+  );
+  const openedPhoto = photoExpense
+    ? expensePhotoUpdate(events, photoExpense, now)
+    : undefined;
+  const sorted = [...transactions].sort(
     (a, b) =>
       Date.parse(b.recordedAt) - Date.parse(a.recordedAt) ||
       a.id.localeCompare(b.id),
@@ -233,45 +247,127 @@ export function ExpenseTransactions({
     >
       <h2 id="expense-transactions-title">Your care transactions</h2>
       <div className="expense-transaction-list">
-        {sorted.map((expense) => {
+        {sorted.map((transaction) => {
+          const expense = transaction.expenses[0];
           const category = expenseCategories.find(
-            (item) => item.id === expense.category,
+            (item) => item.id === transaction.category,
           )!;
-          const dog = profileDogs.find((item) => item.id === expense.dogId)!;
+          const names = transaction.expenses
+            .map((e) => profileDogs.find((d) => d.id === e.dogId)!.name)
+            .join(', ');
+          const photo = transaction.expenses
+            .map((e) => expensePhotoUpdate(events, e, now))
+            .find(Boolean);
+          const title = transaction.legacy
+            ? expenseLabel(transaction.legacy)
+            : transaction.description;
+          const dateLabel = expenseDateLabel({
+            recordedAt: transaction.recordedAt,
+          } as DemoExpense);
+          const selected = transaction.expenses.some(
+            (e) => e.id === selectedId,
+          );
           return (
-            <button
-              type="button"
-              key={expense.id}
+            <div
+              key={transaction.id}
               className="expense-transaction"
-              onClick={() => onReplay(expense)}
-              aria-pressed={selectedId === expense.id}
+              data-selected={selected}
             >
-              <img src={category.asset} alt="" width="46" height="46" />
-              <span className="expense-transaction-copy">
-                <strong>{expenseLabel(expense)}</strong>
-                <span>
-                  {dog.name}
-                  {workbookTransaction(expense) ? ' (demo match)' : ''} ·{' '}
-                  {kronor(expense.amountOre)} SEK
+              <button
+                type="button"
+                className="expense-transaction-main"
+                disabled={!expense}
+                onClick={() => {
+                  if (expense) onReplay(expense);
+                }}
+                aria-pressed={selected}
+                aria-label={`${title}, ${kronor(transaction.amountOre)} SEK, ${dateLabel}.${expense ? ' Replay care.' : ' Awaiting a staff photo and dog assignment.'}`}
+              >
+                <img src={category.asset} alt="" width="46" height="46" />
+                <span className="expense-transaction-copy">
+                  <strong>{title}</strong>
+                  <span>
+                    {names || 'Awaiting care photo'}
+                    {transaction.legacy &&
+                    !transaction.photos.length &&
+                    workbookTransaction(transaction.legacy)
+                      ? ' (demo match)'
+                      : ''}{' '}
+                    · {kronor(transaction.amountOre)} SEK
+                  </span>
+                  <time dateTime={transaction.recordedAt}>{dateLabel}</time>
+                  {!!transaction.products?.length && (
+                    <span className="expense-owned-products">
+                      {transaction.products.map((product) => (
+                        <span key={product.id}>
+                          {product.name} · {kronor(product.amountOre)} SEK
+                        </span>
+                      ))}
+                    </span>
+                  )}
                 </span>
-                <time dateTime={expense.recordedAt}>
-                  {expenseDateLabel(expense)}
-                </time>
-                <small>
-                  <Play size={11} /> Replay care moment
-                </small>
-              </span>
-              <ArrowUpRight size={15} />
-            </button>
+              </button>
+              <TransactionPhotoButton
+                photo={photo}
+                dogName={names || 'this dog'}
+                onOpen={() => {
+                  if (photo) setPhotoExpenseId(photo.expenseId);
+                }}
+              />
+            </div>
           );
         })}
-        {!expenses.length && (
+        {!transactions.length && (
           <p className="spending-empty">
             No care expenses yet. Your donations remain pending until an expense
             is recorded.
           </p>
         )}
       </div>
+      <ShelterPhotoDialog
+        event={openedPhoto ?? null}
+        onClose={() => setPhotoExpenseId(null)}
+      />
     </section>
+  );
+}
+
+function TransactionPhotoButton({
+  photo,
+  dogName,
+  onOpen,
+}: {
+  photo?: CareUpdate;
+  dogName: string;
+  onOpen: () => void;
+}) {
+  const src = photo?.photos[0]?.src;
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const available = !!src && src !== failedSrc;
+  return (
+    <button
+      type="button"
+      className="expense-transaction-photo"
+      disabled={!photo}
+      onClick={onOpen}
+      aria-label={
+        photo
+          ? `View ${dogName}’s transaction photo`
+          : 'No photo available for this transaction'
+      }
+      title={photo ? 'View transaction photo' : 'No photo available'}
+    >
+      {available ? (
+        <img
+          src={src}
+          alt=""
+          width="44"
+          height="44"
+          onError={() => setFailedSrc(src)}
+        />
+      ) : (
+        <ImageIcon size={24} aria-hidden="true" />
+      )}
+    </button>
   );
 }

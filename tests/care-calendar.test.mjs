@@ -6,6 +6,12 @@ import {
   dogCareBasket,
   dogEventPhoto,
   linkedCareExpense,
+  carePhotoLinkError,
+  careExpenseMatches,
+  expensePhotoUpdate,
+  livePhotoExpiry,
+  livePhotoUpdates,
+  liveDogPhoto,
   readCareCalendar,
   safeCarePhoto,
   stockholmInput,
@@ -15,6 +21,7 @@ import {
 } from '../lib/care-calendar.ts';
 import { workbookLedger } from '../lib/workbook-transactions.ts';
 import { profileDogs } from '../lib/donation-shell.ts';
+import { expenseActivity } from '../lib/donation-spending.ts';
 
 const ledger = workbookLedger();
 
@@ -91,6 +98,105 @@ test('photo badges follow the current published event or the exact replayed expe
   );
 });
 
+test('live updates require staff photos and expire exactly one or two hours after publication', () => {
+  const post = {
+    ...entry,
+    startsAt: '2026-09-07T14:00:00Z',
+    publishedAt: '2026-09-07T14:00:00Z',
+    completedAt: '2026-09-07T14:00:00Z',
+    liveHours: 1,
+    photos: [{ src: '/dogs/hundstallet/ake-1.jpg', caption: 'Meal photo' }],
+  };
+  assert.equal(livePhotoExpiry(post), at('15:00'));
+  assert.equal(livePhotoUpdates([post], at('14:00'), ['ake']).length, 1);
+  assert.equal(livePhotoUpdates([post], at('14:59'), ['ake']).length, 1);
+  assert.equal(livePhotoUpdates([post], at('15:00'), ['ake']).length, 0);
+  assert.equal(
+    livePhotoUpdates([{ ...post, liveHours: 2 }], at('15:59')).length,
+    1,
+  );
+  assert.equal(
+    livePhotoUpdates([{ ...post, liveHours: 2 }], at('16:00')).length,
+    0,
+  );
+  assert.equal(
+    livePhotoUpdates([{ ...post, liveHours: undefined }], at('16:00')).length,
+    0,
+  );
+  assert.equal(livePhotoUpdates([post], at('13:59')).length, 0);
+  assert.equal(livePhotoUpdates([post], at('14:15'), ['ove']).length, 0);
+  assert.equal(
+    livePhotoUpdates([{ ...post, photos: [] }], at('14:15')).length,
+    0,
+  );
+  assert.equal(
+    livePhotoUpdates([{ ...post, publishedAt: null }], at('14:15')).length,
+    0,
+  );
+  assert.equal(
+    livePhotoUpdates(
+      [{ ...post, startsAt: '2026-09-07T14:30:00Z' }],
+      at('14:15'),
+    ).length,
+    0,
+  );
+});
+
+test('expiring photos does not delete timeline history or change recorded spending', () => {
+  const post = {
+    ...entry,
+    liveHours: 2,
+    photos: [{ src: '/dogs/hundstallet/ake-1.jpg', caption: 'Staff update' }],
+  };
+  const updates = [post];
+  const before = JSON.stringify({ updates, ledger });
+  assert.deepEqual(livePhotoUpdates(updates, at('18:00')), []);
+  assert.equal(visibleCareUpdates(updates, at('18:00')).length, 1);
+  assert.equal(JSON.stringify({ updates, ledger }), before);
+  assert.equal(validCareUpdate({ ...post, liveHours: 1 }), true);
+  assert.equal(validCareUpdate({ ...post, liveHours: 3 }), false);
+});
+
+test('a new photo moves its dog to the matching category and expiry returns it home', () => {
+  const meal = {
+    ...entry,
+    id: 'meal',
+    activity: 'food',
+    publishedAt: '2026-09-07T14:00:00Z',
+    liveHours: 2,
+    photos: [{ src: '/dogs/hundstallet/ake-1.jpg', caption: 'Meal' }],
+  };
+  const walk = {
+    ...meal,
+    id: 'walk',
+    activity: 'walk',
+    startsAt: '2026-09-07T14:15:00Z',
+    publishedAt: '2026-09-07T14:15:00Z',
+    liveHours: 1,
+    photos: [{ src: '/dogs/hundstallet/ake-2.jpg', caption: 'Walk' }],
+  };
+  const posts = [meal, walk];
+  assert.equal(liveDogPhoto(posts, 'ake', at('14:10'))?.activity, 'food');
+  assert.equal(liveDogPhoto(posts, 'ake', at('14:15'))?.activity, 'walk');
+  assert.equal(
+    liveDogPhoto(posts, 'ake', at('15:14'))?.photos[0].caption,
+    'Walk',
+  );
+  assert.equal(
+    liveDogPhoto(posts, 'ake', at('15:15'))?.activity ?? 'home',
+    'home',
+  );
+  assert.equal(liveDogPhoto(posts, 'koby', at('14:30')), undefined);
+  assert.equal(
+    liveDogPhoto([{ ...walk, publishedAt: null }], 'ake', at('14:30')),
+    undefined,
+  );
+  assert.equal(
+    liveDogPhoto([{ ...walk, photos: [] }], 'ake', at('14:30')),
+    undefined,
+  );
+});
+
 test('editing, unpublishing and removing an event immediately changes schedule selection', () => {
   assert.equal(
     activeDogUpdate([{ ...entry, activity: 'food' }], 'ake', at('14:10'))
@@ -155,11 +261,16 @@ test('every care basket reconciles to recorded spending without adding forecast 
   assert.equal(JSON.stringify(ledger), original);
 });
 
-test('a calendar photo can only link to the expense of the same dog', () => {
+test('a calendar photo can only link to the expense of the same dog and category', () => {
   const expense = ledger.expenses[0];
   assert.equal(
     linkedCareExpense(
-      { ...entry, dogId: expense.dogId, expenseId: expense.id },
+      {
+        ...entry,
+        dogId: expense.dogId,
+        activity: expenseActivity(expense),
+        expenseId: expense.id,
+      },
       [expense],
     ),
     expense,
@@ -175,6 +286,94 @@ test('a calendar photo can only link to the expense of the same dog', () => {
     linkedCareExpense({ ...entry, expenseId: 'missing' }, [expense]),
     undefined,
   );
+});
+
+test('photo saves require a matching transaction, while empty plans can remain drafts', () => {
+  const food = ledger.expenses.find((expense) => expense.category === 'food');
+  const photo = {
+    ...entry,
+    dogId: food.dogId,
+    activity: 'food',
+    expenseId: food.id,
+    photos: [{ src: '/dogs/hundstallet/ake-1.jpg', caption: 'A meal' }],
+  };
+  assert.equal(carePhotoLinkError(photo, ledger.expenses), null);
+  for (const change of [
+    { expenseId: null },
+    { expenseId: 'missing' },
+    { dogId: 'koby' === food.dogId ? 'ake' : 'koby' },
+    { activity: 'walk' },
+  ]) {
+    assert.ok(carePhotoLinkError({ ...photo, ...change }, ledger.expenses));
+  }
+  assert.equal(
+    carePhotoLinkError({ ...entry, publishedAt: null }, ledger.expenses),
+    null,
+  );
+  const medicine = ledger.expenses.find(
+    (expense) => expense.category === 'medicine',
+  );
+  assert.equal(
+    careExpenseMatches(
+      { dogId: medicine.dogId, activity: 'rehabilitation' },
+      medicine,
+    ),
+    true,
+  );
+  const comfort = ledger.expenses.find(
+    (expense) => expense.category === 'comfort',
+  );
+  for (const activity of ['home', 'sleep']) {
+    assert.equal(
+      careExpenseMatches({ dogId: comfort.dogId, activity }, comfort),
+      true,
+    );
+  }
+});
+
+test('transaction thumbnails show the exact linked published photo, including after live expiry', () => {
+  const expense = ledger.expenses.find(
+    (expense) => expense.category === 'food',
+  );
+  const photo = {
+    ...entry,
+    dogId: expense.dogId,
+    activity: 'food',
+    expenseId: expense.id,
+    publishedAt: '2026-09-07T14:00:00Z',
+    liveHours: 1,
+    photos: [{ src: '/dogs/hundstallet/ake-1.jpg', caption: 'First meal' }],
+  };
+  const newer = {
+    ...photo,
+    id: 'newer-photo',
+    publishedAt: '2026-09-07T14:15:00Z',
+    photos: [{ src: '/dogs/hundstallet/ake-2.jpg', caption: 'Another view' }],
+  };
+  assert.equal(expensePhotoUpdate([photo, newer], expense, at('14:10')), photo);
+  assert.equal(expensePhotoUpdate([photo, newer], expense, at('16:00')), newer);
+  assert.equal(livePhotoUpdates([photo, newer], at('16:00')).length, 0);
+  assert.equal(
+    expensePhotoUpdate(
+      [photo],
+      { ...expense, id: 'another-transaction' },
+      at('16:00'),
+    ),
+    undefined,
+  );
+  for (const change of [
+    { expenseId: null },
+    { publishedAt: null },
+    { activity: 'walk' },
+    { dogId: 'unknown' },
+    { startsAt: '2026-09-07T18:00:00Z' },
+    { photos: [] },
+  ]) {
+    assert.equal(
+      expensePhotoUpdate([{ ...photo, ...change }], expense, at('16:00')),
+      undefined,
+    );
+  }
 });
 
 test('calendar storage validates drafts and photos and refuses malformed data', () => {
