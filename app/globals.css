@@ -7690,6 +7690,93 @@ button:not([data-slot]) {
   display: grid;
   gap: 24px;
 }
+.donation-launch[data-slot='button'] {
+  min-height: 72px;
+  margin: 0;
+  border-radius: 17px;
+  font-size: 25px;
+  font-weight: 700;
+}
+.donation-launch[data-slot='button'] > svg {
+  width: 28px;
+  height: 28px;
+}
+.donation-dialog[data-slot='dialog-content'] {
+  min-height: 0;
+  width: min(720px, calc(100vw - 32px));
+  max-width: 720px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 28px;
+  border: 1px solid var(--donation-line);
+  border-radius: 22px;
+  background: var(--donation-paper);
+  color: var(--donation-ink);
+  gap: 12px;
+}
+.donation-dialog [data-slot='dialog-title'] {
+  padding-right: 20px;
+  font-size: 26px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+.donation-dialog [data-slot='dialog-description'] {
+  color: var(--donation-muted);
+  line-height: 1.5;
+}
+.donation-dialog .care-planner {
+  padding: 0;
+  margin: 8px 0 0;
+  border: 0;
+}
+.donation-dialog .care-plan-option[data-slot='button'] {
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  gap: 8px;
+  padding: 15px 10px;
+  border-radius: 14px;
+}
+.donation-dialog .care-plan-option > img {
+  width: 80px;
+  height: 80px;
+}
+.donation-dialog .care-planner-action-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.donation-dialog .giving-frequency > button {
+  flex: 1;
+  padding: 0 8px;
+}
+.care-planner-buttons {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.donation-dialog .care-planner-buttons [data-slot='button'] {
+  height: auto;
+  min-height: 48px;
+  margin: 0;
+  grid-column: auto;
+  white-space: normal;
+  padding: 10px 12px;
+}
+.care-preview-button[data-slot='button'] {
+  color: var(--donation-accent);
+  border-color: var(--donation-line);
+  background: var(--donation-paper);
+}
+.care-preview-button[data-slot='button']:hover {
+  background: var(--donation-soft);
+}
+.donation-dialog .saved-monthly-plan {
+  flex-wrap: wrap;
+}
+#personal-shelter-view {
+  scroll-margin-top: 20px;
+}
 .donation-wallet {
   display: grid;
   width: 100%;
@@ -7799,16 +7886,14 @@ button:not([data-slot]) {
 }
 .spending-breakdown {
   padding: 20px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
   border: 1px solid var(--donation-line);
   border-radius: 17px;
   background: var(--donation-canvas);
 }
-.spending-breakdown[hidden] {
-  display: none;
-}
 .spending-breakdown-heading {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
@@ -8089,5 +8174,31 @@ button:not([data-slot]) {
   }
   .expense-transaction-list {
     max-height: 300px;
+  }
+}
+@media (max-width: 560px) {
+  .donation-dialog[data-slot='dialog-content'] {
+    padding: 22px 18px;
+  }
+  .donation-dialog [data-slot='dialog-title'] {
+    font-size: 23px;
+  }
+  .donation-dialog .care-plan-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .donation-dialog .care-plan-option[data-slot='button'] {
+    flex-direction: row;
+    text-align: left;
+    min-height: 88px;
+    padding: 10px 14px;
+    gap: 14px;
+  }
+  .donation-dialog .care-plan-option > img {
+    width: 60px;
+    height: 60px;
+  }
+  .donation-dialog .care-planner-action-row,
+  .donation-dialog .care-planner-buttons {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

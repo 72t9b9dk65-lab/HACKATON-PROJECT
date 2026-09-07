@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowUpRight, ChevronDown, Play, X } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, ChevronDown, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DogPortrait } from '@/components/dog-portrait';
@@ -32,7 +32,7 @@ export function DonationBalance({
       className="donation-wallet"
       onClick={onToggle}
       aria-expanded={open}
-      aria-controls="donation-spending-breakdown"
+      aria-controls="personal-shelter-view"
     >
       <span className="donation-wallet-heading">
         Your total donated <small>DEMO</small>
@@ -68,7 +68,7 @@ export function DonationBalance({
         />
       </span>
       <span className="donation-wallet-action">
-        {open ? 'Hide spending breakdown' : 'See where your money went'}{' '}
+        {open ? 'Back to your shelter' : 'See where your money went'}{' '}
         <ChevronDown size={17} />
       </span>
     </button>
@@ -85,12 +85,10 @@ function SpendBar({ amount, max }: { amount: number; max: number }) {
 
 export function SpendingBreakdown({
   spending,
-  open,
   onClose,
   onSelectDog,
 }: {
   spending: Spending;
-  open: boolean;
   onClose: () => void;
   onSelectDog: (id: string) => void;
 }) {
@@ -107,7 +105,6 @@ export function SpendingBreakdown({
     <section
       id="donation-spending-breakdown"
       className="spending-breakdown"
-      hidden={!open}
       aria-labelledby="spending-breakdown-title"
     >
       <div className="spending-breakdown-heading">
@@ -120,10 +117,10 @@ export function SpendingBreakdown({
         <Button
           type="button"
           variant="ghost"
-          aria-label="Close spending breakdown"
+          aria-label="Back to your shelter"
           onClick={onClose}
         >
-          <X size={18} />
+          <ArrowLeft size={18} /> Back to shelter
         </Button>
       </div>
       <Tabs value={view} onValueChange={(value) => setView(String(value))}>

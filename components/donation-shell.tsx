@@ -21,6 +21,14 @@ import {
 } from '@/lib/donation-spending';
 import { WORKBOOK_GIFT_ID, workbookLedger } from '@/lib/workbook-transactions';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import {
   Carousel,
   CarouselContent,
@@ -67,12 +75,14 @@ export default function DonationShell() {
   const [ledger, setLedger] = useState<GivingLedger>(workbookLedger);
   const { gifts, expenses } = ledger;
   const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const [donationOpen, setDonationOpen] = useState(false);
   const [replay, setReplay] = useState<{
     expense: DemoExpense;
     key: number;
   } | null>(null);
   const replayCounter = useRef(0);
   const sceneAnchor = useRef<HTMLDivElement>(null);
+  const focusShelterOnClose = useRef(false);
   const [ready, setReady] = useState(false);
   const [sessionOnly, setSessionOnly] = useState(false);
   const [notice, setNotice] = useState('');
@@ -181,11 +191,19 @@ export default function DonationShell() {
     setNotice('');
   }
   function replayExpense(expense: DemoExpense) {
+    setBreakdownOpen(false);
     setSelectedId(expense.dogId);
     setReplay({ expense, key: ++replayCounter.current });
   }
+  function closeDonationToShelter() {
+    focusShelterOnClose.current = true;
+    setDonationOpen(false);
+    setBreakdownOpen(false);
+    setReplay(null);
+  }
   useEffect(() => {
     if (!replay) return;
+    sceneAnchor.current?.focus({ preventScroll: true });
     sceneAnchor.current?.scrollIntoView({
       block: 'start',
       behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -204,6 +222,7 @@ export default function DonationShell() {
       setNotice(
         'Monthly forecast saved to your profile. No payments or automatic charges are scheduled.',
       );
+      closeDonationToShelter();
       return;
     }
     if (gifts.length >= 1000) return;
@@ -235,6 +254,7 @@ export default function DonationShell() {
     setDraftAmount('');
     setTimelineDay(0);
     setStartDate(new Date().toISOString().slice(0, 10));
+    closeDonationToShelter();
   }
 
   return (
@@ -273,31 +293,84 @@ export default function DonationShell() {
                 className="personal-giving-sidebar"
                 aria-label="Your donations and care transactions"
               >
+                <Dialog
+                  open={donationOpen}
+                  onOpenChange={(open) => {
+                    setDonationOpen(open);
+                    if (open) {
+                      focusShelterOnClose.current = false;
+                      setBreakdownOpen(false);
+                      setReplay(null);
+                    }
+                  }}
+                  onOpenChangeComplete={(open) => {
+                    if (!open && focusShelterOnClose.current) {
+                      sceneAnchor.current?.scrollIntoView({
+                        block: 'start',
+                        behavior: window.matchMedia(
+                          '(prefers-reduced-motion: reduce)',
+                        ).matches
+                          ? 'auto'
+                          : 'smooth',
+                      });
+                    }
+                  }}
+                >
+                  <DialogTrigger
+                    data-slot="button"
+                    render={
+                      <Button
+                        type="button"
+                        className="donation-primary donation-launch"
+                        disabled={!ready}
+                      />
+                    }
+                  >
+                    <PixelCareIcon kind="heart" width="28" height="28" />
+                    Donate
+                    <ArrowUpRight size={25} />
+                  </DialogTrigger>
+                  <DialogContent
+                    className="donation-shell donation-dialog"
+                    finalFocus={() =>
+                      focusShelterOnClose.current ? sceneAnchor.current : true
+                    }
+                  >
+                    <DialogTitle>
+                      What could your gift make possible?
+                    </DialogTitle>
+                    <DialogDescription>
+                      Choose an example or enter your own amount. Preview the
+                      impact in your shelter before confirming.
+                    </DialogDescription>
+                    <CarePlanner
+                      amount={draftAmount}
+                      careId={careId}
+                      frequency={frequency}
+                      onAmount={changeAmount}
+                      onCare={changeCare}
+                      onFrequency={changeFrequency}
+                      onConfirm={donate}
+                      onPreview={closeDonationToShelter}
+                      ready={ready}
+                      atLimit={gifts.length >= 1000}
+                      monthlyPlan={profile.monthlyPlan}
+                      onCancelMonthly={() => {
+                        setProfile((current) => ({
+                          ...current,
+                          monthlyPlan: null,
+                        }));
+                        setNotice(
+                          'Monthly preview removed. Your donation history is unchanged.',
+                        );
+                      }}
+                    />
+                  </DialogContent>
+                </Dialog>
                 <DonationBalance
                   spending={spending}
                   open={breakdownOpen}
                   onToggle={() => setBreakdownOpen((value) => !value)}
-                />
-                <CarePlanner
-                  amount={draftAmount}
-                  careId={careId}
-                  frequency={frequency}
-                  onAmount={changeAmount}
-                  onCare={changeCare}
-                  onFrequency={changeFrequency}
-                  onConfirm={donate}
-                  ready={ready}
-                  atLimit={gifts.length >= 1000}
-                  monthlyPlan={profile.monthlyPlan}
-                  onCancelMonthly={() => {
-                    setProfile((current) => ({
-                      ...current,
-                      monthlyPlan: null,
-                    }));
-                    setNotice(
-                      'Monthly preview removed. Your donation history is unchanged.',
-                    );
-                  }}
                 />
                 <ExpenseTransactions
                   expenses={expenses}
@@ -305,40 +378,54 @@ export default function DonationShell() {
                   onReplay={replayExpense}
                 />
               </aside>
-              <div className="personal-care-scene">
-                <SpendingBreakdown
-                  spending={spending}
-                  open={breakdownOpen}
-                  onClose={() => setBreakdownOpen(false)}
-                  onSelectDog={(id) => {
-                    const expense = [...expenses]
-                      .reverse()
-                      .find((item) => item.dogId === id);
-                    if (expense) replayExpense(expense);
-                  }}
-                />
-                <div ref={sceneAnchor} className="shelter-scene-anchor">
-                  <VirtualShelter
-                    funding={funding}
-                    residentIds={residentIds}
-                    previewIds={previewIds}
-                    projection={projection}
-                    confirmed={confirmedScene}
-                    shelterName={profile.shelterName}
-                    onSelectDog={selectDog}
-                    replay={replay}
-                    onExitReplay={() => setReplay(null)}
-                  >
-                    <CareTimeline
+              <div
+                className="personal-care-scene"
+                id="personal-shelter-view"
+                role="region"
+                aria-label={
+                  breakdownOpen ? 'Your spending' : 'Your personal shelter'
+                }
+                ref={sceneAnchor}
+                tabIndex={-1}
+              >
+                {breakdownOpen ? (
+                  <SpendingBreakdown
+                    spending={spending}
+                    onClose={() => {
+                      setBreakdownOpen(false);
+                      sceneAnchor.current?.focus({ preventScroll: true });
+                    }}
+                    onSelectDog={(id) => {
+                      const expense = [...expenses]
+                        .reverse()
+                        .find((item) => item.dogId === id);
+                      if (expense) replayExpense(expense);
+                    }}
+                  />
+                ) : (
+                  <div className="shelter-scene-anchor">
+                    <VirtualShelter
+                      funding={funding}
+                      residentIds={residentIds}
+                      previewIds={previewIds}
                       projection={projection}
-                      startDate={startDate}
-                      onDay={(day) => {
-                        setReplay(null);
-                        setTimelineDay(day);
-                      }}
-                    />
-                  </VirtualShelter>
-                </div>
+                      confirmed={confirmedScene}
+                      shelterName={profile.shelterName}
+                      onSelectDog={selectDog}
+                      replay={replay}
+                      onExitReplay={() => setReplay(null)}
+                    >
+                      <CareTimeline
+                        projection={projection}
+                        startDate={startDate}
+                        onDay={(day) => {
+                          setReplay(null);
+                          setTimelineDay(day);
+                        }}
+                      />
+                    </VirtualShelter>
+                  </div>
+                )}
               </div>
             </div>
 

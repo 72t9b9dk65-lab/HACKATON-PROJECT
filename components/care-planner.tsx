@@ -6,6 +6,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Eye,
   Repeat2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,7 @@ export function CarePlanner({
   onCare,
   onFrequency,
   onConfirm,
+  onPreview,
   ready,
   atLimit,
   monthlyPlan,
@@ -51,6 +53,7 @@ export function CarePlanner({
   onCare: (id: CarePlanId) => void;
   onFrequency: (frequency: GivingFrequency) => void;
   onConfirm: () => void;
+  onPreview: () => void;
   ready: boolean;
   atLimit: boolean;
   monthlyPlan: MonthlyPlan | null;
@@ -65,10 +68,6 @@ export function CarePlanner({
         onConfirm();
       }}
     >
-      <div className="care-planner-heading">
-        <h2>What could your gift make possible?</h2>
-        <span>Choose an example, or enter your own amount.</span>
-      </div>
       <div className="care-plan-options" aria-label="Care examples">
         {carePlans.map((plan) => (
           <Button
@@ -129,20 +128,33 @@ export function CarePlanner({
             <Repeat2 size={15} /> Every month
           </Button>
         </div>
-        <Button
-          type="submit"
-          className="donation-primary"
-          disabled={!ready || ore === null || (frequency === 'once' && atLimit)}
-        >
-          {frequency === 'monthly'
-            ? monthlyPlan
-              ? 'Update monthly preview'
-              : 'Save monthly preview'
-            : ore === null
-              ? 'Choose an amount'
-              : `Donate ${kronor(ore)} SEK`}{' '}
-          <ArrowUpRight size={19} />
-        </Button>
+        <div className="care-planner-buttons">
+          <Button
+            type="button"
+            variant="outline"
+            className="care-preview-button"
+            disabled={!ready || ore === null}
+            onClick={onPreview}
+          >
+            <Eye size={17} /> Preview in your shelter
+          </Button>
+          <Button
+            type="submit"
+            className="donation-primary"
+            disabled={
+              !ready || ore === null || (frequency === 'once' && atLimit)
+            }
+          >
+            {frequency === 'monthly'
+              ? monthlyPlan
+                ? 'Update monthly preview'
+                : 'Save monthly preview'
+              : ore === null
+                ? 'Choose an amount'
+                : `Donate ${kronor(ore)} SEK`}{' '}
+            <ArrowUpRight size={19} />
+          </Button>
+        </div>
       </div>
       <p id="care-planner-note" className="care-planner-note">
         {amount !== '' && ore === null
