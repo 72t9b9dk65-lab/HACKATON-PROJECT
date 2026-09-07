@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'earthealth — Help where it is needed',
+  title: 'Hundstallet — A second chance, together',
   description:
-    'Explore the planet’s needs, choose a cause, and follow your contribution’s journey. A prototype with demo data and simulated donations.',
+    'Explore Swedish shelter locations, follow fictional dog-care journeys, and try transparent giving. An independent Hundstallet hackathon prototype.',
 };
 
 export default function RootLayout({

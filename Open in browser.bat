@@ -17,7 +17,7 @@ if errorlevel 1 goto failed
 
 :start
 echo.
-echo Opening earthealth in your browser...
+echo Opening Hundstallet in your browser...
 echo Keep this window open. Press Ctrl+C to stop the site.
 echo.
 set "EARTHHEALTH_OPEN_BROWSER=1"

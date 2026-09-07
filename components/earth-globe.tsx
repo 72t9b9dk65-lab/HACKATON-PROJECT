@@ -23,10 +23,11 @@ import {
   GraduationCap,
   Heart,
   LoaderCircle,
+  type LucideIcon,
 } from 'lucide-react';
 import {
-  territories,
-  cities,
+  territories as defaultTerritories,
+  cities as defaultCities,
   continents,
   needColor,
   categoryScore,
@@ -56,6 +57,8 @@ export type GlobeProps = {
   onCategory: (category: CategoryId, territory: Territory) => void;
   raised: Record<string, number>;
   onCountries?: (countries: Territory[]) => void;
+  locations?: { countries: Territory[]; points: Territory[] };
+  markerIcon?: LucideIcon;
 };
 
 export default function EarthGlobe({
@@ -70,7 +73,11 @@ export default function EarthGlobe({
   onCategory,
   raised,
   onCountries,
+  locations,
+  markerIcon,
 }: GlobeProps) {
+  const territories = locations?.countries ?? defaultTerritories;
+  const cities = locations?.points ?? defaultCities;
   const [world, setWorld] = useState<ReturnType<typeof buildWorld> | null>(
     null,
   );
@@ -188,8 +195,11 @@ export default function EarthGlobe({
         : needColor(
             category === 'all' ? t.score : categoryScore(t.score, category),
           );
-  const markers =
-    level === 'continents'
+  const markers = locations
+    ? zoom > 2.5
+      ? cities
+      : territories
+    : level === 'continents'
       ? continents
       : level === 'cities'
         ? cities
@@ -467,7 +477,9 @@ export default function EarthGlobe({
                         ? 'food'
                         : 'water'
                     : category;
-                const Icon = mode === 'impact' ? Heart : categoryIcons[cat];
+                const Icon =
+                  markerIcon ??
+                  (mode === 'impact' ? Heart : categoryIcons[cat]);
                 return (
                   <g
                     key={t.id}
@@ -537,7 +549,11 @@ export default function EarthGlobe({
                       <g
                         transform="translate(47,-20)"
                         role="button"
-                        aria-label={`Clean water in ${t.name}`}
+                        aria-label={
+                          locations
+                            ? `Support dogs in ${t.name}`
+                            : `Clean water in ${t.name}`
+                        }
                         tabIndex={0}
                         onClick={(e) => {
                           e.stopPropagation();

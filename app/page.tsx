@@ -1,4 +1,4 @@
-import EarthHealth from '@/components/earth-health';
+import Hundstallet from '@/components/hundstallet';
 export default function Home() {
-  return <EarthHealth />;
+  return <Hundstallet />;
 }

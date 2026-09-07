@@ -23,6 +23,6 @@ if [ ! -x node_modules/.bin/vinext ]; then
   npm ci
 fi
 
-printf '\nOpening earthealth in your browser…\nKeep this Terminal open. Press Ctrl+C to stop the site.\n\n'
+printf '\nOpening Hundstallet in your browser…\nKeep this Terminal open. Press Ctrl+C to stop the site.\n\n'
 export EARTHHEALTH_OPEN_BROWSER=1
 npm run dev -- --hostname 127.0.0.1
