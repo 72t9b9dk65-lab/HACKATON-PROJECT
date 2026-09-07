@@ -1,6 +1,6 @@
 # Hundstallet — A second chance, together
 
-An independent hackathon prototype for engaging supporters in care, rehabilitation, and rehoming for vulnerable dogs. A Sweden-only map connects real published dog profiles to a simple, simulated giving journey: one donation action, pixel icons for care, and a photo timeline.
+An independent hackathon prototype for engaging supporters in care, rehabilitation, and rehoming for vulnerable dogs. A personal virtual shelter connects roaming pixel companions to real published dog profiles, a Sweden-only shelter map, and a simulated giving journey.
 
 ## Run locally
 
@@ -13,12 +13,13 @@ Both launchers install missing dependencies and open your browser. Keep the term
 
 ## Prototype experience
 
-The homepage puts giving first: the overall donated amount and spending bars at the top, a scrollable row of pixel dog avatars below, one donation button, and the warm white Sweden map alongside. Selecting a dog opens its photo journey without changing the donor’s total.
+The homepage centers on a wide personal virtual shelter, with the donated total and spending bars above it and the warm white Sweden map alongside. Amount selection previews possible shared care before the user confirms a demo gift.
 
-- The horizontal helped-dog carousel shows names beneath pixel avatars. The photo journey below also scrolls horizontally with swipe, keyboard, or arrow controls.
+- Pixel dogs roam in the personal shelter. Clicking one opens an accessible dialog with its real photo, breed, age, status, shelter, demo support, and official profile link. Motion pauses during interaction, has a pause control, and respects reduced-motion preferences. The real photo journey below still scrolls horizontally.
 - Click a pixel shelter to fly from Sweden to its real facility location, showing nearby OpenStreetMap roads and buildings. A rectangular, scrollable grid shows its published dog profiles. **All profiles** includes all 43 listings from the official directory on 7 September 2026, including two group listings and two trial adoptions. The single “Rehoming team” listing remains visible without an invented shelter location.
 - Selecting a grid avatar shows its published photo, official profile link, and simulated care allocation. Selecting a profile at another shelter moves the map there. Escape or **Sweden** returns to the overview.
-- Press **Donate 250 SEK** to simulate shared care for the currently imported profiles. The illustrative split is **50% food / 30% vet care / 20% daily care**, divided in integer öre among the recorded recipients. New gifts snapshot their recipient IDs; older shared gifts retain their original three beneficiaries. Totals and category allocations reconcile exactly.
+- Choose 100, 250, or 500 SEK, or enter any whole amount from 1 to 10,000 SEK. Translucent dogs preview possible care using an explicit prototype assumption of 100 SEK per profile, rounded up and capped at the 43 available profiles. This is not a verified cost or promise of reach. Unsupported profiles are previewed first, then profiles with the least demo support; existing dogs can receive more care.
+- Press **Donate** to confirm that amount for exactly the previewed profiles. Pending previews never affect totals or storage. The illustrative split is **50% food / 30% vet care / 20% daily care**, divided in integer öre among the recorded recipients. New gifts snapshot their recipient IDs; older shared gifts retain their original three beneficiaries. Totals and category allocations reconcile exactly, including after reload.
 - A fresh session starts with a labeled 500 SEK example shared among all 43 profiles. Existing user records retain their dates, amounts, and recipient allocations. The map does not claim that every dog lives at its listed shelter continuously.
 - Published photos have no verified event dates. New demo gifts add a dated entry; the final card reserves space for an organization-posted care update.
 - Sweden’s coastline, counties, lakes, rivers, city labels, panning, zoom, and reset remain available. Both map views use warm white backgrounds, light brown geographic details, and cream shelter cards.
@@ -62,7 +63,9 @@ Consulted September 7, 2026:
 
 Run `npm test`, `npm run typecheck`, and `npm run build`. Tests cover exact allocations, per-dog isolation, reload validation, sourced photo availability, map projection, and the retained earlier models.
 
-- `components/donation-shell.tsx`: contribution, helped-dog carousel, and horizontal photo timeline.
+- `components/donation-shell.tsx`: contribution totals, custom demo donations, and horizontal photo timeline.
+- `components/virtual-shelter.tsx`: roaming supported and preview dogs, motion controls, and real-profile dialogs.
+- `lib/virtual-shelter.ts`: custom amount validation and the explicitly illustrative preview model.
 - `components/shelter-map.tsx`: pixel shelter markers, animated close-up, full dog directory, and selected-dog care.
 - `lib/shelter-camera.ts`: geographic camera interpolation and facility centering.
 - `public/data/hundstallet/directory.json` and `lib/hundstallet-directory.ts`: complete sourced snapshot and typed data.

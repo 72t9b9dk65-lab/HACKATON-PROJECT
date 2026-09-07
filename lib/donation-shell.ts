@@ -124,6 +124,7 @@ export const careKinds: {
   { id: 'comfort', label: 'Daily care', color: '#c3a6df', share: 20 },
 ];
 export const DEMO_GIFT_ORE = 25_000;
+export const MAX_DEMO_GIFT_ORE = 1_000_000;
 export const SHARED_CARE_ID = 'shared-care';
 export const SHELL_STORAGE_KEY = 'hundstallet.donation-shell.v1';
 export type DemoGift = {
@@ -219,7 +220,7 @@ export function readDemoGifts(raw: string | null): DemoGift[] {
           !profileDogs.some((dog) => dog.id === g.dogId)) ||
         !Number.isSafeInteger(g.amountOre) ||
         g.amountOre <= 0 ||
-        g.amountOre > 50_000 ||
+        g.amountOre > MAX_DEMO_GIFT_ORE ||
         (g.recipientIds !== undefined &&
           (!Array.isArray(g.recipientIds) ||
             !g.recipientIds.length ||

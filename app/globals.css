@@ -5895,3 +5895,469 @@ button:not([data-slot]) {
 .shelter-dog-detail .dog-breed-label {
   text-align: left;
 }
+
+/* The personal shelter is the primary surface; real shelter locations stay alongside it. */
+.donation-main-personal {
+  grid-template-columns: minmax(0, 1.9fr) minmax(300px, 1fr);
+}
+.donation-panel-personal {
+  min-width: 0;
+  padding: 28px;
+}
+.donation-panel-personal .donation-balance {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.9fr) minmax(0, 1.1fr);
+  column-gap: 24px;
+}
+.donation-panel-personal .donation-balance-label {
+  grid-column: 1;
+  grid-row: 1;
+}
+.donation-panel-personal .donation-balance-label h1 {
+  font-size: 16px;
+}
+.donation-panel-personal .donation-value {
+  grid-column: 1;
+  grid-row: 2 / 4;
+  align-self: center;
+  margin: 8px 0 0;
+  flex-wrap: wrap;
+}
+.donation-panel-personal .donation-value strong {
+  font-size: clamp(40px, 4.3vw, 72px);
+  letter-spacing: -2px;
+  overflow-wrap: anywhere;
+}
+.donation-panel-personal .donation-allocation-bar {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+}
+.donation-panel-personal .donation-breakdown {
+  grid-column: 2;
+  grid-row: 2;
+  margin-top: 8px;
+  gap: 6px;
+}
+.donation-panel-personal .donation-care {
+  padding: 10px 3px;
+  gap: 4px;
+}
+.donation-panel-personal .donation-care strong {
+  font-size: 17px;
+}
+.donation-panel-personal .donation-allocation-note {
+  grid-column: 2;
+  grid-row: 3;
+  font-size: 12px;
+  margin-top: 8px;
+}
+.virtual-shelter {
+  margin-top: 24px;
+  border-top: 1px solid var(--donation-line);
+  padding-top: 18px;
+}
+.virtual-shelter-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.virtual-shelter-heading > img {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+.virtual-shelter-heading > div {
+  min-width: 0;
+}
+.virtual-shelter-heading h2 {
+  font-size: clamp(22px, 2.1vw, 30px);
+  font-weight: 650;
+  letter-spacing: -0.7px;
+  margin: 4px 0;
+}
+.virtual-shelter-heading p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--donation-muted);
+}
+.virtual-motion-toggle[data-slot='button'] {
+  margin-left: auto;
+  flex-shrink: 0;
+  height: 38px;
+  width: 38px;
+  border: 1px solid var(--donation-line);
+  background: var(--donation-paper);
+  color: var(--donation-ink);
+}
+.virtual-shelter-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 14px 0 12px;
+  color: var(--donation-muted);
+  font-size: 13px;
+}
+.virtual-shelter-legend > span {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+}
+.virtual-shelter-legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--donation-accent);
+}
+.virtual-shelter-legend .virtual-preview-dot {
+  opacity: 0.4;
+}
+.virtual-shelter-yard {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(94px, 1fr));
+  grid-auto-rows: 130px;
+  align-content: space-evenly;
+  gap: 14px 3px;
+  height: 360px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding: 18px 12px;
+  border: 1px solid var(--donation-line);
+  border-radius: 18px;
+  background-color: var(--donation-soft);
+  background-image: radial-gradient(
+    var(--donation-line) 0.7px,
+    transparent 0.7px
+  );
+  background-size: 22px 22px;
+  scrollbar-color: var(--donation-line-strong) var(--donation-soft);
+  scrollbar-width: thin;
+}
+.virtual-dog-space {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+}
+.virtual-roaming-dog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 84px;
+  min-height: 108px;
+  border-radius: 12px;
+  padding: 2px;
+  color: var(--donation-ink);
+  animation: virtual-dog-roam var(--roam-duration) ease-in-out var(--roam-delay)
+    infinite;
+}
+.virtual-roaming-dog > img {
+  width: 72px;
+  height: 72px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  pointer-events: none;
+}
+.virtual-dog-name {
+  display: block;
+  padding: 2px 7px;
+  border-radius: 7px;
+  background: var(--donation-paper);
+  font-size: 13px;
+  line-height: 1.3;
+  font-weight: 700;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.virtual-dog-name .dog-display-name {
+  grid-template-columns: 8px minmax(0, auto) 8px;
+  gap: 3px;
+}
+.virtual-dog-name .dog-display-name > svg {
+  width: 8px;
+  height: 8px;
+}
+.virtual-roaming-dog > small {
+  font-size: 12px;
+  margin-top: 2px;
+}
+.virtual-roaming-preview {
+  opacity: 0.45;
+}
+.virtual-roaming-dog:hover,
+.virtual-roaming-dog:focus-visible {
+  z-index: 2;
+  opacity: 1;
+  outline: 2px solid var(--donation-accent);
+  outline-offset: 3px;
+}
+.virtual-shelter-yard:is(:hover, :focus-within, [data-paused='true'])
+  .virtual-roaming-dog {
+  animation-play-state: paused;
+}
+@keyframes virtual-dog-roam {
+  0%,
+  100% {
+    transform: translate(calc(var(--roam-x) * -1), 0);
+  }
+  30% {
+    transform: translate(0, var(--roam-y));
+  }
+  60% {
+    transform: translate(var(--roam-x), calc(var(--roam-y) * -1));
+  }
+  80% {
+    transform: translate(0, 3px);
+  }
+}
+.virtual-shelter-note,
+.shelter-preview-model {
+  color: var(--donation-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+.virtual-shelter-empty {
+  grid-column: 1 / -1;
+  align-self: center;
+  text-align: center;
+  color: var(--donation-muted);
+  font-size: 15px;
+  padding: 30px;
+}
+.shelter-donation-form {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--donation-line);
+}
+.shelter-donation-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin-bottom: 12px;
+}
+.shelter-donation-heading label {
+  font-size: 18px;
+  font-weight: 650;
+}
+.shelter-donation-heading > span {
+  color: var(--donation-muted);
+  font-size: 13px;
+}
+.shelter-donation-controls {
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr);
+  gap: 10px;
+}
+.shelter-amount-presets {
+  display: flex;
+  gap: 6px;
+}
+.shelter-amount-presets [data-slot='button'] {
+  min-width: 58px;
+  height: 44px;
+  font-size: 15px;
+  color: var(--donation-ink);
+  border: 1px solid var(--donation-line);
+  background: var(--donation-paper);
+}
+.shelter-amount-presets [aria-pressed='true'] {
+  background: var(--donation-selected);
+  border-color: var(--donation-accent);
+}
+.shelter-custom-amount {
+  position: relative;
+  min-width: 0;
+}
+.shelter-custom-amount [data-slot='input'] {
+  height: 44px;
+  padding-right: 54px;
+  font-size: 16px;
+  border-color: var(--donation-line);
+  color: var(--donation-ink);
+  background: var(--donation-paper);
+}
+.shelter-custom-amount > span {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--donation-muted);
+  font-size: 13px;
+}
+.shelter-donation-form .donation-primary[data-slot='button'] {
+  grid-column: 1 / -1;
+  height: 48px;
+  margin-top: 0;
+}
+.shelter-amount-error {
+  color: #9b3b2a;
+  font-size: 13px;
+  margin-top: 8px;
+}
+.shelter-amount-error:empty {
+  display: none;
+}
+.donation-panel-personal .donation-payment-note {
+  font-size: 12px;
+}
+.virtual-dog-dialog[data-slot='dialog-content'] {
+  min-height: 0;
+  width: min(440px, calc(100vw - 32px));
+  max-width: 440px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: 20px;
+  gap: 10px;
+  background: var(--donation-paper);
+  color: var(--donation-ink);
+}
+.virtual-dog-dialog > .dog-portrait {
+  width: min(100%, 240px);
+  justify-self: center;
+  margin: 5px 0 8px;
+}
+.virtual-dog-dialog [data-slot='dialog-title'] {
+  font-size: 26px;
+  line-height: 1.3;
+}
+.virtual-dog-dialog .dog-display-name {
+  justify-content: start;
+}
+.virtual-dog-dialog [data-slot='dialog-description'],
+.virtual-profile-breed {
+  color: var(--donation-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.virtual-profile-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--donation-muted);
+}
+.virtual-profile-preview-note {
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--donation-soft);
+  color: var(--donation-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.virtual-profile-care {
+  padding: 14px;
+  background: var(--donation-soft);
+  border-radius: 10px;
+}
+.virtual-profile-care > strong {
+  font-size: 19px;
+}
+.virtual-profile-care > strong small {
+  font-size: 12px;
+  font-weight: 400;
+}
+.virtual-profile-care > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+.virtual-profile-care > div > span {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+.virtual-profile-care small {
+  font-size: 12px;
+  color: var(--donation-muted);
+}
+.virtual-profile-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--donation-action);
+  font-size: 15px;
+  font-weight: 600;
+}
+@media (max-width: 1100px) {
+  .donation-main-personal {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .donation-main-personal > .donation-map {
+    min-height: 700px;
+    border-top: 1px solid var(--donation-line);
+  }
+}
+@media (max-width: 560px) {
+  .donation-panel-personal {
+    padding: 22px 16px;
+  }
+  .donation-panel-personal .donation-balance {
+    display: block;
+  }
+  .donation-panel-personal .donation-value {
+    margin: 12px 0 20px;
+  }
+  .donation-panel-personal .donation-value strong {
+    font-size: 58px;
+  }
+  .donation-panel-personal .donation-breakdown {
+    margin-top: 12px;
+  }
+  .virtual-shelter-heading {
+    gap: 9px;
+  }
+  .virtual-shelter-heading > img {
+    width: 52px;
+    height: 52px;
+  }
+  .virtual-shelter-heading .donation-eyebrow {
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  .virtual-shelter-heading h2 {
+    font-size: 22px;
+  }
+  .virtual-shelter-heading p {
+    font-size: 13px;
+  }
+  .virtual-shelter-yard {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 16px 7px;
+    height: 365px;
+  }
+  .virtual-roaming-dog {
+    width: 68px;
+  }
+  .virtual-roaming-dog > img {
+    width: 62px;
+    height: 62px;
+  }
+  .virtual-motion-toggle[data-slot='button'] {
+    width: 32px;
+    height: 32px;
+  }
+  .shelter-donation-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .shelter-amount-presets > button {
+    flex: 1;
+  }
+  .donation-main-personal > .donation-map {
+    min-height: 780px;
+  }
+}

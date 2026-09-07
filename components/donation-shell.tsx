@@ -3,22 +3,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Camera, Check } from 'lucide-react';
 import ShelterMap from '@/components/shelter-map';
-import { DogName } from '@/components/dog-name';
-import { DogPortrait } from '@/components/dog-portrait';
+import { VirtualShelter } from '@/components/virtual-shelter';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  type CarouselApi,
 } from '@/components/ui/carousel';
 import {
   careAllocation,
   careKinds,
-  DEMO_GIFT_ORE,
   exampleGifts,
   fundingSummary,
   SHARED_CARE_ID,
@@ -28,10 +26,14 @@ import {
   SHELL_STORAGE_KEY,
   type DemoGift,
 } from '@/lib/donation-shell';
+import {
+  parseDonationAmount,
+  previewCareRecipients,
+} from '@/lib/virtual-shelter';
 
 export default function DonationShell() {
   const [selectedId, setSelectedId] = useState('ake');
-  const [dogsCarousel, setDogsCarousel] = useState<CarouselApi>();
+  const [draftAmount, setDraftAmount] = useState('250');
   const [gifts, setGifts] = useState<DemoGift[]>(exampleGifts);
   const [ready, setReady] = useState(false);
   const [sessionOnly, setSessionOnly] = useState(false);
@@ -67,11 +69,9 @@ export default function DonationShell() {
   const helpedDogs = profileDogs.filter(
     (item) => funding.byDog[item.id].amountOre > 0,
   );
-
-  useEffect(() => {
-    const index = helpedDogs.findIndex((item) => item.id === selectedId);
-    if (index >= 0) dogsCarousel?.scrollTo(index);
-  }, [selectedId, dogsCarousel, helpedDogs.map((item) => item.id).join(',')]);
+  const draftOre = parseDonationAmount(draftAmount);
+  const previewIds = previewCareRecipients(draftOre, funding);
+  const invalidAmount = draftAmount !== '' && draftOre === null;
 
   function selectDog(id: string) {
     setSelectedId(id);
@@ -79,16 +79,26 @@ export default function DonationShell() {
     setCelebrate(false);
   }
   function donate() {
-    if (!ready || gifts.length >= 1000) return;
+    if (
+      !ready ||
+      gifts.length >= 1000 ||
+      draftOre === null ||
+      !previewIds.length
+    )
+      return;
     const gift = {
       id: crypto.randomUUID(),
       dogId: SHARED_CARE_ID,
-      recipientIds: profileDogs.map((item) => item.id),
-      amountOre: DEMO_GIFT_ORE,
+      recipientIds: [...previewIds],
+      amountOre: draftOre,
       createdAt: new Date().toISOString(),
     };
     setGifts((current) => [...current, gift]);
-    setNotice('250 SEK added to shared care for the dogs.');
+    setNotice(
+      `${kronor(draftOre)} SEK added to demo care for ${previewIds.length} ${previewIds.length === 1 ? 'profile' : 'profiles'}.`,
+    );
+    setSelectedId(previewIds[0]);
+    setDraftAmount('');
     setCelebrate(true);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setCelebrate(false), 1800);
@@ -111,10 +121,13 @@ export default function DonationShell() {
       </header>
 
       <main className="donation-workspace">
-        <section className="donation-main" aria-label="Map and donation">
-          <aside
-            className="donation-panel donation-panel-total"
-            aria-label="Your giving"
+        <section
+          className="donation-main donation-main-personal"
+          aria-label="Your virtual shelter and real shelters"
+        >
+          <section
+            className="donation-panel donation-panel-total donation-panel-personal"
+            aria-label="Your giving and personal shelter"
           >
             <div className="donation-balance">
               <div className="donation-balance-label">
@@ -128,7 +141,8 @@ export default function DonationShell() {
                 <span>SEK</span>
                 {celebrate && (
                   <span className="donation-float">
-                    +250 <PixelCareIcon kind="heart" width="18" height="18" />
+                    +{kronor(latestGift?.amountOre ?? 0)}{' '}
+                    <PixelCareIcon kind="heart" width="18" height="18" />
                   </span>
                 )}
               </div>
@@ -164,62 +178,95 @@ export default function DonationShell() {
               </p>
             </div>
 
-            <Carousel
-              setApi={setDogsCarousel}
-              opts={{ align: 'start', containScroll: 'trimSnaps' }}
-              className="donation-helped-carousel"
-              aria-label="Dogs helped through shared care"
-            >
-              <div className="donation-helped-heading">
-                <h2>Dogs you’re helping</h2>
-                <div className="donation-carousel-controls">
-                  <CarouselPrevious aria-label="Previous helped dog" />
-                  <CarouselNext aria-label="Next helped dog" />
-                </div>
-              </div>
-              {helpedDogs.length ? (
-                <CarouselContent className="donation-helped-track">
-                  {helpedDogs.map((item) => (
-                    <CarouselItem
-                      key={item.id}
-                      className="donation-helped-item"
-                    >
-                      <button
-                        className="donation-helped-dog"
-                        aria-pressed={item.id === dog.id}
-                        aria-label={`Follow ${item.name}’s journey, ${item.breed}`}
-                        onClick={() => selectDog(item.id)}
-                      >
-                        <DogPortrait dog={item} />
-                        <DogName name={item.name} />
-                        <span className="dog-breed-label">{item.breed}</span>
-                        <span>{item.location}</span>
-                      </button>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-              ) : (
-                <p className="donation-helped-empty">
-                  Your first donation will start a shared care trail.
-                </p>
-              )}
-              <p className="donation-helped-note">
-                One donation, shared care. Illustrated badges · demo
-                beneficiaries.
-              </p>
-            </Carousel>
+            <VirtualShelter
+              funding={funding}
+              previewIds={previewIds}
+              onSelectDog={selectDog}
+            />
 
-            <Button
-              className="donation-primary"
-              onClick={donate}
-              disabled={!ready || gifts.length >= 1000}
+            <form
+              className="shelter-donation-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                donate();
+              }}
             >
-              <PixelCareIcon kind="heart" width="23" height="23" /> Donate 250
-              SEK <span>↗</span>
-            </Button>
-            <p className="donation-payment-note">
-              Try it out. No payment is taken.
-            </p>
+              <div className="shelter-donation-heading">
+                <label htmlFor="shelter-donation-amount">
+                  Add a little care
+                </label>
+                <span>Choose an amount to preview its reach</span>
+              </div>
+              <div className="shelter-donation-controls">
+                <div
+                  className="shelter-amount-presets"
+                  aria-label="Suggested donation amounts"
+                >
+                  {[100, 250, 500].map((amount) => (
+                    <Button
+                      key={amount}
+                      type="button"
+                      variant="outline"
+                      aria-pressed={draftOre === amount * 100}
+                      onClick={() => {
+                        setDraftAmount(String(amount));
+                        setNotice('');
+                      }}
+                    >
+                      {amount}
+                    </Button>
+                  ))}
+                </div>
+                <div className="shelter-custom-amount">
+                  <Input
+                    id="shelter-donation-amount"
+                    type="number"
+                    min="1"
+                    max="10000"
+                    step="1"
+                    inputMode="numeric"
+                    placeholder="Your amount"
+                    value={draftAmount}
+                    aria-invalid={invalidAmount}
+                    aria-describedby="shelter-preview-model shelter-amount-error"
+                    onChange={(event) => {
+                      setDraftAmount(event.target.value);
+                      setNotice('');
+                    }}
+                  />
+                  <span>SEK</span>
+                </div>
+                <Button
+                  type="submit"
+                  className="donation-primary"
+                  disabled={!ready || gifts.length >= 1000 || draftOre === null}
+                >
+                  <PixelCareIcon kind="heart" width="23" height="23" />
+                  {draftOre === null
+                    ? 'Choose an amount'
+                    : `Donate ${kronor(draftOre)} SEK`}
+                  <span>↗</span>
+                </Button>
+              </div>
+              <p
+                id="shelter-amount-error"
+                className="shelter-amount-error"
+                role="status"
+              >
+                {invalidAmount
+                  ? 'Enter a whole amount from 1 to 10,000 SEK.'
+                  : gifts.length >= 1000
+                    ? 'This device has reached its limit of 1,000 demo gifts.'
+                    : ''}
+              </p>
+              <p id="shelter-preview-model" className="shelter-preview-model">
+                Illustrative preview: 100 SEK per profile, rounded up and capped
+                at available profiles. Actual reach depends on shelter needs.
+              </p>
+              <p className="donation-payment-note">
+                Try it out. No payment is taken.
+              </p>
+            </form>
             <div className="donation-receipt" aria-live="polite" role="status">
               {notice ? (
                 <>
@@ -249,7 +296,7 @@ export default function DonationShell() {
                 {sessionOnly ? 'This session only' : 'Saved on this device'}
               </span>
             </div>
-          </aside>
+          </section>
           <div className="donation-map">
             <ShelterMap
               selectedDogId={selectedId}
