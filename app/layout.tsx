@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Hundstallet — A second chance, together',
   description:
-    'Explore Swedish shelter locations, follow fictional dog-care journeys, and try transparent giving. An independent Hundstallet hackathon prototype.',
+    'Meet dogs from Hundstallet, explore their locations in Sweden, and try a simple visual donation journey. Independent prototype with simulated giving.',
 };
 
 export default function RootLayout({

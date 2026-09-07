@@ -1,6 +1,6 @@
 # Hundstallet — A second chance, together
 
-An independent hackathon prototype for engaging supporters in care, rehabilitation, and rehoming for vulnerable dogs. A Sweden-only map is the main interface: explore Swedish shelter locations, meet fictional dogs, follow their stories, and understand an illustrative contribution allocation.
+An independent hackathon prototype for engaging supporters in care, rehabilitation, and rehoming for vulnerable dogs. A Sweden-only map connects real published dog profiles to a simple, simulated giving journey: one donation action, pixel icons for care, and a photo timeline.
 
 ## Run locally
 
@@ -13,22 +13,23 @@ Both launchers install missing dependencies and open your browser. Keep the term
 
 ## Prototype experience
 
-- **Explore shelters:** a draggable, zoomable map showing only Sweden, with detailed 1:10 million coastlines, islands, 21 county boundaries, lakes, rivers, and city labels, with approximate city-level markers for Stockholm, Alingsås, and Örkelljunga. Choose a shelter directly, pan and zoom up to 6×, or reset to show all of Sweden. Geographic labels appear progressively and avoid shelter callouts.
-- **Follow a dog:** three fictional stories connect care, rehabilitation, and rehoming. Bookmark a journey and read example care updates. The next-chapter control is an explicit demo action; donating does not advance rehabilitation or guarantee adoption.
-- **Try a contribution:** simulate SEK 10–25,000. Amounts are stored as integer öre and allocated without rounding losses across veterinary care (40%), food and daily care (30%), training and rehabilitation (20%), and rehoming support (10%). These are proposed demo percentages, not Hundstallet’s accounts.
-- **My impact:** see your simulated contributions, allocations, followed dogs, and downloadable JSON receipts.
-- **The pack:** earn one-time local badges for following a story, reading an update, and trying a contribution. The community challenge combines explicitly fictional sample participation with your local activity. Rewards are not tradable, and there are no spending rankings.
-- **Receipt integrity:** each receipt contains a SHA-256 fingerprint of its fields and the previous receipt hash. The app validates the local chain on reload and on request.
+The homepage is deliberately small: a black Sweden map, one donation button, a visual allocation, and a photo carousel.
 
-## Honest boundaries
+- Select **Åke, Koby, or Ove** on the map. The selected dog, money breakdown, and photo journey stay in sync. These are real public profiles checked on 7 September 2026; pins indicate cities, not live dog locations.
+- Press **Donate 250 SEK** to simulate a contribution to the selected dog's example care plan. The amount immediately updates the three colored pixel icons (food, vet care, and daily care) below the balance and on that dog's map marker.
+- The illustrative split is **50% food / 30% vet care / 20% daily care**, stored as integer öre without rounding loss. The initial 500 SEK for Åke is a labeled example.
+- Browse photos published on each dog's Hundstallet profile. New demo gifts add a dated entry; the final card reserves space for a future organization-posted care update.
+- The detailed map retains Sweden's coastline, islands, counties, lakes, rivers, city labels, pan, zoom, and reset controls. Dashboard tabs, rewards pages, filters, and multiple donation actions have been removed from the active experience.
 
-This is not an official Hundstallet product. There are no real payments, server accounts, live case updates, connected shelter systems, or shared community activity. Dogs, stories, funding totals, rewards, and allocations are illustrative. The Luna portrait is AI-generated. Milo and Bella use symbolic artwork, not photographs of actual shelter dogs.
+## Data and prototype boundaries
 
-Receipts are **local hash-linked records, not blockchain transactions**. They can detect edits to a record or broken links, but a fully rewritten chain or removed suffix cannot be detected without an independent anchor. They are not proof of expenditure, dog outcomes, delivery, or tax-deductible giving.
+This is an independent shell, not an official Hundstallet service. Public names, profile summaries, city locations, and photographs are a manually imported snapshot. All financial amounts, allocations, and donation events are simulated. Åke's profile mentions allergy food; the app does not claim that a purchase was made for him or that Hundstallet earmarks donations to particular dogs.
 
-Following a particular dog does not earmark a real gift for that dog. Real donations must be made on [Hundstallet’s official website](https://hundstallet.se/stod-oss/). Actual care includes staffing and overhead; the prototype allocation is not a claim about real costs.
+Photo order is gallery order, not a verified care chronology. The original photos have no asserted event dates and do not prove expenditure, delivery, or outcomes. The next-update card is visibly a placeholder; donations do not generate organization updates or advance a dog's rehabilitation. Photo sources, original URLs, and hashes are recorded in `public/dogs/hundstallet/sources.json`. Copyright remains with the original rights holders.
 
-The new experience uses `hundstallet.prototype.v1` in localStorage. Existing EarthHealth records remain untouched under their original key. The former humanitarian components and tests are retained for reference, but are not the active homepage.
+Demo records are saved only in this browser under `hundstallet.donation-shell.v1`. If storage is unavailable, the shell works for the current session and says so. There are no payments, blockchain transactions, server accounts, or live integrations. Real giving is available on [Hundstallet's official website](https://hundstallet.se/stod-oss/).
+
+Previous EarthHealth and Hundstallet flows and their local records are retained for reference and are not used by the active homepage.
 
 ## Production path
 
@@ -42,6 +43,7 @@ The new experience uses `hundstallet.prototype.v1` in localStorage. Existing Ear
 
 Consulted September 7, 2026:
 
+- [Åke](https://hundstallet.se/hundar/ake/), [Koby](https://hundstallet.se/hundar/koby/), and [Ove](https://hundstallet.se/hundar/ove/): public profiles and photo galleries.
 - [Hundstallet’s mission and shelter locations](https://hundstallet.se/var-verksamhet/)
 - [How Hundstallet uses donations](https://hundstallet.kb.kundo.se/guide/vad-anvands-mina-pengar-till?category=gavor-och-donationer)
 - [Official giving page](https://hundstallet.se/stod-oss/)
@@ -51,9 +53,13 @@ Consulted September 7, 2026:
 
 ## Validation and code
 
-Run `npm test`, `npm run typecheck`, and `npm run build`. Tests cover contribution validation, exact allocation, local receipt integrity, persistence, badge eligibility, shelter totals, and the retained globe and original donation model.
+Run `npm test`, `npm run typecheck`, and `npm run build`. Tests cover exact allocations, per-dog isolation, reload validation, sourced photo availability, map projection, and the retained earlier models.
 
-- `components/hundstallet.tsx`: active map, stories, donation flow, dashboard, community, and dialogs.
+- `components/donation-shell.tsx`: active simplified map, contribution, and photo timeline.
+- `lib/donation-shell.ts`: sourced profiles, demo allocation, and local records.
+- `components/pixel-care-icon.tsx`: shared pixel icons for amounts and map markers.
+- `public/dogs/hundstallet/`: original profile photos with a source manifest.
+- `components/hundstallet.tsx`: retained earlier prototype, no longer the homepage.
 - `lib/hundstallet-data.ts`: locations, fictional dogs, stages, and proposed allocations.
 - `lib/hundstallet-model.ts`: currency validation, allocation, local receipts, reload validation, and badges.
 - `components/sweden-map.tsx` and `lib/sweden-map.ts`: Sweden-only projection, panning, zooming, and accessible shelter markers.

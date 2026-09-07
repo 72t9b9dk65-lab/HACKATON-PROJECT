@@ -10,6 +10,13 @@ import {
 } from '@/lib/sweden-map';
 import { shelters, sek } from '@/lib/hundstallet-data';
 import type { MapMode } from '@/lib/earth-data';
+import { PixelCareIcon } from '@/components/pixel-care-icon';
+import {
+  careAllocation,
+  careKinds,
+  kronor,
+  type ProfileDog,
+} from '@/lib/donation-shell';
 
 export default function SwedenMap({
   selectedId,
@@ -19,6 +26,7 @@ export default function SwedenMap({
   resetKey,
   raised,
   onSelect,
+  dogMarkers,
 }: {
   selectedId: string;
   mode: MapMode;
@@ -27,6 +35,7 @@ export default function SwedenMap({
   resetKey: number;
   raised: Record<string, number>;
   onSelect: (id: string) => void;
+  dogMarkers?: (ProfileDog & { amountOre: number })[];
 }) {
   const container = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 800, height: 770 });
@@ -105,9 +114,10 @@ export default function SwedenMap({
             size.width,
             size.height,
             details ?? undefined,
+            dogMarkers ? 'donation' : 'default',
           )
         : null,
-    [boundary, size, details],
+    [boundary, size, details, !!dogMarkers],
   );
   const cx = size.width * 0.56,
     cy = size.height * 0.49;
@@ -399,102 +409,229 @@ export default function SwedenMap({
               </text>
             </>
           )}
-          {shelters.map((s) => {
-            const point = prepared.projection(s.coordinates);
+          {!dogMarkers &&
+            shelters.map((s) => {
+              const point = prepared.projection(s.coordinates);
+              if (!point) return null;
+              const x = (point[0] - cx) * zoom + cx + pan.x,
+                y = (point[1] - cy) * zoom + cy + pan.y;
+              if (
+                x < -25 ||
+                x > size.width + 25 ||
+                y < 80 ||
+                y > size.height - 40
+              )
+                return null;
+              const active = s.id === selectedId;
+              const Icon = mode === 'impact' ? Heart : PawPrint;
+              const left = s.id === 'alingsas';
+              const labelX = left
+                ? Math.max(105, x - 32)
+                : Math.min(size.width - 112, x + 32);
+              const labelY = y + (s.id === 'orkelljunga' ? 15 : -13);
+              const percentage = Math.round(
+                ((raised[s.id] ?? s.raised) / s.goal) * 100,
+              );
+              return (
+                <g
+                  key={s.id}
+                  role="button"
+                  tabIndex={0}
+                  className="hs-shelter-marker"
+                  aria-pressed={active}
+                  aria-label={`${s.name} shelter. ${mode === 'impact' ? `${sek(raised[s.id] ?? s.raised)} in demo support` : 'View the dog care story'}`}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={() => onSelect(s.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onSelect(s.id);
+                    }
+                  }}
+                >
+                  <path
+                    d={`M${x} ${y} L${labelX} ${labelY}`}
+                    stroke={active ? '#e0f4b3' : '#b0c99b'}
+                    strokeWidth="1"
+                    fill="none"
+                  />
+                  {active && (
+                    <circle cx={x} cy={y} r="25" fill="#d9f1a8" opacity=".15" />
+                  )}
+                  <circle
+                    className="hs-pin-circle"
+                    cx={x}
+                    cy={y}
+                    r={active ? 16 : 13}
+                    fill={active ? '#e8f5c5' : '#fffef5'}
+                    stroke="#526f49"
+                    strokeWidth="1.5"
+                  />
+                  <Icon
+                    x={x - 8}
+                    y={y - 8}
+                    width="16"
+                    height="16"
+                    color="#35513a"
+                    strokeWidth="1.7"
+                  />
+                  <rect
+                    x={left ? labelX - 102 : labelX}
+                    y={labelY - 19}
+                    width="106"
+                    height="43"
+                    rx="7"
+                    fill={active ? '#e8f0d5' : '#1b362a'}
+                    stroke={active ? '#d5e7b3' : '#52734a'}
+                    strokeWidth="1"
+                  />
+                  <text
+                    x={left ? labelX - 49 : labelX + 53}
+                    y={labelY - 2}
+                    textAnchor="middle"
+                    className={active ? 'hs-pin-label active' : 'hs-pin-label'}
+                  >
+                    {s.name}
+                  </text>
+                  <text
+                    x={left ? labelX - 49 : labelX + 53}
+                    y={labelY + 13}
+                    textAnchor="middle"
+                    className={
+                      active ? 'hs-pin-caption active' : 'hs-pin-caption'
+                    }
+                  >
+                    {mode === 'impact'
+                      ? `${percentage}% demo funded`
+                      : 'Meet the dogs'}
+                  </text>
+                </g>
+              );
+            })}
+          {dogMarkers?.map((dog) => {
+            const point = prepared.projection(dog.coordinates);
             if (!point) return null;
-            const x = (point[0] - cx) * zoom + cx + pan.x,
-              y = (point[1] - cy) * zoom + cy + pan.y;
-            if (
-              x < -25 ||
-              x > size.width + 25 ||
-              y < 80 ||
-              y > size.height - 40
-            )
+            const x = (point[0] - cx) * zoom + cx + pan.x;
+            const y = (point[1] - cy) * zoom + cy + pan.y;
+            if (x < 0 || x > size.width || y < 45 || y > size.height - 30)
               return null;
-            const active = s.id === selectedId;
-            const Icon = mode === 'impact' ? Heart : PawPrint;
-            const left = s.id === 'alingsas';
-            const labelX = left
-              ? Math.max(105, x - 32)
-              : Math.min(size.width - 112, x + 32);
-            const labelY = y + (s.id === 'orkelljunga' ? 15 : -13);
-            const percentage = Math.round(
-              ((raised[s.id] ?? s.raised) / s.goal) * 100,
+            const active = dog.shelterId === selectedId;
+            const funded = dog.amountOre > 0;
+            const width = size.width < 500 ? 138 : 164;
+            const left = dog.shelterId === 'alingsas';
+            const cardX = Math.max(
+              12,
+              Math.min(size.width - width - 12, x + (left ? -width - 34 : 36)),
             );
+            const cardY = Math.max(
+              60,
+              Math.min(
+                size.height - 132,
+                y +
+                  (dog.shelterId === 'stockholm'
+                    ? -140
+                    : left
+                      ? size.width < 500
+                        ? -148
+                        : -95
+                      : 16),
+              ),
+            );
+            const allocation = careAllocation(dog.amountOre);
             return (
               <g
-                key={s.id}
+                key={dog.id}
+                className="donation-dog-pin"
                 role="button"
                 tabIndex={0}
-                className="hs-shelter-marker"
                 aria-pressed={active}
-                aria-label={`${s.name} shelter. ${mode === 'impact' ? `${sek(raised[s.id] ?? s.raised)} in demo support` : 'View the dog care story'}`}
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={() => onSelect(s.id)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onSelect(s.id);
+                aria-label={`Select ${dog.name} in ${dog.location}, ${kronor(dog.amountOre)} SEK in demo support`}
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={() => onSelect(dog.shelterId)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onSelect(dog.shelterId);
                   }
                 }}
               >
                 <path
-                  d={`M${x} ${y} L${labelX} ${labelY}`}
-                  stroke={active ? '#e0f4b3' : '#b0c99b'}
-                  strokeWidth="1"
+                  d={`M${x} ${y} L${left ? cardX + width : cardX} ${cardY + 30}`}
                   fill="none"
+                  stroke={active ? '#d4f6a0' : '#617166'}
+                  strokeWidth="1"
                 />
-                {active && (
-                  <circle cx={x} cy={y} r="25" fill="#d9f1a8" opacity=".15" />
-                )}
                 <circle
-                  className="hs-pin-circle"
                   cx={x}
                   cy={y}
-                  r={active ? 16 : 13}
-                  fill={active ? '#e8f5c5' : '#fffef5'}
-                  stroke="#526f49"
-                  strokeWidth="1.5"
-                />
-                <Icon
-                  x={x - 8}
-                  y={y - 8}
-                  width="16"
-                  height="16"
-                  color="#35513a"
-                  strokeWidth="1.7"
-                />
-                <rect
-                  x={left ? labelX - 102 : labelX}
-                  y={labelY - 19}
-                  width="106"
-                  height="43"
-                  rx="7"
-                  fill={active ? '#e8f0d5' : '#1b362a'}
-                  stroke={active ? '#d5e7b3' : '#52734a'}
+                  r={active ? 29 : 24}
+                  fill={active ? '#d4f6a014' : '#000'}
+                  stroke={active ? '#d4f6a0' : '#839184'}
                   strokeWidth="1"
                 />
+                <clipPath id={`dog-photo-${dog.id}`}>
+                  <circle cx={x} cy={y} r="20" />
+                </clipPath>
+                <image
+                  href={dog.photos[0].src}
+                  x={x - 20}
+                  y={y - 20}
+                  width="40"
+                  height="40"
+                  clipPath={`url(#dog-photo-${dog.id})`}
+                  preserveAspectRatio="xMidYMid slice"
+                />
+                <rect
+                  className="donation-pin-card"
+                  x={cardX}
+                  y={cardY}
+                  width={width}
+                  height={funded ? 110 : 60}
+                  rx="10"
+                  fill={active ? '#20271c' : '#101310'}
+                  stroke={active ? '#b6d88c' : '#3c443d'}
+                />
                 <text
-                  x={left ? labelX - 49 : labelX + 53}
-                  y={labelY - 2}
-                  textAnchor="middle"
-                  className={active ? 'hs-pin-label active' : 'hs-pin-label'}
+                  x={cardX + 13}
+                  y={cardY + 24}
+                  className="donation-pin-name"
                 >
-                  {s.name}
+                  {dog.name}
                 </text>
                 <text
-                  x={left ? labelX - 49 : labelX + 53}
-                  y={labelY + 13}
-                  textAnchor="middle"
-                  className={
-                    active ? 'hs-pin-caption active' : 'hs-pin-caption'
-                  }
+                  x={cardX + 13}
+                  y={cardY + 43}
+                  className="donation-pin-place"
                 >
-                  {mode === 'impact'
-                    ? `${percentage}% demo funded`
-                    : 'Meet the dogs'}
+                  {dog.location}
                 </text>
+                {funded && (
+                  <>
+                    <text
+                      x={cardX + 13}
+                      y={cardY + 68}
+                      className="donation-pin-value"
+                    >
+                      {kronor(dog.amountOre)} SEK
+                    </text>
+                    {careKinds.map((kind, index) => (
+                      <g key={kind.id} opacity={allocation[kind.id] ? 1 : 0.3}>
+                        <title>
+                          {kind.label}: {kronor(allocation[kind.id])} SEK (demo)
+                        </title>
+                        <PixelCareIcon
+                          kind={kind.id}
+                          x={cardX + 13 + index * 35}
+                          y={cardY + 78}
+                          width="24"
+                          height="24"
+                        />
+                      </g>
+                    ))}
+                  </>
+                )}
               </g>
             );
           })}

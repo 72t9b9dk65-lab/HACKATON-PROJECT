@@ -1,4 +1,4 @@
-import Hundstallet from '@/components/hundstallet';
+import DonationShell from '@/components/donation-shell';
 export default function Home() {
-  return <Hundstallet />;
+  return <DonationShell />;
 }

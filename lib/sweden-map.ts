@@ -23,13 +23,21 @@ export function prepareSwedenMap(
   width: number,
   height: number,
   details?: SwedenDetails,
+  layout: 'default' | 'donation' = 'default',
 ) {
   if (String(boundary.id) !== '752')
     throw Error('Expected the Sweden boundary.');
   const projection = geoMercator().fitExtent(
     [
-      [width > 700 ? width * 0.31 : width * 0.2, 118],
-      [width * 0.85, height - 160],
+      [
+        layout === 'donation'
+          ? width * 0.19
+          : width > 700
+            ? width * 0.31
+            : width * 0.2,
+        layout === 'donation' ? 58 : 118,
+      ],
+      [width * 0.85, height - (layout === 'donation' ? 100 : 160)],
     ],
     boundary,
   );
