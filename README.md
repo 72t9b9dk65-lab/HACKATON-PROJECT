@@ -6,6 +6,10 @@ Un prototipo di un atlante per connettere bisogni umanitari, donazioni anonime e
 
 Node.js 22.13 o successivo. `npm install`, poi `npm run dev`. Per il controllo: `npm test`, `npm run typecheck`, `npm run build`.
 
+Su macOS puoi fare doppio clic su **Apri nel browser.command**: al primo avvio installa le dipendenze mancanti e apre il sito nel browser predefinito. Lascia aperto il Terminale durante l'utilizzo; premi Ctrl+C per fermarlo. Se hai scaricato il progetto come ZIP e il file non è eseguibile, dalla cartella del progetto esegui `bash "Apri nel browser.command"`.
+
+Su Windows fai doppio clic su **Apri nel browser.bat** dopo aver estratto la cartella del progetto: richiede Node.js 22.13 o successivo, installa le dipendenze mancanti e apre il browser predefinito. Lascia aperta la finestra durante l'utilizzo; premi Ctrl+C per fermarlo.
+
 ## Funzioni
 
 - Globo ortografico ruotabile con trascinamento, tastiera, zoom e ricerca.
