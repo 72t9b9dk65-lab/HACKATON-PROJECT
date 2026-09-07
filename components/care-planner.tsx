@@ -1,9 +1,21 @@
 'use client';
 
-import { ArrowUpRight, ChevronLeft, ChevronRight, Repeat2 } from 'lucide-react';
+import { useState } from 'react';
+import {
+  ArrowUpRight,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Repeat2,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { kronor } from '@/lib/donation-shell';
 import {
   CARE_SOURCE,
@@ -167,106 +179,138 @@ export function CareTimeline({
   onDay: (day: number) => void;
 }) {
   const plan = carePlan(projection.careId);
+  const [expanded, setExpanded] = useState(false);
   return (
-    <section className="care-timeline" aria-labelledby="care-timeline-title">
-      <div className="care-timeline-heading">
-        <div>
-          <span className="donation-eyebrow">
-            {projection.frequency === 'monthly'
-              ? '12-MONTH FORECAST'
-              : 'YOUR GIFT OVER TIME'}
-          </span>
-          <h3 id="care-timeline-title">
-            {displayDate(projection.date)}{' '}
-            <small>· Day {projection.day + 1}</small>
-          </h3>
-        </div>
-        <div className="care-day-controls">
-          <Button
-            type="button"
-            variant="outline"
-            disabled={projection.day === 0}
-            onClick={() => onDay(projection.day - 1)}
-            aria-label="Previous forecast day"
-          >
-            <ChevronLeft />
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={projection.day === projection.maxDay}
-            onClick={() => onDay(projection.day + 1)}
-            aria-label="Next forecast day"
-          >
-            <ChevronRight />
-          </Button>
-        </div>
-      </div>
-      <Slider
-        value={[projection.day]}
-        min={0}
-        max={projection.maxDay}
-        step={1}
-        onValueChange={(value) =>
-          onDay(Array.isArray(value) ? value[0] : value)
-        }
-        aria-labelledby="care-timeline-title"
-        className="care-day-slider"
-      />
-      <div className="care-month-ticks">
-        {Array.from({ length: 12 }, (_, index) => (
-          <button
-            type="button"
-            key={index}
-            aria-label={`Preview month ${index + 1}`}
-            aria-current={projection.month === index + 1 ? 'date' : undefined}
-            onClick={() =>
-              onDay(daysBetween(startDate, dateAfterMonths(startDate, index)))
+    <Collapsible
+      open={expanded}
+      onOpenChange={setExpanded}
+      className="care-timeline-disclosure"
+    >
+      <CollapsibleTrigger className="care-timeline-toggle">
+        <span>
+          <strong>
+            {expanded
+              ? 'Hide impact timeline'
+              : 'Explore your impact over time'}
+          </strong>
+          <small>
+            {displayDate(projection.date)} · Day {projection.day + 1} ·{' '}
+            {kronor(projection.committedOre)} SEK projected
+          </small>
+        </span>
+        <ChevronDown size={20} aria-hidden="true" />
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <section
+          className="care-timeline"
+          aria-labelledby="care-timeline-title"
+        >
+          <div className="care-timeline-heading">
+            <div>
+              <span className="donation-eyebrow">
+                {projection.frequency === 'monthly'
+                  ? '12-MONTH FORECAST'
+                  : 'YOUR GIFT OVER TIME'}
+              </span>
+              <h3 id="care-timeline-title">
+                {displayDate(projection.date)}{' '}
+                <small>· Day {projection.day + 1}</small>
+              </h3>
+            </div>
+            <div className="care-day-controls">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={projection.day === 0}
+                onClick={() => onDay(projection.day - 1)}
+                aria-label="Previous forecast day"
+              >
+                <ChevronLeft />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={projection.day === projection.maxDay}
+                onClick={() => onDay(projection.day + 1)}
+                aria-label="Next forecast day"
+              >
+                <ChevronRight />
+              </Button>
+            </div>
+          </div>
+          <Slider
+            value={[projection.day]}
+            min={0}
+            max={projection.maxDay}
+            step={1}
+            onValueChange={(value) =>
+              onDay(Array.isArray(value) ? value[0] : value)
             }
+            aria-labelledby="care-timeline-title"
+            className="care-day-slider"
+          />
+          <div className="care-month-ticks">
+            {Array.from({ length: 12 }, (_, index) => (
+              <button
+                type="button"
+                key={index}
+                aria-label={`Preview month ${index + 1}`}
+                aria-current={
+                  projection.month === index + 1 ? 'date' : undefined
+                }
+                onClick={() =>
+                  onDay(
+                    daysBetween(startDate, dateAfterMonths(startDate, index)),
+                  )
+                }
+              >
+                {index === 0 ? 'Start' : `M${index + 1}`}
+              </button>
+            ))}
+          </div>
+          <div
+            className="care-projection-stats"
+            aria-live="polite"
+            aria-atomic="true"
           >
-            {index === 0 ? 'Start' : `M${index + 1}`}
-          </button>
-        ))}
-      </div>
-      <div
-        className="care-projection-stats"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        <div>
-          <strong>
-            {kronor(projection.committedOre)} <small>SEK</small>
-          </strong>
-          <span>
-            {projection.contributions} projected{' '}
-            {projection.contributions === 1 ? 'gift' : 'gifts'}
-          </span>
-        </div>
-        <div>
-          <strong>{projection.dogCount}</strong>
-          <span>estimated {projection.dogCount === 1 ? 'dog' : 'dogs'}</span>
-        </div>
-        <div>
-          <strong>
-            {projection.usedUnits} <small>/ {projection.totalUnits}</small>
-          </strong>
-          <span>{plan.unit} · use / capacity</span>
-        </div>
-        <div>
-          <strong>
-            {kronor(projection.reserveOre)} <small>SEK</small>
-          </strong>
-          <span>carried toward next care unit</span>
-        </div>
-      </div>
-      <p className="care-forecast-source">
-        <a href={CARE_SOURCE} target="_blank" rel="noreferrer">
-          Based on Hundstallet’s giving examples <ArrowUpRight size={13} />
-        </a>
-        . One care option uses the budget at a time. Timing and dog matching are
-        illustrative; food and rehabilitation can support the same dogs each
-        month.
-      </p>
-    </section>
+            <div>
+              <strong>
+                {kronor(projection.committedOre)} <small>SEK</small>
+              </strong>
+              <span>
+                {projection.contributions} projected{' '}
+                {projection.contributions === 1 ? 'gift' : 'gifts'}
+              </span>
+            </div>
+            <div>
+              <strong>{projection.dogCount}</strong>
+              <span>
+                estimated {projection.dogCount === 1 ? 'dog' : 'dogs'}
+              </span>
+            </div>
+            <div>
+              <strong>
+                {projection.usedUnits} <small>/ {projection.totalUnits}</small>
+              </strong>
+              <span>{plan.unit} · use / capacity</span>
+            </div>
+            <div>
+              <strong>
+                {kronor(projection.reserveOre)} <small>SEK</small>
+              </strong>
+              <span>carried toward next care unit</span>
+            </div>
+          </div>
+          <p className="care-forecast-source">
+            <a href={CARE_SOURCE} target="_blank" rel="noreferrer">
+              Based on Hundstallet’s giving examples <ArrowUpRight size={13} />
+            </a>
+            . One care option uses the budget at a time. Timing and dog matching
+            are illustrative; food and rehabilitation can support the same dogs
+            each month.
+          </p>
+        </section>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }

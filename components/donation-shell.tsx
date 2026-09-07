@@ -116,6 +116,12 @@ export default function DonationShell() {
   const funding = fundingSummary(gifts);
   const { amountOre, allocation } = funding;
   const myGifts = gifts.filter((gift) => gift.id !== 'example');
+  const personalFunding = fundingSummary(myGifts);
+  const residentIds = profileDogs
+    .filter(
+      (item) => !item.group && personalFunding.byDog[item.id].amountOre > 0,
+    )
+    .map((item) => item.id);
   const latestGift = myGifts.at(-1);
   const helpedDogs = profileDogs.filter(
     (item) => funding.byDog[item.id].amountOre > 0,
@@ -134,7 +140,7 @@ export default function DonationShell() {
   });
   const previewIds = confirmedScene
     ? (latestGift.recipientIds ?? [latestGift.dogId])
-    : previewCareRecipients(projection.dogCount, funding);
+    : previewCareRecipients(projection.dogCount, personalFunding, careId);
 
   function changeAmount(value: string) {
     setDraftAmount(value);
@@ -170,7 +176,7 @@ export default function DonationShell() {
     if (gifts.length >= 1000) return;
     const recipients = previewIds.length
       ? previewIds
-      : previewCareRecipients(1, funding);
+      : previewCareRecipients(1, personalFunding, careId);
     const gift = {
       id: crypto.randomUUID(),
       dogId: SHARED_CARE_ID,
@@ -294,17 +300,19 @@ export default function DonationShell() {
               <div className="personal-care-scene">
                 <VirtualShelter
                   funding={funding}
+                  residentIds={residentIds}
                   previewIds={previewIds}
                   projection={projection}
                   confirmed={confirmedScene}
                   shelterName={profile.shelterName}
                   onSelectDog={selectDog}
-                />
-                <CareTimeline
-                  projection={projection}
-                  startDate={startDate}
-                  onDay={setTimelineDay}
-                />
+                >
+                  <CareTimeline
+                    projection={projection}
+                    startDate={startDate}
+                    onDay={setTimelineDay}
+                  />
+                </VirtualShelter>
               </div>
             </div>
 

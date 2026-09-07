@@ -6985,6 +6985,286 @@ button:not([data-slot]) {
 .personal-care-scene .care-timeline {
   margin-top: 16px;
 }
+.care-timeline-disclosure {
+  margin-top: 16px;
+  border: 1px solid var(--donation-line);
+  border-radius: 14px;
+  background: var(--donation-canvas);
+}
+.care-timeline-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 15px 18px;
+  text-align: left;
+  color: var(--donation-ink);
+  border-radius: 14px;
+}
+.care-timeline-toggle > span {
+  display: grid;
+  gap: 4px;
+}
+.care-timeline-toggle strong {
+  font-size: 15px;
+  font-weight: 650;
+}
+.care-timeline-toggle small {
+  font-size: 13px;
+  color: var(--donation-muted);
+}
+.care-timeline-toggle > svg {
+  flex-shrink: 0;
+  transition: transform 180ms;
+}
+.care-timeline-toggle[aria-expanded='true'] > svg {
+  transform: rotate(180deg);
+}
+.care-timeline-toggle:hover {
+  background: var(--donation-soft);
+}
+.care-timeline-toggle:focus-visible,
+.dog-in-need-card:focus-visible,
+.dogs-in-need-grid:focus-visible {
+  outline: 2px solid var(--donation-accent);
+  outline-offset: 3px;
+}
+.personal-care-scene .care-timeline-disclosure .care-timeline {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--donation-line);
+  border-radius: 0 0 14px 14px;
+}
+.dogs-in-need {
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid var(--donation-line);
+  border-radius: 18px;
+  background: var(--donation-paper);
+}
+.dogs-in-need-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.dogs-in-need-heading h2 {
+  font-size: 22px;
+  font-weight: 700;
+}
+.dogs-in-need-heading h2 > span {
+  padding: 3px 8px;
+  margin-left: 5px;
+  border-radius: 7px;
+  background: var(--donation-soft);
+  color: var(--donation-muted);
+  font-size: 14px;
+  vertical-align: middle;
+}
+.dogs-in-need-heading p,
+.dogs-in-need-hint {
+  font-size: 14px;
+  color: var(--donation-muted);
+  line-height: 1.5;
+}
+.dogs-in-need-heading p {
+  margin-top: 4px;
+}
+.dogs-in-need-transfer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: var(--donation-soft);
+  color: var(--donation-accent);
+}
+.dogs-in-need-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 16px 0 10px;
+}
+.dog-need-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 5px;
+  min-height: 28px;
+  min-width: 28px;
+  padding: 4px;
+  border: 1px solid var(--donation-line);
+  border-radius: 8px;
+  background: var(--donation-paper);
+  color: var(--donation-accent);
+  font-size: 13px;
+  line-height: 1.2;
+}
+.dogs-in-need-legend .dog-need-badge {
+  padding: 5px 8px;
+}
+.dog-need-urgent {
+  color: #b33b36;
+  background: #fff0eb;
+  border-color: #e3b6a9;
+}
+.dog-need-urgent > svg {
+  fill: currentColor;
+}
+.dog-need-checkup {
+  color: #486b98;
+  background: #f1f5fc;
+  border-color: #cad6e9;
+}
+.dogs-in-need-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(130px, 100%), 1fr));
+  gap: 12px;
+  max-height: 520px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--donation-line-strong) var(--donation-soft);
+  scrollbar-width: thin;
+  margin-top: 17px;
+  padding: 4px;
+  align-items: start;
+}
+.dog-in-need-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 8px 11px;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  border: 1px solid var(--donation-line);
+  border-radius: 13px;
+  background: var(--donation-canvas);
+  color: var(--donation-ink);
+  text-align: center;
+  animation: dog-return-to-grid 250ms ease-out;
+}
+.dog-in-need-card[data-matching='true'] {
+  border-color: var(--donation-line-strong);
+  background: var(--donation-soft);
+}
+.dog-in-need-card:hover {
+  border-color: var(--donation-accent);
+}
+.dog-in-need-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 112px;
+}
+.dog-in-need-art > img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.dog-in-need-badges {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  gap: 4px;
+}
+.dog-in-need-card .dog-display-name {
+  font-size: 15px;
+  max-width: 100%;
+}
+.dog-in-need-breed {
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--donation-muted);
+  overflow-wrap: anywhere;
+}
+.dog-in-need-card > small {
+  font-size: 12px;
+  color: var(--donation-muted);
+  margin-top: auto;
+}
+.dogs-in-need-note {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--donation-muted);
+}
+.dogs-in-need-empty {
+  grid-column: 1 / -1;
+  padding: 24px 8px;
+  font-size: 14px;
+  color: var(--donation-muted);
+}
+.virtual-dog-needs {
+  position: absolute;
+  top: 0;
+  right: -5px;
+  z-index: 1;
+  display: flex;
+  gap: 2px;
+}
+.virtual-dog-needs .dog-need-badge {
+  min-width: 20px;
+  min-height: 20px;
+  padding: 2px;
+  border-radius: 5px;
+}
+.virtual-dog-needs .dog-need-badge > svg {
+  width: 14px;
+  height: 14px;
+}
+.virtual-dog-arrival {
+  animation: dog-enter-shelter 450ms ease-out;
+}
+@keyframes dog-enter-shelter {
+  from {
+    opacity: 0;
+    transform: translateY(34px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes dog-return-to-grid {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 650px) {
+  .dogs-in-need {
+    padding: 14px;
+  }
+  .dogs-in-need-grid {
+    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(min(116px, 100%), 1fr));
+  }
+  .care-timeline-toggle {
+    padding: 13px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .virtual-dog-arrival,
+  .dog-in-need-card {
+    animation: none;
+  }
+  .care-timeline-toggle > svg {
+    transition: none;
+  }
+}
 .virtual-service-yard:hover .virtual-roaming-dog,
 .virtual-service-yard:hover .virtual-service-visitor > img,
 .virtual-service-yard:hover .virtual-dog-activity {
