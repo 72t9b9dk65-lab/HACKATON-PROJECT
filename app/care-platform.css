@@ -492,7 +492,7 @@
   overflow: auto;
 }
 .cp-scene {
-  height: 508px;
+  height: 735px;
   min-width: 660px;
   position: relative;
   background: linear-gradient(
@@ -501,13 +501,29 @@
     var(--scene-ground) 60%
   );
 }
+.cp-habitat {
+  position: absolute;
+  top: 14px;
+  left: 75%;
+  transform: translateX(-50%);
+  width: min(46%, 300px);
+  height: 450px;
+  pointer-events: none;
+}
+.cp-habitat .cp-lawn {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
 .cp-kennel {
   position: absolute;
-  top: 10px;
-  left: 23%;
-  width: 55%;
-  height: 268px;
-  text-align: center;
+  top: -4px;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 1217 / 1293;
 }
 .cp-kennel img {
   width: 100%;
@@ -519,11 +535,11 @@
   position: absolute;
   left: 14px;
   right: 14px;
-  bottom: 18px;
+  bottom: 35px;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 9px;
-  height: 181px;
+  height: 205px;
 }
 .cp-stations-title {
   position: absolute;
@@ -615,8 +631,12 @@
   font-weight: 600;
   line-height: 1.4;
 }
-.cp-name-label .dog-name {
-  gap: 3px !important;
+.cp-name-label .dog-display-name {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
 }
 .cp-name-label svg {
   width: 9px;
@@ -640,6 +660,13 @@
 }
 .cp-ghost .cp-dog-sprite > img {
   animation: none;
+}
+.cp-is-sleeping .cp-dog-sprite > img {
+  animation-duration: 7s;
+}
+.cp-scene-dog.cp-rest-crowded .cp-dog-sprite > img {
+  width: 31px;
+  height: 34px;
 }
 .cp-sleep {
   position: absolute;
@@ -691,8 +718,8 @@
 .cp-empty-shelter {
   position: absolute;
   top: 127px;
-  left: 15%;
-  width: 70%;
+  left: 5%;
+  width: 40%;
   text-align: center;
   background: #fffaf3e8;
   border-radius: 16px;
@@ -1974,16 +2001,13 @@
     gap: 30px;
   }
   .cp-scene {
-    height: 555px;
+    height: 755px;
   }
   .cp-stations {
-    height: 195px;
+    height: 215px;
   }
   .cp-station > img {
     height: 118px;
-  }
-  .cp-kennel {
-    height: 300px;
   }
   .cp-total {
     font-size: 2.7rem;
@@ -2175,7 +2199,7 @@
     display: none;
   }
   .cp-scene {
-    height: 485px;
+    height: 735px;
     min-width: 620px;
   }
   .cp-latest {
@@ -4198,6 +4222,9 @@
 }
 .cp-night .cp-kennel img {
   filter: brightness(0.91);
+}
+.cp-night .cp-lawn {
+  filter: brightness(0.66) saturate(0.8);
 }
 .cp-activity-label {
   display: inline-block;

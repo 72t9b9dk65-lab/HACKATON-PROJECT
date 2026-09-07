@@ -13,6 +13,7 @@ import type { CarePost, Workspace, Category } from '@/lib/platform/types';
 import { DogName } from '@/components/dog-name';
 import { Button } from '@/components/ui/button';
 import { useClock } from './shared';
+import { dogIsSleeping, shelterMoment } from '@/lib/platform/shelter-routine';
 export function ShelterScene({
   state,
   donorId,
@@ -55,16 +56,8 @@ export function ShelterScene({
     'vaccination',
     'play',
   ] as const;
-  const hour = now
-    ? Number(
-        new Intl.DateTimeFormat('en-GB', {
-          timeZone: 'Europe/Stockholm',
-          hour: '2-digit',
-          hourCycle: 'h23',
-        }).format(now),
-      )
-    : 12;
-  const night = hour >= 21 || hour < 7;
+  const moment = shelterMoment(clock);
+  const night = moment.night;
   const clockLabel = now
     ? new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Europe/Stockholm',
@@ -82,13 +75,16 @@ export function ShelterScene({
     : 'Today';
   const previews = previewIds.filter((id) => !ids.includes(id));
   const show = [...residents, ...previews].slice(0, 18);
+  const sleeping = new Map(show.map((id) => [id, dogIsSleeping(id, moment)]));
   const targetFor = (id: string) => {
+    if (sleeping.get(id)) return 'kennel';
     const cat = previews.includes(id)
       ? previewArrived
         ? previewCategory
         : undefined
       : activePhoto(state, id, clock)?.category;
-    return cat === 'medicine' ? 'rehabilitation' : cat;
+    const target = cat === 'medicine' ? 'rehabilitation' : cat;
+    return stations.some((station) => station === target) ? target : 'lawn';
   };
   return (
     <section
@@ -136,11 +132,22 @@ export function ShelterScene({
       )}
       <div className="cp-scene-scroll">
         <div className="cp-scene">
-          <div className="cp-kennel">
+          <div className="cp-habitat" aria-hidden="true">
             <CareImage
-              src="/shelters/pixel-big-kennel.png"
-              alt="A spacious illustrated kennel"
+              className="cp-lawn"
+              src="/shelters/prato-rettangolare.png"
+              alt=""
+              width={1024}
+              height={1536}
             />
+            <div className="cp-kennel">
+              <CareImage
+                src="/shelters/cuccia-con-cuscini.png"
+                alt=""
+                width={1217}
+                height={1293}
+              />
+            </div>
           </div>
           {!show.length && (
             <div className="cp-empty-shelter">
@@ -192,28 +199,51 @@ export function ShelterScene({
               (other) => targetFor(other) === category,
             );
             const seat = occupants.indexOf(id);
-            const crowded = station >= 0 && occupants.length > 3;
+            const isSleeping = sleeping.get(id)!;
+            const crowded = occupants.length > 3;
+            const homeColumns =
+              occupants.length > 12 ? 6 : occupants.length > 6 ? 4 : 3;
+            const columns = station >= 0 ? 3 : homeColumns;
+            const step =
+              station >= 0
+                ? 5
+                : occupants.length > 12
+                  ? 34
+                  : occupants.length > 6
+                    ? 49
+                    : 65;
+            const offset =
+              ((seat % columns) -
+                (Math.min(occupants.length, columns) - 1) / 2) *
+              step;
             const x =
               station >= 0
-                ? (station + 0.5) * 20 +
-                  ((seat % 3) - (Math.min(occupants.length, 3) - 1) / 2) * 5
-                : 35 + (seat % 4) * 10;
+                ? `${(station + 0.5) * 20 + offset}%`
+                : `calc(75% + ${offset}px)`;
             const y =
               station >= 0
-                ? `calc(100% - ${145 + Math.floor(seat / 3) * 34}px)`
-                : 153 + Math.floor(seat / 4) * 19;
+                ? `calc(100% - ${170 + Math.floor(seat / 3) * 34}px)`
+                : isSleeping
+                  ? (occupants.length <= 3 ? 144 : 100) +
+                    Math.floor(seat / columns) *
+                      (occupants.length <= 6 ? 85 : 64)
+                  : 343 + Math.floor(seat / columns) * 32;
             return (
               <div
-                className={`cp-scene-dog ${preview ? 'cp-ghost' : ''} ${station >= 0 ? 'cp-at-station' : ''} ${crowded ? 'cp-dog-crowded' : ''}`}
+                className={`cp-scene-dog ${preview ? 'cp-ghost' : ''} ${station >= 0 ? 'cp-at-station' : ''} ${crowded ? 'cp-dog-crowded' : ''} ${isSleeping ? 'cp-is-sleeping' : ''} ${station < 0 && occupants.length > 12 ? 'cp-rest-crowded' : ''}`}
                 key={id}
                 style={{
-                  left: `${x}%`,
+                  left: x,
                   top: y,
                   animationDelay: `${index * -0.9}s`,
                 }}
               >
-                {night && station < 0 && !preview && (
-                  <span className="cp-sleep" aria-label="Sleeping">
+                {isSleeping && (
+                  <span
+                    className="cp-sleep"
+                    aria-label="Sleeping"
+                    title="Sleeping · illustrated routine"
+                  >
                     z z Z
                   </span>
                 )}
@@ -262,7 +292,8 @@ export function ShelterScene({
       </div>
       <div className="cp-shelter-note">
         <span>
-          <Camera size={14} /> Staff photo updates guide the activities.
+          <Camera size={14} /> Staff photos guide activities; sleep is
+          illustrated.
         </span>
         <span>New moments stay live for 1–2 hours.</span>
       </div>

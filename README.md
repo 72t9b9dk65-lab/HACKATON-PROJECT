@@ -37,7 +37,7 @@ On other operating systems, staff can upload the document and paste its text or 
 
 ### Personal shelter
 
-- Real Stockholm date and clock, day/night styling, pause and reduced-motion support. Only a published photo sends a dog to a care station; the photo stays live for one or two hours, then remains in the dog's journey.
+- Real Stockholm date and clock, day/night styling, pause and reduced-motion support. The supplied cushion kennel sits on the lawn in the right half of the scene. Every virtual dog sleeps 21:00–07:00 and takes 3–4 hours of independent daily naps; this is an illustrated routine, not staff evidence. Only a published photo sends an awake dog to a care station; the photo stays live for one or two hours, then remains in the dog's journey.
 - Permanent companions require a positive contribution to a funded product and a published update identifying that dog. A donation alone never claims that a dog received care.
 - Real portraits, pixel avatars, official profile links, following without donating, a photo timeline, and the contributor's care basket. Homecoming milestones move dogs into a lasting **Home at last** section.
 - Custom gifts, three official care examples and one-time/monthly forecasts. Faded dogs appear only when a donor explicitly requests a preview. The collapsed daily forecast accumulates monthly care capacity, keeps unspent remainders and avoids presenting repeated care as new unique recipients.
