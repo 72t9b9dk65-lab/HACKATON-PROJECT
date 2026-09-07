@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Camera, Check } from 'lucide-react';
 import ShelterMap from '@/components/shelter-map';
 import { DogName } from '@/components/dog-name';
+import { DogPortrait } from '@/components/dog-portrait';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
 import { Button } from '@/components/ui/button';
 import {
@@ -189,15 +190,7 @@ export default function DonationShell() {
                         aria-label={`Follow ${item.name}’s journey, ${item.breed}`}
                         onClick={() => selectDog(item.id)}
                       >
-                        <span className="donation-sprite-frame">
-                          <img
-                            src={item.sprite}
-                            alt={item.spriteDescription}
-                            width="160"
-                            height="160"
-                            draggable="false"
-                          />
-                        </span>
+                        <DogPortrait dog={item} />
                         <DogName name={item.name} />
                         <span className="dog-breed-label">{item.breed}</span>
                         <span>{item.location}</span>
@@ -211,7 +204,7 @@ export default function DonationShell() {
                 </p>
               )}
               <p className="donation-helped-note">
-                One donation, shared care. Illustrated avatars · demo
+                One donation, shared care. Illustrated badges · demo
                 beneficiaries.
               </p>
             </Carousel>

@@ -31,6 +31,7 @@ import {
 } from '@/lib/shelter-camera';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
 import { DogName } from '@/components/dog-name';
+import { DogPortrait } from '@/components/dog-portrait';
 
 type LocalMap = FeatureCollection<
   Geometry,
@@ -624,14 +625,7 @@ export default function ShelterMap({
                   }}
                   aria-label={`Meet ${dog.name}, ${dog.breed}, ${dog.location}`}
                 >
-                  <img
-                    src={dog.sprite}
-                    alt={dog.spriteDescription}
-                    width="112"
-                    height="112"
-                    loading="lazy"
-                    draggable="false"
-                  />
+                  <DogPortrait dog={dog} />
                   <DogName name={dog.name} />
                   <span className="dog-breed-label">{dog.breed}</span>
                   <span>{dog.group ? 'Group profile' : dog.age}</span>
@@ -643,12 +637,7 @@ export default function ShelterMap({
               ))}
             </div>
             <div className="shelter-dog-detail" aria-live="polite">
-              <img
-                src={selectedDog.photos[0].src}
-                alt={selectedDog.name}
-                width="48"
-                height="48"
-              />
+              <DogPortrait dog={selectedDog} />
               <div>
                 <DogName name={selectedDog.name} />
                 <span className="dog-breed-label">{selectedDog.breed}</span>

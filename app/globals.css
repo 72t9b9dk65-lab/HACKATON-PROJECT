@@ -5309,29 +5309,47 @@ button:not([data-slot]) {
   gap: 4px;
   border-radius: 10px;
 }
-.donation-sprite-frame {
-  display: grid;
-  place-items: center;
+.dog-portrait {
+  position: relative;
+  display: block;
   width: 100%;
-  height: 112px;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  background: var(--donation-soft);
-  transition: background 0.2s;
-}
-.donation-sprite-frame img {
-  width: 112px;
-  height: 112px;
   max-width: 100%;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: var(--donation-soft);
+  transition: border-color 0.2s;
+}
+.dog-portrait-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.dog-portrait-avatar {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 32%;
+  max-width: 48px;
+  height: auto;
+  aspect-ratio: 1;
   object-fit: contain;
   image-rendering: pixelated;
+  padding: 2px;
+  border: 1px solid var(--donation-paper);
+  border-radius: 8px;
+  background: var(--donation-paper);
+  box-shadow: 0 1px 4px #49362626;
 }
-.donation-helped-dog[aria-pressed='true'] .donation-sprite-frame {
+.donation-helped-dog[aria-pressed='true'] .dog-portrait {
   border-color: var(--donation-accent);
-  background: var(--donation-selected);
 }
-.donation-helped-dog:hover .donation-sprite-frame {
-  background: var(--donation-hover);
+.donation-helped-dog:hover .dog-portrait {
+  border-color: var(--donation-line-strong);
 }
 .donation-helped-dog > strong {
   font-size: 15px;
@@ -5394,13 +5412,6 @@ button:not([data-slot]) {
   .donation-helped-item {
     flex-basis: 38%;
   }
-  .donation-sprite-frame {
-    height: 128px;
-  }
-  .donation-sprite-frame img {
-    width: 128px;
-    height: 128px;
-  }
   .donation-main .donation-map {
     min-height: 600px;
   }
@@ -5423,13 +5434,6 @@ button:not([data-slot]) {
   }
   .donation-helped-item {
     flex-basis: 40%;
-  }
-  .donation-sprite-frame {
-    height: 100px;
-  }
-  .donation-sprite-frame img {
-    width: 104px;
-    height: 104px;
   }
   .donation-main .donation-map {
     min-height: 570px;
@@ -5685,12 +5689,8 @@ button:not([data-slot]) {
   background: var(--donation-selected);
   border-color: var(--donation-accent);
 }
-.shelter-dog-card img {
+.shelter-dog-card .dog-portrait {
   width: 94px;
-  height: 94px;
-  image-rendering: pixelated;
-  object-fit: contain;
-  max-width: 100%;
 }
 .shelter-dog-card strong {
   font-size: 14px;
@@ -5715,12 +5715,16 @@ button:not([data-slot]) {
   border-top: 1px solid var(--donation-line);
   min-width: 0;
 }
-.shelter-dog-detail > img {
+.shelter-dog-detail > .dog-portrait {
   width: 48px;
-  height: 48px;
-  object-fit: cover;
   border-radius: 6px;
-  flex-shrink: 0;
+}
+.shelter-dog-detail .dog-portrait-avatar {
+  width: 42%;
+  right: 1px;
+  bottom: 1px;
+  padding: 0;
+  border-radius: 4px;
 }
 .shelter-dog-detail > div:nth-child(2) {
   display: flex;
@@ -5790,9 +5794,8 @@ button:not([data-slot]) {
   .shelter-dog-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .shelter-dog-card img {
+  .shelter-dog-card .dog-portrait {
     width: 78px;
-    height: 78px;
   }
   .shelter-location-caption {
     max-width: 95px;
@@ -5812,9 +5815,8 @@ button:not([data-slot]) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 7px;
   }
-  .shelter-dog-card img {
+  .shelter-dog-card .dog-portrait {
     width: 80px;
-    height: 80px;
   }
   .shelter-location-caption {
     top: 80px;
@@ -5825,9 +5827,8 @@ button:not([data-slot]) {
   .shelter-directory-heading h2 {
     font-size: 20px;
   }
-  .shelter-dog-detail > img {
+  .shelter-dog-detail > .dog-portrait {
     width: 40px;
-    height: 40px;
   }
 }
 .shelter-dog-support > span > span {
