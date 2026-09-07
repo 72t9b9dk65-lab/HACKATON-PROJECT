@@ -5850,7 +5850,9 @@ button:not([data-slot]) {
 }
 
 .donation-shell .dog-display-name {
-  display: inline-flex;
+  display: inline-grid;
+  grid-template-columns: 12px minmax(0, auto) 12px;
+  grid-auto-flow: column;
   align-items: center;
   justify-content: center;
   gap: 5px;
