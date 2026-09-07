@@ -152,8 +152,9 @@ export function VirtualShelter({
             aria-hidden="true"
           />
           <div>
-            <span className="donation-eyebrow">CONNECTED TO REAL DOGS</span>
-            <h2 id="virtual-shelter-title">{shelterName}</h2>
+            <h2 id="virtual-shelter-title">
+              {shelterName}, connected to real dogs
+            </h2>
             <p>Watch care take shape. Click a dog to meet them.</p>
           </div>
           <Button
