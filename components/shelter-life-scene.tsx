@@ -10,9 +10,13 @@ import { dogNeeds } from '@/lib/dog-needs';
 import {
   expenseActivity,
   expenseCategories,
+  expenseDateLabel,
+  expenseHasTime,
   expenseHour,
+  expenseLabel,
   type ExpenseReplay,
 } from '@/lib/donation-spending';
+import { workbookTransaction } from '@/lib/workbook-transactions';
 import { kronor } from '@/lib/donation-shell';
 import { carePlan, displayDate, type CareProjection } from '@/lib/care-impact';
 import {
@@ -167,23 +171,11 @@ export function ShelterLifeScene({
               · {kronor(replay.expense.amountOre)} SEK used
             </strong>
             <span>
-              {
-                expenseCategories.find(
-                  (category) => category.id === replay.expense.category,
-                )!.label
-              }{' '}
-              · Illustrated replay
+              {expenseLabel(replay.expense)} · Illustrated replay
+              {workbookTransaction(replay.expense) && ' · Simulated dog match'}
             </span>
             <time dateTime={replay.expense.recordedAt}>
-              {new Intl.DateTimeFormat('en-GB', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                timeZone: 'Europe/Stockholm',
-              }).format(new Date(replay.expense.recordedAt))}{' '}
-              · Stockholm
+              {expenseDateLabel(replay.expense)}
             </time>
           </div>
           <Button
@@ -200,15 +192,21 @@ export function ShelterLifeScene({
         <span>
           {night ? <Moon size={18} /> : <Sun size={18} />}{' '}
           <strong>
-            {String(hour).padStart(2, '0')}:
-            {replay
-              ? new Intl.DateTimeFormat('en-GB', {
-                  minute: '2-digit',
-                  timeZone: 'Europe/Stockholm',
-                })
-                  .format(new Date(replay.expense.recordedAt))
-                  .padStart(2, '0')
-              : '00'}
+            {replay && !expenseHasTime(replay.expense) ? (
+              'Daytime illustration'
+            ) : (
+              <>
+                {String(hour).padStart(2, '0')}:
+                {replay
+                  ? new Intl.DateTimeFormat('en-GB', {
+                      minute: '2-digit',
+                      timeZone: 'Europe/Stockholm',
+                    })
+                      .format(new Date(replay.expense.recordedAt))
+                      .padStart(2, '0')
+                  : '00'}
+              </>
+            )}
           </strong>{' '}
           {night ? 'A quiet night' : 'A day at the shelter'}
         </span>
@@ -271,7 +269,7 @@ export function ShelterLifeScene({
               (activity) => activity === station.id,
             ).length;
             const selected = replay
-              ? station.id === replay.expense.category
+              ? station.id === expenseActivity(replay.expense)
               : station.id === projection.careId && projection.totalUnits > 0;
             return (
               <div

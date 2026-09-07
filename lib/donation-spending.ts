@@ -1,5 +1,9 @@
 import { carePlan, type CarePlanId } from './care-impact.ts';
 import {
+  importWorkbookTransactions,
+  workbookTransaction,
+} from './workbook-transactions.ts';
+import {
   fundingSummary,
   giftAllocation,
   LEGACY_SHARED_RECIPIENTS,
@@ -17,6 +21,12 @@ export const expenseCategories = [
     label: 'Food & enrichment',
     kind: 'food',
     asset: '/care/pixel/food-enrichment.png',
+  },
+  {
+    id: 'medicine',
+    label: 'Medicine',
+    kind: 'health',
+    asset: '/care/pixel/care-rehabilitation.png',
   },
   {
     id: 'rehabilitation',
@@ -38,13 +48,13 @@ export const expenseCategories = [
   },
   {
     id: 'play',
-    label: 'Playtime',
+    label: 'Toys & play',
     kind: 'comfort',
     asset: '/care/pixel/play-enrichment.png',
   },
   {
     id: 'comfort',
-    label: 'Rest & daily care',
+    label: 'Shelter & daily care',
     kind: 'comfort',
     asset: '/shelters/pixel-big-kennel.png',
   },
@@ -57,15 +67,45 @@ export type DemoExpense = {
   category: ExpenseCategory;
   amountOre: number;
   recordedAt: string;
+  sourceRow?: number;
 };
 export type GivingLedger = { gifts: DemoGift[]; expenses: DemoExpense[] };
 export type ExpenseReplay = { expense: DemoExpense; key: number };
 
 export function expenseActivity(expense: DemoExpense) {
+  if (expense.category === 'medicine') return 'rehabilitation' as const;
   return expense.category === 'comfort' ? ('sleep' as const) : expense.category;
 }
 
+export function expenseHasTime(expense: DemoExpense) {
+  return !/^\d{4}-\d{2}-\d{2}$/.test(expense.recordedAt);
+}
+
+export function expenseDateLabel(expense: DemoExpense) {
+  const hasTime = expenseHasTime(expense);
+  const date = new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    ...(hasTime
+      ? { hour: '2-digit' as const, minute: '2-digit' as const }
+      : {}),
+    timeZone: hasTime ? 'Europe/Stockholm' : 'UTC',
+  }).format(new Date(expense.recordedAt));
+  return `${date} · ${hasTime ? 'Stockholm' : 'Time not supplied'}`;
+}
+
+export function expenseLabel(expense: DemoExpense) {
+  const source = workbookTransaction(expense);
+  return source
+    ? source.category[0].toUpperCase() + source.category.slice(1)
+    : expenseCategories.find((category) => category.id === expense.category)!
+        .label;
+}
+
 export function expenseHour(expense: DemoExpense) {
+  // A neutral daytime illustration when only a calendar date was supplied.
+  if (!expenseHasTime(expense)) return 12;
   return Number(
     new Intl.DateTimeFormat('en-GB', {
       hour: '2-digit',
@@ -110,6 +150,8 @@ export function validExpenses(
       expense.amountOre <= 0 ||
       typeof expense.recordedAt !== 'string' ||
       !Number.isFinite(Date.parse(expense.recordedAt)) ||
+      (expense.sourceRow !== undefined &&
+        (!Number.isSafeInteger(expense.sourceRow) || expense.sourceRow < 2)) ||
       Date.parse(expense.recordedAt) < Date.parse(gift.createdAt) ||
       (gift.carePlanId && gift.carePlanId !== category.id)
     )
@@ -228,15 +270,15 @@ export function readGivingLedger(
       const value = JSON.parse(raw);
       if (value && Array.isArray(value.gifts)) {
         const gifts = readDemoGifts(JSON.stringify(value.gifts));
-        return {
+        return importWorkbookTransactions({
           gifts,
           expenses: validExpenses(value.expenses, gifts) ? value.expenses : [],
-        };
+        });
       }
     } catch {
       /* Keep the original gift records if the new snapshot cannot be read. */
     }
   }
   const gifts = readDemoGifts(legacyGifts);
-  return { gifts, expenses: exampleExpenses(gifts) };
+  return importWorkbookTransactions({ gifts, expenses: [] });
 }

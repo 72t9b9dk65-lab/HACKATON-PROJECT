@@ -135,6 +135,7 @@ export type DemoGift = {
   createdAt: string;
   recipientIds?: string[];
   carePlanId?: CarePlanId;
+  allocation?: Record<CareKind, number>;
 };
 export const LEGACY_SHARED_RECIPIENTS = ['ake', 'koby', 'ove'];
 export const exampleGifts: DemoGift[] = [
@@ -164,11 +165,34 @@ export function giftsForDog(gifts: DemoGift[], dogId: string) {
 }
 
 export function giftAllocation(gift: DemoGift) {
+  if (gift.allocation !== undefined) {
+    if (!validGiftAllocation(gift)) throw new Error('Invalid gift allocation.');
+    return { ...gift.allocation };
+  }
   if (!gift.carePlanId) return careAllocation(gift.amountOre);
   if (!isCarePlanId(gift.carePlanId)) throw new Error('Unknown care plan.');
   const allocation = careAllocation(0);
   allocation[gift.carePlanId === 'food' ? 'food' : 'health'] = gift.amountOre;
   return allocation;
+}
+
+function validGiftAllocation(gift: DemoGift) {
+  if (gift.allocation === undefined) return true;
+  if (
+    !gift.allocation ||
+    typeof gift.allocation !== 'object' ||
+    gift.carePlanId
+  )
+    return false;
+  return (
+    Object.keys(gift.allocation).length === careKinds.length &&
+    careKinds.every(
+      ({ id }) =>
+        Number.isSafeInteger(gift.allocation![id]) && gift.allocation![id] >= 0,
+    ) &&
+    careKinds.reduce((sum, { id }) => sum + gift.allocation![id], 0) ===
+      gift.amountOre
+  );
 }
 
 // Divide each care category in integer öre, so both the map and overall bars
@@ -231,6 +255,7 @@ export function readDemoGifts(raw: string | null): DemoGift[] {
         !Number.isSafeInteger(g.amountOre) ||
         g.amountOre <= 0 ||
         g.amountOre > MAX_DEMO_GIFT_ORE ||
+        !validGiftAllocation(g) ||
         (g.carePlanId !== undefined && !isCarePlanId(g.carePlanId)) ||
         (g.recipientIds !== undefined &&
           (!Array.isArray(g.recipientIds) ||

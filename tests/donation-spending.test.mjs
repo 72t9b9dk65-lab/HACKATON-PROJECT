@@ -17,6 +17,10 @@ import {
 } from '../lib/donation-shell.ts';
 import { previewCareRecipients } from '../lib/virtual-shelter.ts';
 import { projectCare } from '../lib/care-impact.ts';
+import {
+  WORKBOOK_GIFT_ID,
+  workbookLedger,
+} from '../lib/workbook-transactions.ts';
 
 const empty = { gifts: [], expenses: [] };
 function createGift(amountOre, careId, id = 'gift') {
@@ -71,17 +75,19 @@ function assertReconciled(ledger) {
   return summary;
 }
 
-test('Starter example has explicit sample expenses; previous user gifts stay pending without proof of spending', () => {
+test('Workbook replaces the old starter example; previous user gifts stay pending without proof of spending', () => {
   const prior = createGift(100000, 'food', 'prior');
   const gifts = [...exampleGifts, prior];
   const before = JSON.stringify(gifts);
   const ledger = readGivingLedger(null, JSON.stringify(gifts));
   const summary = assertReconciled(ledger);
-  assert.equal(summary.totalOre, 150000);
-  assert.equal(summary.usedOre, 22000);
-  assert.equal(summary.pendingOre, 128000);
-  assert.deepEqual([...summary.residentIds].sort(), ['ake', 'ove']);
-  assert.ok(ledger.expenses.every((expense) => expense.giftId === 'example'));
+  assert.equal(summary.totalOre, 578300);
+  assert.equal(summary.usedOre, 478300);
+  assert.equal(summary.pendingOre, 100000);
+  assert.deepEqual([...summary.residentIds].sort(), ['ake', 'koby', 'ove']);
+  assert.ok(
+    ledger.expenses.every((expense) => expense.giftId === WORKBOOK_GIFT_ID),
+  );
   assert.equal(JSON.stringify(gifts), before);
 });
 
@@ -110,10 +116,7 @@ test('A donation alone never creates a permanent companion; first care spends on
 });
 
 test('Amounts and category/dog spending reconcile over many donations and after atomic snapshot reload', () => {
-  const ledger = {
-    gifts: structuredClone(exampleGifts),
-    expenses: exampleExpenses(exampleGifts),
-  };
+  const ledger = workbookLedger();
   for (const careId of ['food', 'rehabilitation', 'vaccination']) {
     for (let amount = 1; amount <= 10000; amount += 137) {
       const gift = createGift(amount * 100, careId, `${careId}-${amount}`);
@@ -157,7 +160,7 @@ test('Invalid, duplicate, misattributed, or over-budget expenses cannot increase
       JSON.stringify({ gifts: [gift], expenses: invalid }),
       null,
     );
-    assert.equal(spendingSummary(restored).usedOre, 0);
+    assert.equal(spendingSummary(restored).usedOre, 478300);
     assert.equal(spendingSummary(restored).pendingOre, gift.amountOre);
   }
 });
@@ -215,7 +218,11 @@ test('Transaction replays use the saved category and Stockholm hour without chan
     const expense = { ...ledger.expenses[0], category: category.id };
     assert.equal(
       expenseActivity(expense),
-      category.id === 'comfort' ? 'sleep' : category.id,
+      category.id === 'comfort'
+        ? 'sleep'
+        : category.id === 'medicine'
+          ? 'rehabilitation'
+          : category.id,
     );
   }
   assert.equal(

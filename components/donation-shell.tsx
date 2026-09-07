@@ -12,7 +12,6 @@ import {
   SpendingBreakdown,
 } from '@/components/donation-spending';
 import {
-  exampleExpenses,
   firstCareExpenses,
   GIVING_STORAGE_KEY,
   readGivingLedger,
@@ -20,6 +19,7 @@ import {
   type DemoExpense,
   type GivingLedger,
 } from '@/lib/donation-spending';
+import { WORKBOOK_GIFT_ID, workbookLedger } from '@/lib/workbook-transactions';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
 import {
   Carousel,
@@ -30,7 +30,6 @@ import {
 } from '@/components/ui/carousel';
 import {
   giftAllocation,
-  exampleGifts,
   SHARED_CARE_ID,
   kronor,
   profileDogs,
@@ -65,10 +64,7 @@ export default function DonationShell() {
     new Date().toISOString().slice(0, 10),
   );
   const [profile, setProfile] = useState<Profile>(defaultShelterProfile);
-  const [ledger, setLedger] = useState<GivingLedger>(() => ({
-    gifts: exampleGifts,
-    expenses: exampleExpenses(exampleGifts),
-  }));
+  const [ledger, setLedger] = useState<GivingLedger>(workbookLedger);
   const { gifts, expenses } = ledger;
   const [breakdownOpen, setBreakdownOpen] = useState(false);
   const [replay, setReplay] = useState<{
@@ -138,7 +134,10 @@ export default function DonationShell() {
   const spending = spendingSummary(ledger);
   const { funding, residentIds } = spending;
   const amountOre = spending.totalOre;
-  const myGifts = gifts.filter((gift) => gift.id !== 'example');
+  const myGifts = gifts.filter(
+    (gift) => gift.id !== 'example' && gift.id !== WORKBOOK_GIFT_ID,
+  );
+  const openingFunding = gifts.find((gift) => gift.id === WORKBOOK_GIFT_ID);
   const latestGift = myGifts.at(-1);
   const latestExpenses = expenses.filter(
     (expense) => expense.giftId === latestGift?.id,
@@ -362,11 +361,10 @@ export default function DonationShell() {
             </div>
             <div className="donation-ledger-meta">
               <span>
-                {latestGift
-                  ? `${myGifts.length} demo ${myGifts.length === 1 ? 'gift' : 'gifts'}${gifts.some((gift) => gift.id === 'example') ? ' + 500 SEK example' : ''}`
-                  : amountOre
-                    ? '500 SEK example included'
-                    : 'No demo gifts yet'}
+                {openingFunding &&
+                  `${kronor(openingFunding.amountOre)} SEK sample opening funding`}
+                {myGifts.length > 0 &&
+                  ` · ${myGifts.length} demo ${myGifts.length === 1 ? 'gift' : 'gifts'} added`}
               </span>
               <span>
                 {sessionOnly ? 'This session only' : 'Saved on this device'}

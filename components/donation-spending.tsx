@@ -8,9 +8,12 @@ import { DogPortrait } from '@/components/dog-portrait';
 import { DogName } from '@/components/dog-name';
 import {
   expenseCategories,
+  expenseDateLabel,
+  expenseLabel,
   type DemoExpense,
   type spendingSummary,
 } from '@/lib/donation-spending';
+import { workbookTransaction } from '@/lib/workbook-transactions';
 import { kronor, profileDogs } from '@/lib/donation-shell';
 
 type Spending = ReturnType<typeof spendingSummary>;
@@ -199,7 +202,8 @@ export function SpendingBreakdown({
       </Tabs>
       <p className="spending-breakdown-note">
         Pending: {kronor(spending.pendingOre)} SEK awaiting expenses. Both views
-        show the same recorded demo spending; forecasts are separate.
+        show the same recorded demo spending; forecasts are separate. Imported
+        expenses use simulated dog assignments.
       </p>
     </section>
   );
@@ -225,7 +229,10 @@ export function ExpenseTransactions({
       aria-labelledby="expense-transactions-title"
     >
       <h2 id="expense-transactions-title">Your care transactions</h2>
-      <p>Recorded demo expenses · Stockholm time</p>
+      <p>
+        {expenses.length} demo expenses. Imported dates, amounts and categories
+        come from your spreadsheet; dog assignments are simulated.
+      </p>
       <div className="expense-transaction-list">
         {sorted.map((expense) => {
           const category = expenseCategories.find(
@@ -242,19 +249,14 @@ export function ExpenseTransactions({
             >
               <img src={category.asset} alt="" width="46" height="46" />
               <span className="expense-transaction-copy">
-                <strong>{category.label}</strong>
+                <strong>{expenseLabel(expense)}</strong>
                 <span>
-                  {dog.name} · {kronor(expense.amountOre)} SEK
+                  {dog.name}
+                  {workbookTransaction(expense) ? ' (demo match)' : ''} ·{' '}
+                  {kronor(expense.amountOre)} SEK
                 </span>
                 <time dateTime={expense.recordedAt}>
-                  {new Intl.DateTimeFormat('en-GB', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    timeZone: 'Europe/Stockholm',
-                  }).format(new Date(expense.recordedAt))}
+                  {expenseDateLabel(expense)}
                 </time>
                 <small>
                   <Play size={11} /> Replay care moment
