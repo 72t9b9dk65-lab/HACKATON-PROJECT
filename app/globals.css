@@ -8191,7 +8191,7 @@ button:not([data-slot]) {
   outline-offset: 5px;
 }
 .shelter-life-dog-position[data-replay-background='true'] {
-  opacity: 0.4;
+  opacity: 1;
 }
 @media (max-width: 1000px) {
   .donation-wallet {

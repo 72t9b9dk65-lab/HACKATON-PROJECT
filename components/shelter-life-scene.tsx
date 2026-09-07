@@ -45,6 +45,7 @@ export function ShelterLifeScene({
   replay,
   onExitReplay,
   fullImpact,
+  previewActive,
 }: {
   companions: ShelterCompanion[];
   projection: CareProjection;
@@ -53,6 +54,7 @@ export function ShelterLifeScene({
   replay: ExpenseReplay | null;
   onExitReplay: () => void;
   fullImpact: boolean;
+  previewActive: boolean;
 }) {
   const viewport = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(900);
@@ -268,7 +270,9 @@ export function ShelterLifeScene({
             ).length;
             const selected = replay
               ? station.id === expenseActivity(replay.expense)
-              : station.id === projection.careId && projection.totalUnits > 0;
+              : previewActive &&
+                station.id === projection.careId &&
+                projection.totalUnits > 0;
             return (
               <div
                 key={station.id}
@@ -385,9 +389,11 @@ export function ShelterLifeScene({
         <span>
           {replay
             ? 'Expense replay · does not change your balance'
-            : fullImpact
-              ? 'Full-impact estimate · routines follow Stockholm time'
-              : `Daily care forecast · ${displayDate(projection.date)} · real-time routine`}
+            : !previewActive
+              ? 'Your shelter · real-time daily routine'
+              : fullImpact
+                ? 'Full-impact estimate · routines follow Stockholm time'
+                : `Daily care forecast · ${displayDate(projection.date)} · real-time routine`}
         </span>
         {width < 760 && (
           <span>Scroll sideways to explore all activities →</span>

@@ -46,6 +46,8 @@ export function VirtualShelter({
   onExitReplay,
   fullImpact,
   onFullImpact,
+  previewActive,
+  onExitPreview,
 }: {
   funding: ReturnType<typeof fundingSummary>;
   residentIds: string[];
@@ -59,6 +61,8 @@ export function VirtualShelter({
   onExitReplay: () => void;
   fullImpact: boolean;
   onFullImpact: (full: boolean) => void;
+  previewActive: boolean;
+  onExitPreview: () => void;
 }) {
   const [paused, setPaused] = useState(false);
   useEffect(() => {
@@ -73,7 +77,7 @@ export function VirtualShelter({
     (dog) =>
       residentIds.includes(dog.id) && funding.byDog[dog.id].amountOre > 0,
   );
-  const visiblePreviewIds = replay ? [] : previewIds;
+  const visiblePreviewIds = replay || !previewActive ? [] : previewIds;
   const waitingIds = waitingDogIds(profileDogs, residentIds, visiblePreviewIds);
   const waitingDogs = waitingIds.map((id) =>
     profileDogs.find((item) => item.id === id)!,
@@ -95,7 +99,7 @@ export function VirtualShelter({
       .map((item) => ({ dog: item, preview: false, visitor: false })),
   ];
   const unmatchedCount =
-    replay || confirmed
+    replay || confirmed || !previewActive
       ? 0
       : Math.max(0, projection.dogCount - visiblePreviewIds.length);
   const companions: ShelterCompanion[] = [
@@ -184,7 +188,7 @@ export function VirtualShelter({
           )}
         </div>
 
-        {!replay && (
+        {!replay && previewActive && (
           <div className="shelter-impact-summary">
             <div
               className="shelter-impact-switch"
@@ -203,6 +207,9 @@ export function VirtualShelter({
                 onClick={() => onFullImpact(false)}
               >
                 Selected forecast day
+              </Button>
+              <Button variant="ghost" onClick={onExitPreview}>
+                Exit donation preview
               </Button>
             </div>
             {fullImpact && (
@@ -233,6 +240,7 @@ export function VirtualShelter({
         )}
         <ShelterLifeScene
           fullImpact={fullImpact}
+          previewActive={previewActive}
           companions={companions}
           projection={projection}
           paused={paused || inspected !== null}
@@ -246,11 +254,13 @@ export function VirtualShelter({
         <p className="virtual-shelter-note">
           {replay
             ? 'Replaying a recorded demo expense. '
-            : fullImpact
-              ? 'Showing the estimated shelter after the selected gift has funded all complete care units. '
-              : projection.activeDogs
-                ? `${projection.activeDogs} ${projection.activeDogs === 1 ? 'dog has' : 'dogs have'} ${plan.name.toLowerCase()} scheduled on this forecast day. `
-                : 'No care use scheduled on this forecast day. '}
+            : !previewActive
+              ? 'Your shelter companions have recorded demo care expenses. '
+              : fullImpact
+                ? 'Showing the estimated shelter after the selected gift has funded all complete care units. '
+                : projection.activeDogs
+                  ? `${projection.activeDogs} ${projection.activeDogs === 1 ? 'dog has' : 'dogs have'} ${plan.name.toLowerCase()} scheduled on this forecast day. `
+                  : 'No care use scheduled on this forecast day. '}
           Daily routines and need labels are illustrative. Faded dogs preview
           possible care; they are not verified recipients.
         </p>

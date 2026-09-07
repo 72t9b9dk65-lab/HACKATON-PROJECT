@@ -77,6 +77,7 @@ export default function DonationShell() {
   const [breakdownOpen, setBreakdownOpen] = useState(false);
   const [donationOpen, setDonationOpen] = useState(false);
   const [fullImpact, setFullImpact] = useState(true);
+  const [previewActive, setPreviewActive] = useState(false);
   const [replay, setReplay] = useState<{
     expense: DemoExpense;
     key: number;
@@ -196,11 +197,13 @@ export default function DonationShell() {
     setNotice('');
   }
   function replayExpense(expense: DemoExpense) {
+    setPreviewActive(false);
     setBreakdownOpen(false);
     setSelectedId(expense.dogId);
     setReplay({ expense, key: ++replayCounter.current });
   }
-  function closeDonationToShelter() {
+  function closeDonationToShelter(preview = false) {
+    setPreviewActive(preview);
     setFullImpact(true);
     focusShelterOnClose.current = true;
     setDonationOpen(false);
@@ -228,7 +231,7 @@ export default function DonationShell() {
       setNotice(
         'Monthly forecast saved to your profile. No payments or automatic charges are scheduled.',
       );
-      closeDonationToShelter();
+      closeDonationToShelter(true);
       return;
     }
     if (gifts.length >= 1000) return;
@@ -304,6 +307,7 @@ export default function DonationShell() {
                   onOpenChange={(open) => {
                     setDonationOpen(open);
                     if (open) {
+                      setPreviewActive(false);
                       focusShelterOnClose.current = false;
                       setBreakdownOpen(false);
                       setReplay(null);
@@ -357,7 +361,7 @@ export default function DonationShell() {
                       onCare={changeCare}
                       onFrequency={changeFrequency}
                       onConfirm={donate}
-                      onPreview={closeDonationToShelter}
+                      onPreview={() => closeDonationToShelter(true)}
                       ready={ready}
                       atLimit={gifts.length >= 1000}
                       monthlyPlan={profile.monthlyPlan}
@@ -414,6 +418,8 @@ export default function DonationShell() {
                       funding={funding}
                       residentIds={residentIds}
                       previewIds={previewIds}
+                      previewActive={previewActive}
+                      onExitPreview={() => setPreviewActive(false)}
                       projection={projection}
                       confirmed={confirmedScene && !fullImpact}
                       fullImpact={fullImpact}
@@ -423,14 +429,16 @@ export default function DonationShell() {
                       replay={replay}
                       onExitReplay={() => setReplay(null)}
                     >
-                      <CareTimeline
-                        projection={projection}
-                        startDate={startDate}
-                        onDay={(day) => {
-                          setReplay(null);
-                          setTimelineDay(day);
-                        }}
-                      />
+                      {previewActive && (
+                        <CareTimeline
+                          projection={projection}
+                          startDate={startDate}
+                          onDay={(day) => {
+                            setReplay(null);
+                            setTimelineDay(day);
+                          }}
+                        />
+                      )}
                     </VirtualShelter>
                   </div>
                 )}
