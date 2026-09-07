@@ -13,7 +13,7 @@ Both launchers install missing dependencies and open your browser. Keep the term
 
 ## Prototype experience
 
-The homepage puts giving first: the overall donated amount and spending bars at the top, a scrollable row of pixel dog avatars below, one donation button, and the black Sweden map alongside. Selecting a dog opens its photo journey without changing the donor’s total.
+The homepage puts giving first: the overall donated amount and spending bars at the top, a scrollable row of pixel dog avatars below, one donation button, and the warm white Sweden map alongside. Selecting a dog opens its photo journey without changing the donor’s total.
 
 - The horizontal helped-dog carousel shows names beneath pixel avatars. The photo journey below also scrolls horizontally with swipe, keyboard, or arrow controls.
 - Click a pixel shelter to fly from Sweden to its real facility location, showing nearby OpenStreetMap roads and buildings. A rectangular, scrollable grid shows its published dog profiles. **All profiles** includes all 43 listings from the official directory on 7 September 2026, including two group listings and two trial adoptions. The single “Rehoming team” listing remains visible without an invented shelter location.
@@ -21,7 +21,7 @@ The homepage puts giving first: the overall donated amount and spending bars at 
 - Press **Donate 250 SEK** to simulate shared care for the currently imported profiles. The illustrative split is **50% food / 30% vet care / 20% daily care**, divided in integer öre among the recorded recipients. New gifts snapshot their recipient IDs; older shared gifts retain their original three beneficiaries. Totals and category allocations reconcile exactly.
 - A fresh session starts with a labeled 500 SEK example shared among all 43 profiles. Existing user records retain their dates, amounts, and recipient allocations. The map does not claim that every dog lives at its listed shelter continuously.
 - Published photos have no verified event dates. New demo gifts add a dated entry; the final card reserves space for an organization-posted care update.
-- Sweden’s coastline, counties, lakes, rivers, city labels, panning, zoom, and reset remain available. The overview background stays black.
+- Sweden’s coastline, counties, lakes, rivers, city labels, panning, zoom, and reset remain available. Both map views use warm white backgrounds, light brown geographic details, and cream shelter cards.
 
 ## Data and prototype boundaries
 

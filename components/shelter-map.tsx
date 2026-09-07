@@ -456,7 +456,7 @@ export default function ShelterMap({
                   }
                 }}
               >
-                <circle r="5" fill="#d5eead" stroke="#000" strokeWidth="2" />
+                <circle r="5" className="shelter-pin-dot" strokeWidth="2" />
                 <image
                   href="/shelters/pixel-shelter.png"
                   x={-iconWidth / 2}
@@ -471,8 +471,7 @@ export default function ShelterMap({
                   width="142"
                   height={shelter ? 43 : 55}
                   rx="6"
-                  fill="#111811"
-                  stroke="#536544"
+                  className="shelter-pin-label"
                 />
                 <text
                   textAnchor="middle"

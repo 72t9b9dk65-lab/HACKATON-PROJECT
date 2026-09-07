@@ -4309,9 +4309,28 @@ button:not([data-slot]) {
 
 /* The simplified donation shell: one action, a map, and the dog's photo trail. */
 .donation-shell {
+  --donation-page: #f8f4ee;
+  --donation-paper: #fffdf8;
+  --donation-canvas: #faf6ef;
+  --donation-panel: #fffdf8f7;
+  --donation-soft: #f3e9dd;
+  --donation-hover: #eee0ce;
+  --donation-selected: #e8d3b9;
+  --donation-line: #d6bfa4;
+  --donation-line-strong: #ac8058;
+  --donation-ink: #493626;
+  --donation-muted: #72583f;
+  --donation-accent: #895a33;
+  --donation-action: #ddbd98;
+  --donation-action-hover: #d0ad84;
+  --donation-land: #eadbc7;
+  --ring: var(--donation-accent);
+  --border: var(--donation-line);
+  --muted: var(--donation-soft);
+  --muted-foreground: var(--donation-muted);
   min-height: 100vh;
-  background: #f6f7f3;
-  color: #222a22;
+  background: var(--donation-page);
+  color: var(--donation-ink);
 }
 .donation-header {
   min-height: 82px;
@@ -4320,8 +4339,8 @@ button:not([data-slot]) {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  border-bottom: 1px solid #e1e5dc;
-  background: #fcfdf9;
+  border-bottom: 1px solid var(--donation-line);
+  background: var(--donation-paper);
 }
 .donation-brand {
   display: flex;
@@ -4336,18 +4355,18 @@ button:not([data-slot]) {
   place-items: center;
   width: 36px;
   height: 36px;
-  color: #375831;
-  background: #e2eccf;
+  color: var(--donation-accent);
+  background: var(--donation-soft);
   border-radius: 8px;
 }
 .donation-brand .donation-brand-divider {
   height: 22px;
   width: 1px;
   margin: 0 7px;
-  background: #dce0d6;
+  background: var(--donation-line);
 }
 .donation-brand small {
-  color: #6f796c;
+  color: var(--donation-muted);
   font-size: 13px;
   font-weight: 400;
   letter-spacing: 0;
@@ -4357,14 +4376,14 @@ button:not([data-slot]) {
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #70786b;
+  color: var(--donation-muted);
   white-space: nowrap;
 }
 .donation-prototype > span {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #91a27c;
+  background: var(--donation-accent);
 }
 .donation-workspace {
   max-width: 1640px;
@@ -4374,16 +4393,16 @@ button:not([data-slot]) {
 .donation-main {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 390px;
-  border: 1px solid #dce1d5;
+  border: 1px solid var(--donation-line);
   border-radius: 18px;
   overflow: hidden;
-  background: #fffefa;
+  background: var(--donation-paper);
 }
 .donation-map {
   position: relative;
   min-height: 690px;
-  background: #000;
-  color: #eef3e8;
+  background: var(--donation-canvas);
+  color: var(--donation-ink);
   overflow: hidden;
 }
 .donation-map-heading {
@@ -4398,10 +4417,10 @@ button:not([data-slot]) {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 1.8px;
-  color: #788170;
+  color: var(--donation-muted);
 }
 .donation-map-heading .donation-eyebrow {
-  color: #a4b698;
+  color: var(--donation-muted);
 }
 .donation-map-heading h2 {
   font-size: clamp(22px, 2vw, 30px);
@@ -4412,63 +4431,63 @@ button:not([data-slot]) {
   max-width: 200px;
 }
 .donation-map-heading p {
-  color: #949f91;
+  color: var(--donation-muted);
   font-size: 14px;
   margin-top: 10px;
 }
 .donation-map .hs-sweden-land {
-  fill: #222b21;
-  stroke: #758368;
+  fill: var(--donation-land);
+  stroke: #ab8e70;
   filter: none;
 }
 .donation-map .hs-county {
-  fill: #49583d;
+  fill: #b78d62;
   fill-opacity: 0.15;
-  stroke: #536047;
+  stroke: #b99d7e;
   stroke-width: 0.6;
 }
 .donation-map .hs-county-1 {
-  fill: #a0af8a;
+  fill: #cdb292;
   fill-opacity: 0.055;
 }
 .donation-map .hs-county-2 {
-  fill: #405134;
+  fill: #c4a17b;
   fill-opacity: 0.22;
 }
 .donation-map .hs-river {
-  stroke: #6c877c;
+  stroke: #b7a189;
   opacity: 0.55;
   stroke-width: 0.6;
 }
 .donation-map .hs-lake {
-  fill: #030906;
-  stroke: #526752;
+  fill: #fdfaf4;
+  stroke: #c3ac92;
   stroke-width: 0.5;
 }
 .donation-map .hs-country-label {
-  fill: #acb5a2;
+  fill: var(--donation-muted);
   font-size: 11px;
   letter-spacing: 5px;
 }
 .donation-map .hs-water-label {
-  fill: #727c75;
+  fill: var(--donation-muted);
   font-size: 10px;
 }
 .donation-map .hs-context-label text {
-  fill: #b1baa7;
-  stroke: #222b21;
+  fill: var(--donation-muted);
+  stroke: var(--donation-land);
   font-size: 11px;
   stroke-width: 3px;
 }
 .donation-map .hs-context-label circle {
-  fill: #a4b393;
-  stroke: #273222;
+  fill: var(--donation-muted);
+  stroke: var(--donation-line-strong);
 }
 .donation-map .hs-context-county text {
-  fill: #849575;
+  fill: var(--donation-muted);
 }
 .donation-map .hs-context-lake text {
-  fill: #8faaa0;
+  fill: var(--donation-muted);
 }
 .donation-map-region {
   position: absolute;
@@ -4477,14 +4496,14 @@ button:not([data-slot]) {
   display: flex;
   align-items: center;
   gap: 16px;
-  color: #b6c0af;
+  color: var(--donation-muted);
   font-size: 11px;
   letter-spacing: 2px;
   pointer-events: none;
 }
 .donation-north {
   font-size: 13px;
-  color: #8b9882;
+  color: var(--donation-muted);
   letter-spacing: 3px;
 }
 .donation-map-key {
@@ -4495,18 +4514,18 @@ button:not([data-slot]) {
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #bdc8b6;
+  color: var(--donation-muted);
   pointer-events: none;
 }
 .donation-map-key > span {
   width: 7px;
   height: 7px;
-  background: #d0edaa;
+  background: var(--donation-accent);
   border-radius: 50%;
 }
 .donation-map-key small {
   font-size: 11px;
-  color: #788572;
+  color: var(--donation-muted);
   margin-left: 6px;
 }
 .donation-map-credit {
@@ -4514,7 +4533,7 @@ button:not([data-slot]) {
   bottom: 19px;
   left: 30px;
   font-size: 10px;
-  color: #778071;
+  color: var(--donation-muted);
 }
 .donation-map-controls {
   position: absolute;
@@ -4522,8 +4541,8 @@ button:not([data-slot]) {
   bottom: 22px;
   display: flex;
   flex-direction: column;
-  background: #10140f;
-  border: 1px solid #354030;
+  background: var(--donation-paper);
+  border: 1px solid var(--donation-line);
   border-radius: 9px;
   overflow: hidden;
 }
@@ -4531,38 +4550,38 @@ button:not([data-slot]) {
   border-radius: 0;
   width: 34px;
   height: 34px;
-  color: #c7d0bc;
-  background: #10140f;
+  color: var(--donation-muted);
+  background: var(--donation-paper);
   box-shadow: none;
 }
 .donation-map-controls [data-slot='button']:hover {
-  background: #2a3523;
+  background: var(--donation-hover);
 }
 .donation-map-controls [data-slot='button'] + [data-slot='button'] {
-  border-top: 1px solid #2b3327;
+  border-top: 1px solid var(--donation-line);
 }
 .donation-dog-pin {
   cursor: pointer;
   outline: none;
 }
 .donation-dog-pin:focus-visible .donation-pin-card {
-  stroke: #e7ffc7;
+  stroke: var(--donation-accent);
   stroke-width: 3;
 }
 .donation-dog-pin:hover .donation-pin-card {
-  stroke: #d4e8b7;
+  stroke: var(--donation-accent);
 }
 .donation-pin-name {
-  fill: #f4f6ed;
+  fill: var(--donation-ink);
   font-size: 17px;
   font-weight: 550;
 }
 .donation-pin-place {
-  fill: #abb8a1;
+  fill: var(--donation-muted);
   font-size: 12px;
 }
 .donation-pin-value {
-  fill: #d6ecb6;
+  fill: var(--donation-accent);
   font-size: 14px;
   font-weight: 550;
 }
@@ -4580,7 +4599,7 @@ button:not([data-slot]) {
   height: 78px;
   border-radius: 14px;
   object-fit: cover;
-  background: #e3e8db;
+  background: var(--donation-soft);
 }
 .donation-dog-intro h2 {
   font-size: 32px;
@@ -4595,7 +4614,7 @@ button:not([data-slot]) {
   flex-wrap: wrap;
   gap: 4px;
   font-size: 12px;
-  color: #6e7868;
+  color: var(--donation-muted);
 }
 .donation-dog-intro .donation-eyebrow {
   font-size: 10px;
@@ -4604,23 +4623,23 @@ button:not([data-slot]) {
   margin-top: 22px;
   font-size: 16px;
   line-height: 1.65;
-  color: #616b5c;
+  color: var(--donation-muted);
 }
 .donation-profile-link {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #47603b;
+  color: var(--donation-accent);
   margin-top: 10px;
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: #bac6b1;
+  text-decoration-color: var(--donation-line-strong);
 }
 .donation-balance {
   margin-top: 27px;
   padding-top: 24px;
-  border-top: 1px solid #e3e7dd;
+  border-top: 1px solid var(--donation-line);
 }
 .donation-balance-label {
   display: flex;
@@ -4628,12 +4647,12 @@ button:not([data-slot]) {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #6e7965;
+  color: var(--donation-muted);
 }
 .donation-demo-label {
-  color: #798370;
+  color: var(--donation-muted);
   padding: 3px 5px;
-  border: 1px solid #dfe5d6;
+  border: 1px solid var(--donation-line);
   border-radius: 4px;
   font-size: 9px;
   letter-spacing: 1px;
@@ -4654,7 +4673,7 @@ button:not([data-slot]) {
 }
 .donation-value > span:not(.donation-float) {
   font-size: 18px;
-  color: #7c8674;
+  color: var(--donation-muted);
 }
 .donation-value-pop strong {
   animation: donation-pop 0.35s ease-out;
@@ -4667,7 +4686,7 @@ button:not([data-slot]) {
   align-items: center;
   gap: 5px;
   font-size: 15px;
-  color: #688b3b;
+  color: var(--donation-accent);
   animation: donation-float 1.8s ease-out forwards;
 }
 .donation-allocation-bar {
@@ -4692,7 +4711,7 @@ button:not([data-slot]) {
   min-width: 0;
   padding: 12px 3px;
   border-radius: 9px;
-  background: #f8f5ec;
+  background: var(--donation-soft);
 }
 .donation-care-health {
   background: #f0f4f9;
@@ -4707,17 +4726,17 @@ button:not([data-slot]) {
 }
 .donation-care strong small {
   font-size: 10px;
-  color: #84907b;
+  color: var(--donation-muted);
   font-weight: 450;
 }
 .donation-care > span {
-  color: #717767;
+  color: var(--donation-muted);
   font-size: 12px;
   line-height: 1.4;
 }
 .donation-allocation-note {
   margin-top: 12px;
-  color: #838b7c;
+  color: var(--donation-muted);
   font-size: 10px;
   line-height: 1.5;
   text-align: center;
@@ -4729,14 +4748,14 @@ button:not([data-slot]) {
   height: 53px;
   margin-top: 24px;
   border-radius: 9px;
-  background: #d1edaa;
-  color: #263e1e;
+  background: var(--donation-action);
+  color: var(--donation-ink);
   box-shadow: none;
   font-size: 16px;
   font-weight: 600;
 }
 .donation-primary[data-slot='button']:hover {
-  background: #bedf91;
+  background: var(--donation-action-hover);
 }
 .donation-primary[data-slot='button'] > svg {
   width: 23px;
@@ -4750,7 +4769,7 @@ button:not([data-slot]) {
 .donation-payment-note {
   text-align: center;
   font-size: 11px;
-  color: #858d7e;
+  color: var(--donation-muted);
   margin-top: 10px;
 }
 .donation-receipt {
@@ -4759,7 +4778,7 @@ button:not([data-slot]) {
   gap: 8px;
   margin-top: 20px;
   min-height: 31px;
-  color: #627052;
+  color: var(--donation-accent);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -4770,7 +4789,7 @@ button:not([data-slot]) {
   flex-shrink: 0;
   width: 6px;
   height: 6px;
-  background: #8da970;
+  background: var(--donation-accent);
   border-radius: 50%;
   margin-top: 6px;
 }
@@ -4779,7 +4798,7 @@ button:not([data-slot]) {
   flex-wrap: wrap;
   gap: 5px 10px;
   justify-content: space-between;
-  color: #8e9585;
+  color: var(--donation-muted);
   font-size: 10px;
   margin-top: 6px;
 }
@@ -4802,7 +4821,7 @@ button:not([data-slot]) {
 }
 .donation-journey-heading p {
   font-size: 13px;
-  color: #798270;
+  color: var(--donation-muted);
   margin-top: 6px;
 }
 .donation-carousel-controls {
@@ -4815,14 +4834,14 @@ button:not([data-slot]) {
   transform: none;
   width: 36px;
   height: 36px;
-  border: 1px solid #dae1d2;
+  border: 1px solid var(--donation-line);
   border-radius: 50%;
-  background: #fffef9;
-  color: #59694b;
+  background: var(--donation-paper);
+  color: var(--donation-accent);
   box-shadow: none;
 }
 .donation-carousel-controls button:hover {
-  background: #e7ecdf;
+  background: var(--donation-hover);
 }
 .donation-photo-track {
   display: flex;
@@ -4843,14 +4862,14 @@ button:not([data-slot]) {
   height: 35px;
   padding-bottom: 16px;
   margin-bottom: 15px;
-  color: #758269;
+  color: var(--donation-muted);
   font-size: 11px;
 }
 .donation-timeline-stop::after {
   content: '';
   position: absolute;
   height: 1px;
-  background: #d4dccb;
+  background: var(--donation-line);
   bottom: 0;
   left: 0;
   right: -18px;
@@ -4861,22 +4880,22 @@ button:not([data-slot]) {
   height: 7px;
   left: 0;
   bottom: -3px;
-  background: #879b6e;
+  background: var(--donation-accent);
   border-radius: 50%;
   z-index: 1;
-  box-shadow: 0 0 0 4px #f6f7f3;
+  box-shadow: 0 0 0 4px var(--donation-page);
 }
 .donation-timeline-stop small {
   margin-left: auto;
   font-family: var(--font-geist-mono), monospace;
   font-size: 10px;
-  color: #929b89;
+  color: var(--donation-muted);
 }
 .donation-photo {
   position: relative;
   overflow: hidden;
   height: 220px;
-  background: #e3e9da;
+  background: var(--donation-soft);
   border-radius: 12px;
 }
 .donation-photo > img {
@@ -4896,8 +4915,8 @@ button:not([data-slot]) {
   border-radius: 5px;
   padding: 4px 7px;
   font-size: 10px;
-  color: #fff;
-  background: #14200c70;
+  color: var(--donation-paper);
+  background: #59422ed9;
   backdrop-filter: blur(6px);
 }
 .donation-timeline-item figcaption {
@@ -4913,12 +4932,12 @@ button:not([data-slot]) {
   align-items: center;
   gap: 4px;
   font-size: 11px;
-  color: #87917d;
+  color: var(--donation-muted);
   margin-top: 5px;
 }
 .donation-photo-placeholder {
-  background: #eaf0e2;
-  border: 1px dashed #cbd8be;
+  background: var(--donation-soft);
+  border: 1px dashed var(--donation-line);
   padding: 22px;
   display: flex;
   align-items: center;
@@ -4930,32 +4949,32 @@ button:not([data-slot]) {
   display: flex;
   align-items: flex-end;
   gap: 10px;
-  color: #91a27d;
+  color: var(--donation-muted);
 }
 .donation-photo-placeholder strong {
   font-size: 14px;
-  color: #5c6d4c;
+  color: var(--donation-accent);
   margin-top: 12px;
   font-weight: 500;
 }
 .donation-photo-placeholder p {
   font-size: 12px;
   line-height: 1.5;
-  color: #7b886e;
+  color: var(--donation-muted);
   margin-top: 7px;
 }
 .donation-photo-placeholder > span {
-  color: #8c997e;
+  color: var(--donation-muted);
   font-size: 10px;
   margin-top: 12px;
 }
 .donation-upcoming .donation-timeline-stop > span {
-  border: 1px solid #9dae8a;
-  background: #f6f7f3;
+  border: 1px solid var(--donation-line);
+  background: var(--donation-page);
 }
 .donation-journey-note {
   margin-top: 22px;
-  color: #8c9582;
+  color: var(--donation-muted);
   font-size: 11px;
   line-height: 1.7;
 }
@@ -4963,25 +4982,25 @@ button:not([data-slot]) {
   max-width: 1640px;
   padding: 25px clamp(20px, 3vw, 48px);
   margin: 16px auto 0;
-  border-top: 1px solid #e3e7dc;
+  border-top: 1px solid var(--donation-line);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
   font-size: 11px;
-  color: #8c9682;
+  color: var(--donation-muted);
 }
 .donation-footer a {
   display: flex;
   gap: 4px;
   align-items: center;
-  color: #657757;
+  color: var(--donation-accent);
 }
 @keyframes donation-pop {
   50% {
     transform: translateY(-3px);
-    color: #668b3a;
+    color: var(--donation-accent);
   }
 }
 @keyframes donation-float {
@@ -5149,7 +5168,7 @@ button:not([data-slot]) {
     padding: 25px 24px;
   }
   .donation-balance {
-    border-top: 1px solid #e3e7dd;
+    border-top: 1px solid var(--donation-line);
     margin-top: 22px;
     padding-top: 22px;
   }
@@ -5201,8 +5220,8 @@ button:not([data-slot]) {
 }
 
 .donation-gift-moment {
-  color: #71984b;
-  background: #edf5e2;
+  color: var(--donation-accent);
+  background: var(--donation-soft);
   border-style: solid;
 }
 
@@ -5222,7 +5241,7 @@ button:not([data-slot]) {
 .donation-balance-label h1 {
   font-size: 17px;
   font-weight: 450;
-  color: #6d7862;
+  color: var(--donation-muted);
 }
 .donation-panel-total .donation-value {
   margin-top: 12px;
@@ -5253,7 +5272,7 @@ button:not([data-slot]) {
 .donation-helped-carousel {
   margin-top: 27px;
   padding-top: 22px;
-  border-top: 1px solid #e2e7dc;
+  border-top: 1px solid var(--donation-line);
 }
 .donation-helped-heading {
   display: flex;
@@ -5297,7 +5316,7 @@ button:not([data-slot]) {
   height: 112px;
   border: 1px solid transparent;
   border-radius: 10px;
-  background: #f2f4ec;
+  background: var(--donation-soft);
   transition: background 0.2s;
 }
 .donation-sprite-frame img {
@@ -5308,11 +5327,11 @@ button:not([data-slot]) {
   image-rendering: pixelated;
 }
 .donation-helped-dog[aria-pressed='true'] .donation-sprite-frame {
-  border-color: #a7bc8a;
-  background: #e8f0dc;
+  border-color: var(--donation-accent);
+  background: var(--donation-selected);
 }
 .donation-helped-dog:hover .donation-sprite-frame {
-  background: #e8efdd;
+  background: var(--donation-hover);
 }
 .donation-helped-dog > strong {
   font-size: 15px;
@@ -5320,20 +5339,20 @@ button:not([data-slot]) {
   margin-top: 4px;
 }
 .donation-helped-dog > span:last-child {
-  color: #829174;
+  color: var(--donation-muted);
   font-size: 11px;
 }
 .donation-helped-note {
   font-size: 11px;
   line-height: 1.5;
-  color: #8b957f;
+  color: var(--donation-muted);
   margin-top: 10px;
 }
 .donation-helped-empty {
   padding: 30px 15px;
   text-align: center;
-  background: #f3f5ef;
-  color: #7b896c;
+  background: var(--donation-soft);
+  color: var(--donation-muted);
   font-size: 14px;
   border-radius: 10px;
 }
@@ -5417,11 +5436,11 @@ button:not([data-slot]) {
   }
 }
 
-/* Shelter exploration stays on the black map; the directory opens over it. */
+/* Warm shelter map with a cream directory and light brown geographic detail. */
 .shelter-explorer {
   position: absolute;
   inset: 0;
-  background: #000;
+  background: var(--donation-canvas);
   overflow: hidden;
 }
 .shelter-map-svg {
@@ -5440,13 +5459,13 @@ button:not([data-slot]) {
   stroke-width: 1;
 }
 .shelter-local-building {
-  fill: #242d24;
-  stroke: #617151;
+  fill: #e8d5ba;
+  stroke: #b7936b;
   stroke-width: 1;
 }
 .shelter-local-road {
   fill: none;
-  stroke: #53614c;
+  stroke: #c6a582;
   stroke-width: 5;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -5457,19 +5476,19 @@ button:not([data-slot]) {
   opacity: 0.65;
 }
 .shelter-local-park {
-  fill: #111c13;
+  fill: #f3ece1;
   stroke: none;
 }
 .shelter-local-water {
-  fill: #081d23;
-  stroke: #22434a;
+  fill: #fdfaf4;
+  stroke: #c3ac92;
   stroke-width: 1;
 }
 .shelter-city-label {
-  fill: #a0aa96;
+  fill: var(--donation-muted);
   font-size: 11px;
   paint-order: stroke;
-  stroke: #0a1008;
+  stroke: var(--donation-canvas);
   stroke-width: 3;
 }
 .shelter-pixel-marker {
@@ -5478,27 +5497,27 @@ button:not([data-slot]) {
 }
 .shelter-pixel-image {
   image-rendering: pixelated;
-  filter: drop-shadow(0 4px 4px #0009);
+  filter: drop-shadow(0 4px 4px #78553335);
 }
 .shelter-pixel-marker:hover .shelter-pixel-image,
 .shelter-pixel-marker:focus-visible .shelter-pixel-image {
-  filter: drop-shadow(0 0 6px #dcffa880);
+  filter: drop-shadow(0 0 6px #b8834b66);
 }
 .shelter-pixel-marker:focus-visible rect {
-  stroke: #e5ffb7;
+  stroke: var(--donation-accent);
   stroke-width: 3;
 }
 .shelter-marker-name {
-  fill: #edf5df;
+  fill: var(--donation-ink);
   font-size: 14px;
   font-weight: 600;
 }
 .shelter-marker-count {
-  fill: #b0c198;
+  fill: var(--donation-muted);
   font-size: 11px;
 }
 .shelter-marker-amount {
-  fill: #d8ebbd;
+  fill: var(--donation-accent);
   font-size: 10px;
 }
 .shelter-explorer .donation-map-controls button {
@@ -5507,10 +5526,10 @@ button:not([data-slot]) {
   display: grid;
   place-items: center;
   border-radius: 7px;
-  color: #d6e8bf;
+  color: var(--donation-muted);
 }
 .shelter-explorer .donation-map-controls button:hover {
-  background: #27321f;
+  background: var(--donation-hover);
 }
 .shelter-explorer .donation-map-controls button:disabled {
   opacity: 0.35;
@@ -5523,15 +5542,15 @@ button:not([data-slot]) {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #152014;
-  border: 1px solid #465239;
+  background: var(--donation-paper);
+  border: 1px solid var(--donation-line);
   padding: 9px 12px;
   border-radius: 7px;
-  color: #d7eac2;
+  color: var(--donation-muted);
   font-size: 13px;
 }
 .shelter-back:hover {
-  background: #293922;
+  background: var(--donation-hover);
 }
 .shelter-location-caption {
   position: absolute;
@@ -5544,18 +5563,18 @@ button:not([data-slot]) {
   pointer-events: none;
   font-size: 12px;
   line-height: 1.5;
-  color: #d0dcca;
-  text-shadow: 0 1px 3px #000;
+  color: var(--donation-muted);
+  text-shadow: 0 1px 3px var(--donation-paper);
 }
 .shelter-location-caption small {
   font-size: 10px;
-  color: #889880;
+  color: var(--donation-muted);
 }
 .shelter-local-status {
   position: absolute;
   top: 70px;
   right: 20px;
-  color: #aebc9f;
+  color: var(--donation-muted);
   font-size: 12px;
 }
 .shelter-directory {
@@ -5568,12 +5587,12 @@ button:not([data-slot]) {
   display: flex;
   flex-direction: column;
   padding: 18px 18px 11px;
-  border: 1px solid #556343;
+  border: 1px solid var(--donation-line);
   border-radius: 12px;
-  background: #11170fec;
+  background: var(--donation-panel);
   backdrop-filter: blur(16px);
-  box-shadow: 0 18px 45px #0009;
-  color: #e5eddc;
+  box-shadow: 0 18px 45px #7855331f;
+  color: var(--donation-ink);
   outline: none;
   animation: shelter-directory-in 0.45s ease 0.85s both;
 }
@@ -5587,7 +5606,7 @@ button:not([data-slot]) {
 .shelter-directory-heading > div > span {
   font-size: 10px;
   letter-spacing: 1.7px;
-  color: #9eaf8c;
+  color: var(--donation-muted);
 }
 .shelter-directory-heading h2 {
   font-size: 23px;
@@ -5601,17 +5620,17 @@ button:not([data-slot]) {
   border-radius: 6px;
   display: grid;
   place-items: center;
-  color: #b3c69c;
+  color: var(--donation-muted);
 }
 .shelter-directory-heading > button:hover {
-  background: #26341d;
+  background: var(--donation-hover);
 }
 .shelter-directory-tabs {
   display: flex;
   gap: 16px;
   margin-top: 12px;
   margin-bottom: 12px;
-  border-bottom: 1px solid #34412a;
+  border-bottom: 1px solid var(--donation-line);
   flex-shrink: 0;
 }
 .shelter-directory-tabs button {
@@ -5619,18 +5638,18 @@ button:not([data-slot]) {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #96a883;
+  color: var(--donation-muted);
   padding: 0 0 10px;
   border-bottom: 2px solid transparent;
 }
 .shelter-directory-tabs button[aria-pressed='true'] {
-  color: #d8f1b8;
-  border-color: #c5e89f;
+  color: var(--donation-accent);
+  border-color: var(--donation-accent);
 }
 .shelter-directory-tabs button > span {
   font-size: 10px;
-  background: #2c3b21;
-  color: #cde4b0;
+  background: var(--donation-selected);
+  color: var(--donation-muted);
   padding: 1px 6px;
   border-radius: 5px;
 }
@@ -5644,7 +5663,7 @@ button:not([data-slot]) {
   align-content: start;
   gap: 9px;
   padding: 2px 7px 8px 2px;
-  scrollbar-color: #607347 #1b2516;
+  scrollbar-color: var(--donation-line-strong) var(--donation-soft);
   scrollbar-width: thin;
 }
 .shelter-dog-card {
@@ -5654,17 +5673,17 @@ button:not([data-slot]) {
   align-items: center;
   gap: 4px;
   padding: 8px 4px 10px;
-  border: 1px solid #303d26;
+  border: 1px solid var(--donation-line);
   border-radius: 8px;
-  background: #1e2918;
+  background: var(--donation-soft);
   transition: background 0.15s;
 }
 .shelter-dog-card:hover {
-  background: #2e3e23;
+  background: var(--donation-hover);
 }
 .shelter-dog-card[aria-pressed='true'] {
-  background: #33472a;
-  border-color: #cae99f;
+  background: var(--donation-selected);
+  border-color: var(--donation-accent);
 }
 .shelter-dog-card img {
   width: 94px;
@@ -5680,11 +5699,11 @@ button:not([data-slot]) {
 }
 .shelter-dog-card > span {
   font-size: 11px;
-  color: #b3c59f;
+  color: var(--donation-muted);
 }
 .shelter-dog-card > small {
   font-size: 10px;
-  color: #9cac8d;
+  color: var(--donation-muted);
 }
 .shelter-dog-detail {
   display: flex;
@@ -5693,7 +5712,7 @@ button:not([data-slot]) {
   flex-shrink: 0;
   margin-top: 11px;
   padding-top: 11px;
-  border-top: 1px solid #34412a;
+  border-top: 1px solid var(--donation-line);
   min-width: 0;
 }
 .shelter-dog-detail > img {
@@ -5716,7 +5735,7 @@ button:not([data-slot]) {
 }
 .shelter-dog-detail > div > span {
   font-size: 10px;
-  color: #b6c8a3;
+  color: var(--donation-muted);
   overflow-wrap: anywhere;
 }
 .shelter-dog-detail a {
@@ -5724,7 +5743,7 @@ button:not([data-slot]) {
   gap: 4px;
   align-items: center;
   font-size: 11px;
-  color: #d0ebaf;
+  color: var(--donation-accent);
 }
 .shelter-dog-support {
   display: flex;
@@ -5741,11 +5760,11 @@ button:not([data-slot]) {
 .shelter-dog-support small {
   font-size: 9px;
   font-weight: 400;
-  color: #a1b48d;
+  color: var(--donation-muted);
 }
 .shelter-directory-note {
   font-size: 10px;
-  color: #a0af90;
+  color: var(--donation-muted);
   margin-top: 9px;
   flex-shrink: 0;
 }
@@ -5816,4 +5835,16 @@ button:not([data-slot]) {
   flex-direction: column;
   align-items: center;
   gap: 3px;
+}
+
+.shelter-pin-dot {
+  fill: var(--donation-action);
+  stroke: var(--donation-ink);
+}
+.shelter-pin-label {
+  fill: var(--donation-paper);
+  stroke: var(--donation-line-strong);
+}
+.shelter-explorer .map-loading {
+  color: var(--donation-muted);
 }
