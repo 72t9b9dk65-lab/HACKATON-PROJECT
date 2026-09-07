@@ -116,3 +116,40 @@ test('The active map contains Sweden only and projects every shelter at desktop 
   }
   assert.throws(() => prepareSwedenMap({ ...boundary, id: '840' }, 800, 770));
 });
+
+test('Detailed Sweden layers have valid regional geometry, all 21 counties, and the major lakes', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { geoArea, geoBounds } = await import('d3-geo');
+  const { prepareSwedenMap } = await import('../lib/sweden-map.ts');
+  const read = (name) =>
+    JSON.parse(
+      readFileSync(new URL(`../public/data/${name}`, import.meta.url), 'utf8'),
+    );
+  const boundary = read('sweden.json');
+  const details = read('sweden-details.json');
+  assert.equal(new Set(details.counties.map((c) => c.id)).size, 21);
+  assert.ok(details.counties.every((c) => c.id.startsWith('SE-')));
+  assert.ok(details.lakes.some((l) => l.properties.name === 'Vänern'));
+  assert.ok(details.lakes.some((l) => l.properties.name === 'Vättern'));
+  assert.ok(details.places.some((p) => p.properties.name === 'Stockholm'));
+  const [[west, south], [east, north]] = geoBounds(boundary);
+  assert.ok(west > 10 && east < 25 && south > 55 && north < 70);
+  for (const f of [boundary, ...details.counties, ...details.lakes])
+    assert.ok(
+      geoArea(f) > 0 && geoArea(f) < Math.PI * 2,
+      'Polygon winding must not cover the rest of the world',
+    );
+  for (const [width, height] of [
+    [800, 770],
+    [360, 570],
+  ]) {
+    const prepared = prepareSwedenMap(boundary, width, height, details);
+    assert.equal(prepared.counties.length, 21);
+    for (const feature of [
+      ...prepared.counties,
+      ...prepared.lakes,
+      ...prepared.rivers,
+    ])
+      assert.ok(feature.path && !feature.path.includes('NaN'));
+  }
+});

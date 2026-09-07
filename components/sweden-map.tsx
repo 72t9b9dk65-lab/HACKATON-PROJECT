@@ -1,7 +1,13 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { PawPrint, Heart, LoaderCircle } from 'lucide-react';
-import { prepareSwedenMap, type SwedenBoundary } from '@/lib/sweden-map';
+import { geoContains } from 'd3-geo';
+import {
+  prepareSwedenMap,
+  MAX_SWEDEN_ZOOM,
+  type SwedenBoundary,
+  type SwedenDetails,
+} from '@/lib/sweden-map';
 import { shelters, sek } from '@/lib/hundstallet-data';
 import type { MapMode } from '@/lib/earth-data';
 
@@ -25,6 +31,7 @@ export default function SwedenMap({
   const container = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 800, height: 770 });
   const [boundary, setBoundary] = useState<SwedenBoundary | null>(null);
+  const [details, setDetails] = useState<SwedenDetails | null>(null);
   const [error, setError] = useState(false);
   const [retry, setRetry] = useState(0);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -39,14 +46,22 @@ export default function SwedenMap({
   useEffect(() => {
     const controller = new AbortController();
     setError(false);
-    fetch('/data/sweden.json', { signal: controller.signal })
-      .then((r) => {
+    Promise.all([
+      fetch('/data/sweden.json', { signal: controller.signal }).then((r) => {
         if (!r.ok) throw Error('Map unavailable');
         return r.json() as Promise<SwedenBoundary>;
-      })
-      .then((data: SwedenBoundary) => {
-        prepareSwedenMap(data, 800, 770);
+      }),
+      fetch('/data/sweden-details.json', { signal: controller.signal }).then(
+        (r) => {
+          if (!r.ok) throw Error('Map details unavailable');
+          return r.json() as Promise<SwedenDetails>;
+        },
+      ),
+    ])
+      .then(([data, detail]) => {
+        prepareSwedenMap(data, 800, 770, detail);
         setBoundary(data);
+        setDetails(detail);
       })
       .catch((e) => {
         if (e.name !== 'AbortError') setError(true);
@@ -66,7 +81,10 @@ export default function SwedenMap({
       zoomRef.current.onZoom(
         Math.max(
           1,
-          Math.min(3, zoomRef.current.zoom * Math.exp(-e.deltaY * 0.001)),
+          Math.min(
+            MAX_SWEDEN_ZOOM,
+            zoomRef.current.zoom * Math.exp(-e.deltaY * 0.001),
+          ),
         ),
       );
     };
@@ -81,15 +99,110 @@ export default function SwedenMap({
   }, [resetKey]);
   const prepared = useMemo(
     () =>
-      boundary ? prepareSwedenMap(boundary, size.width, size.height) : null,
-    [boundary, size],
+      boundary
+        ? prepareSwedenMap(
+            boundary,
+            size.width,
+            size.height,
+            details ?? undefined,
+          )
+        : null,
+    [boundary, size, details],
   );
   const cx = size.width * 0.56,
     cy = size.height * 0.49;
   const limit = (x: number, y: number) => ({
-    x: Math.max(-size.width * 0.65, Math.min(size.width * 0.65, x)),
-    y: Math.max(-size.height * 0.65, Math.min(size.height * 0.65, y)),
+    x: Math.max(
+      -size.width * 0.65 * zoom,
+      Math.min(size.width * 0.65 * zoom, x),
+    ),
+    y: Math.max(
+      -size.height * 0.65 * zoom,
+      Math.min(size.height * 0.65 * zoom, y),
+    ),
   });
+  // Reserve shelter callouts and controls before placing secondary geographic labels.
+  const contextLabels = useMemo(() => {
+    if (!prepared || !details) return [];
+    const screen = (coords: [number, number]) => {
+      const p = prepared.projection(coords)!;
+      return {
+        x: (p[0] - cx) * zoom + cx + pan.x,
+        y: (p[1] - cy) * zoom + cy + pan.y,
+      };
+    };
+    const occupied = shelters.map((s) => {
+      const p = screen(s.coordinates);
+      return {
+        left: p.x - 140,
+        right: p.x + 140,
+        top: p.y - 48,
+        bottom: p.y + 48,
+      };
+    });
+    occupied.push({ left: 0, right: 230, top: 0, bottom: 245 });
+    const candidates = [
+      ...details.places
+        .filter((p) => zoom >= 2 || (p.properties.population ?? 0) > 90000)
+        .map((p) => ({
+          id: String(p.id),
+          name: p.properties.name,
+          kind: 'city',
+          coordinates:
+            p.geometry.type === 'Point'
+              ? (p.geometry.coordinates as [number, number])
+              : ([0, 0] as [number, number]),
+        })),
+      ...(zoom >= 1.7
+        ? prepared.counties.map((p) => ({ ...p, kind: 'county' }))
+        : []),
+      ...(zoom >= 2.4
+        ? prepared.lakes
+            .filter(
+              (p) => p.name && boundary && geoContains(boundary, p.coordinates),
+            )
+            .map((p) => ({ ...p, kind: 'lake' }))
+        : []),
+    ];
+    const labels: {
+      id: string;
+      name: string;
+      kind: string;
+      x: number;
+      y: number;
+    }[] = [];
+    for (const c of candidates) {
+      const p = screen(c.coordinates);
+      const width = c.name.length * (c.kind === 'county' ? 6.7 : 6.2);
+      const left = c.kind === 'city' ? p.x : p.x - width / 2;
+      const box = {
+        left: left - 5,
+        right: left + width + 12,
+        top: p.y - 18,
+        bottom: p.y + 8,
+      };
+      if (
+        box.left < 15 ||
+        box.right > size.width - 20 ||
+        box.top < 110 ||
+        box.bottom > size.height - 155
+      )
+        continue;
+      if (
+        occupied.some(
+          (r) =>
+            box.left < r.right &&
+            box.right > r.left &&
+            box.top < r.bottom &&
+            box.bottom > r.top,
+        )
+      )
+        continue;
+      occupied.push(box);
+      labels.push({ ...c, ...p });
+    }
+    return labels;
+  }, [prepared, details, boundary, zoom, pan, cx, cy, size]);
   function stopDrag(e: React.PointerEvent<SVGSVGElement>) {
     drag.current = null;
     if (e.currentTarget.hasPointerCapture(e.pointerId))
@@ -117,7 +230,7 @@ export default function SwedenMap({
           className="hs-sweden-svg"
           viewBox={`0 0 ${size.width} ${size.height}`}
           role="group"
-          aria-label="Map of Sweden and three Hundstallet shelters. Drag to pan, use arrow keys to move, and plus or minus to zoom."
+          aria-label="Detailed map of Sweden, with counties, lakes, rivers, cities, and three Hundstallet shelters. Drag to pan, use arrow keys to move, and plus or minus to zoom."
           tabIndex={0}
           onPointerDown={(e) => {
             if (e.button !== 0) return;
@@ -153,7 +266,7 @@ export default function SwedenMap({
               ].includes(e.key)
             ) {
               e.preventDefault();
-              if (e.key === '+') onZoom(Math.min(3, zoom * 1.25));
+              if (e.key === '+') onZoom(Math.min(MAX_SWEDEN_ZOOM, zoom * 1.25));
               else if (e.key === '-') onZoom(Math.max(1, zoom / 1.25));
               else
                 setPan((p) =>
@@ -176,6 +289,9 @@ export default function SwedenMap({
           }}
         >
           <defs>
+            <clipPath id="sweden-detail-clip">
+              <path d={prepared.outline} />
+            </clipPath>
             <linearGradient id="sweden-land" x1="0" x2="1" y1="0" y2="1">
               <stop stopColor="#dce6c8" />
               <stop offset="1" stopColor="#a7c298" />
@@ -211,9 +327,59 @@ export default function SwedenMap({
               strokeWidth="1.2"
               vectorEffect="non-scaling-stroke"
             >
-              <title>Sweden · Natural Earth boundary</title>
+              <title>Sweden · Natural Earth 1:10 million boundary</title>
             </path>
+            <g clipPath="url(#sweden-detail-clip)">
+              {prepared.counties.map((county, i) => (
+                <path
+                  key={county.id}
+                  d={county.path}
+                  className={`hs-county hs-county-${i % 3}`}
+                  vectorEffect="non-scaling-stroke"
+                >
+                  <title>{county.name} County</title>
+                </path>
+              ))}
+              {prepared.rivers.map((river) => (
+                <path
+                  key={river.id}
+                  d={river.path}
+                  className="hs-river"
+                  vectorEffect="non-scaling-stroke"
+                >
+                  <title>{river.name}</title>
+                </path>
+              ))}
+              {prepared.lakes.map((lake) => (
+                <path
+                  key={lake.id}
+                  d={lake.path}
+                  className="hs-lake"
+                  vectorEffect="non-scaling-stroke"
+                >
+                  <title>{lake.name}</title>
+                </path>
+              ))}
+            </g>
           </g>
+          {contextLabels.map((label) => (
+            <g
+              key={label.id}
+              className={`hs-context-label hs-context-${label.kind}`}
+              pointerEvents="none"
+            >
+              {label.kind === 'city' && (
+                <circle cx={label.x} cy={label.y} r="2.3" />
+              )}
+              <text
+                x={label.x + (label.kind === 'city' ? 7 : 0)}
+                y={label.y - 4}
+                textAnchor={label.kind === 'city' ? 'start' : 'middle'}
+              >
+                {label.name}
+              </text>
+            </g>
+          ))}
           {zoom === 1 && (
             <>
               <text
@@ -238,6 +404,13 @@ export default function SwedenMap({
             if (!point) return null;
             const x = (point[0] - cx) * zoom + cx + pan.x,
               y = (point[1] - cy) * zoom + cy + pan.y;
+            if (
+              x < -25 ||
+              x > size.width + 25 ||
+              y < 80 ||
+              y > size.height - 40
+            )
+              return null;
             const active = s.id === selectedId;
             const Icon = mode === 'impact' ? Heart : PawPrint;
             const left = s.id === 'alingsas';

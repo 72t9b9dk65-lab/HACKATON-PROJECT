@@ -1,11 +1,28 @@
-import { geoMercator, geoPath } from 'd3-geo';
+import { geoMercator, geoPath, geoCentroid } from 'd3-geo';
 import type { Feature, Geometry } from 'geojson';
 
 export type SwedenBoundary = Feature<Geometry, { name: string }>;
+export type MapDetail = Feature<
+  Geometry,
+  {
+    name: string;
+    coordinates?: [number, number];
+    rank?: number;
+    population?: number;
+  }
+>;
+export type SwedenDetails = {
+  counties: MapDetail[];
+  lakes: MapDetail[];
+  rivers: MapDetail[];
+  places: MapDetail[];
+};
+export const MAX_SWEDEN_ZOOM = 6;
 export function prepareSwedenMap(
   boundary: SwedenBoundary,
   width: number,
   height: number,
+  details?: SwedenDetails,
 ) {
   if (String(boundary.id) !== '752')
     throw Error('Expected the Sweden boundary.');
@@ -19,5 +36,19 @@ export function prepareSwedenMap(
   const outline = geoPath(projection)(boundary);
   if (!outline || outline.includes('NaN'))
     throw Error('Unable to prepare the Sweden map.');
-  return { projection, outline };
+  const path = geoPath(projection);
+  const layer = (features: MapDetail[] = []) =>
+    features.map((f) => ({
+      id: String(f.id),
+      name: f.properties.name,
+      path: path(f) ?? '',
+      coordinates: f.properties.coordinates ?? geoCentroid(f),
+    }));
+  return {
+    projection,
+    outline,
+    counties: layer(details?.counties),
+    lakes: layer(details?.lakes),
+    rivers: layer(details?.rivers),
+  };
 }

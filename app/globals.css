@@ -4246,3 +4246,63 @@ button:not([data-slot]) {
 .hs-pin-caption.active {
   fill: #688253;
 }
+
+/* Geographic detail is neutral context; shelter callouts carry the donation data. */
+.hs-map::before {
+  display: none;
+}
+.hs-county {
+  stroke: #728e67;
+  stroke-width: 0.65;
+  stroke-linejoin: round;
+  fill: #c7d8b4;
+  fill-opacity: 0.27;
+}
+.hs-county-1 {
+  fill: #b0c69c;
+  fill-opacity: 0.22;
+}
+.hs-county-2 {
+  fill: #e7edcf;
+  fill-opacity: 0.32;
+}
+.hs-river {
+  fill: none;
+  stroke: #587f7c;
+  stroke-width: 0.85;
+  opacity: 0.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.hs-lake {
+  fill: #345e59;
+  stroke: #72958a;
+  stroke-width: 0.5;
+}
+.hs-context-label text {
+  font-size: 12px;
+  fill: #38503b;
+  paint-order: stroke;
+  stroke: #dce7cc;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.hs-context-label circle {
+  fill: #466440;
+  stroke: #e2ebd4;
+  stroke-width: 1;
+}
+.hs-context-county text {
+  font-size: 11px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  fill: #55734c;
+  stroke-width: 2.5px;
+}
+.hs-context-lake text {
+  fill: #315d59;
+  font-size: 11px;
+  font-style: italic;
+  stroke: #cfdfc0;
+  stroke-width: 2px;
+}

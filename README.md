@@ -13,7 +13,7 @@ Both launchers install missing dependencies and open your browser. Keep the term
 
 ## Prototype experience
 
-- **Explore shelters:** a draggable, zoomable map showing only Sweden, with approximate city-level markers for Stockholm, Alingsås, and Örkelljunga. Choose a shelter directly, pan and zoom, or reset to show all of Sweden.
+- **Explore shelters:** a draggable, zoomable map showing only Sweden, with detailed 1:10 million coastlines, islands, 21 county boundaries, lakes, rivers, and city labels, with approximate city-level markers for Stockholm, Alingsås, and Örkelljunga. Choose a shelter directly, pan and zoom up to 6×, or reset to show all of Sweden. Geographic labels appear progressively and avoid shelter callouts.
 - **Follow a dog:** three fictional stories connect care, rehabilitation, and rehoming. Bookmark a journey and read example care updates. The next-chapter control is an explicit demo action; donating does not advance rehabilitation or guarantee adoption.
 - **Try a contribution:** simulate SEK 10–25,000. Amounts are stored as integer öre and allocated without rounding losses across veterinary care (40%), food and daily care (30%), training and rehabilitation (20%), and rehoming support (10%). These are proposed demo percentages, not Hundstallet’s accounts.
 - **My impact:** see your simulated contributions, allocations, followed dogs, and downloadable JSON receipts.
@@ -45,7 +45,8 @@ Consulted September 7, 2026:
 - [Hundstallet’s mission and shelter locations](https://hundstallet.se/var-verksamhet/)
 - [How Hundstallet uses donations](https://hundstallet.kb.kundo.se/guide/vad-anvands-mina-pengar-till?category=gavor-och-donationer)
 - [Official giving page](https://hundstallet.se/stod-oss/)
-- [Natural Earth / World Atlas](https://github.com/topojson/world-atlas): public-domain geographic boundaries.
+- [Natural Earth 1:10 million](https://www.naturalearthdata.com/downloads/10m-physical-vectors/) and [county boundaries](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/): public-domain geography pinned to source revision `ca96624a56bd078437bca8184e78163e5039ad19`. These are cartographic context rather than cadastral or navigation-grade boundaries.
+- [Natural Earth / World Atlas](https://github.com/topojson/world-atlas): retained public-domain globe assets.
 - [Country metadata](https://github.com/mledoze/countries): ODbL-1.0. The derived selection is in `public/data/countries.json`; three `map-*` identifiers are internal rather than ISO codes.
 
 ## Validation and code
@@ -56,7 +57,10 @@ Run `npm test`, `npm run typecheck`, and `npm run build`. Tests cover contributi
 - `lib/hundstallet-data.ts`: locations, fictional dogs, stages, and proposed allocations.
 - `lib/hundstallet-model.ts`: currency validation, allocation, local receipts, reload validation, and badges.
 - `components/sweden-map.tsx` and `lib/sweden-map.ts`: Sweden-only projection, panning, zooming, and accessible shelter markers.
-- `public/data/sweden.json`: Sweden boundary extracted from the bundled Natural Earth atlas.
+- `public/data/sweden.json`: detailed Natural Earth 1:10 million Sweden boundary.
+- `public/data/sweden-details.json`: 21 counties, regional lake and river features, and Swedish city points. Hydrology is clipped to Sweden during rendering.
+- `public/data/sweden-sources.json`: pinned source URLs, revision, source SHA-256 checksums, license, and processing notes.
+- `scripts/build-sweden-map.mjs`: repeatable extraction; download the source files listed in the manifest as `<name>.json` and run `node scripts/build-sweden-map.mjs /path/to/source-directory`.
 - `components/earth-globe.tsx`: retained original globe implementation; not used by the active homepage.
 
 Automated tests and builds do not establish that every browser interaction, touch gesture, or Windows launcher works. Live payments, blockchain integration, and real-time shelter data are not implemented.

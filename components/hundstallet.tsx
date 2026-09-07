@@ -25,6 +25,7 @@ import {
   CircleCheck,
 } from 'lucide-react';
 import SwedenMap from './sweden-map';
+import { MAX_SWEDEN_ZOOM } from '@/lib/sweden-map';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
@@ -328,7 +329,7 @@ export default function Hundstallet() {
                     <br />
                     starts somewhere.
                   </strong>
-                  <p>Three shelters. One shared mission.</p>
+                  <p>Counties, waterways, and the places we care.</p>
                 </div>
                 <div
                   className="hs-shelter-picker"
@@ -359,8 +360,10 @@ export default function Hundstallet() {
                 <div className="hs-globe-controls">
                   <button
                     aria-label="Zoom in"
-                    disabled={zoom >= 3}
-                    onClick={() => setZoom(Math.min(3, zoom * 1.5))}
+                    disabled={zoom >= MAX_SWEDEN_ZOOM}
+                    onClick={() =>
+                      setZoom(Math.min(MAX_SWEDEN_ZOOM, zoom * 1.5))
+                    }
                   >
                     <Plus />
                   </button>
@@ -386,7 +389,7 @@ export default function Hundstallet() {
                     <Move size={13} />
                     Drag to pan · Scroll to zoom
                   </span>
-                  <span>SAMPLE FUNDING · NATURAL EARTH</span>
+                  <span>NATURAL EARTH · 1:10M</span>
                 </div>
               </section>
               <aside className="hs-dog-panel">
