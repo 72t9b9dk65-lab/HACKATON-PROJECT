@@ -601,8 +601,8 @@ function ReceiptEditor({
     const failure = await store.updateStaff((staff, base) => {
       const fresh = planReceipt(staff, base, review);
       if (
-        JSON.stringify(fresh.lines.map((l) => l.allocations)) !==
-        JSON.stringify(review.lines.map((l) => l.allocations))
+        JSON.stringify(fresh.lines.map((l) => l.products)) !==
+        JSON.stringify(review.lines.map((l) => l.products))
       )
         throw new Error(
           'Balances changed in another tab. Go back and review the product assignments.',
@@ -888,8 +888,8 @@ function ReceiptEditor({
             <Plus size={16} /> Add another item
           </Button>
           <p className="staff-form-note">
-            File reading is manual in this prototype. Enter the receipt totals
-            above; no automatic OCR or external connection is used.
+            Enter each product’s price including VAT. Use separate rows when
+            items have different prices.
           </p>
           <div className="staff-form-actions">
             <span>

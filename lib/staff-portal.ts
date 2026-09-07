@@ -521,7 +521,7 @@ export function planReceipt(
   });
   const assigned = assignWholeProducts(
     drafted.flatMap((line) => line.products),
-    donorPortfolios(staff, base).map(donor => ({ ...donor, usedOre: 0 })),
+    donorPortfolios(staff, base).map((donor) => ({ ...donor, usedOre: 0 })),
   );
   const byId = new Map(assigned.map((product) => [product.id, product]));
   const lines = drafted.map((line) => {
@@ -532,6 +532,7 @@ export function planReceipt(
   readStaffLedger(
     JSON.stringify({ ...staff, receipts: [...staff.receipts, result] }),
   );
+  donorPortfolios({ ...staff, receipts: [...staff.receipts, result] }, base);
   return result;
 }
 export function recordReceipt(

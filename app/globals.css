@@ -10070,7 +10070,7 @@ button.shelter-life-dog-photo:focus-visible {
 }
 .staff-receipt-line {
   display: grid;
-  grid-template-columns: minmax(130px, 1.5fr) minmax(140px, 1fr) 100px 30px;
+  grid-template-columns: minmax(120px, 1.5fr) minmax(130px, 1fr) 95px 70px 30px;
   align-items: end;
   gap: 10px;
 }
@@ -10224,6 +10224,115 @@ button.shelter-life-dog-photo:focus-visible {
 .expense-transaction-main:disabled {
   cursor: default;
 }
+.staff-purchased-products {
+  margin-top: 16px;
+}
+.staff-purchased-products h4 {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--donation-muted);
+  margin-bottom: 5px;
+}
+.staff-purchased-products li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--donation-line);
+  font-size: 14px;
+}
+.staff-purchased-products li > span {
+  min-width: 0;
+}
+.staff-purchased-products strong {
+  display: block;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.staff-purchased-products small {
+  display: block;
+  font-size: 12px;
+  color: var(--donation-muted);
+  margin-top: 4px;
+}
+.staff-purchased-products b {
+  font-size: 14px;
+  white-space: nowrap;
+}
+.staff-edit-products[data-slot='button'] {
+  margin-top: 12px;
+  font-size: 13px;
+}
+.staff-product-missing {
+  margin-top: 12px !important;
+}
+.staff-product-form {
+  display: grid;
+  gap: 16px;
+}
+.staff-product-edit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 80px 120px 30px;
+  gap: 10px;
+  align-items: end;
+}
+.staff-product-edit-row label {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  font-size: 14px;
+}
+.staff-product-edit-row input {
+  padding: 11px;
+  border: 1px solid var(--donation-line);
+  border-radius: 8px;
+  background: var(--donation-paper);
+  font-size: 15px;
+  width: 100%;
+  min-width: 0;
+}
+.staff-products-total {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 14px;
+  border: 1px solid var(--donation-line);
+  border-radius: 9px;
+  background: var(--donation-soft);
+  font-size: 14px;
+}
+.staff-products-total[data-matched='false'] strong {
+  color: #8f462f;
+}
+.staff-review-caption {
+  text-align: left;
+  font-size: 16px;
+  font-weight: 650;
+  padding-bottom: 10px;
+}
+.expense-owned-products {
+  display: grid;
+  gap: 3px;
+  padding-top: 4px;
+  border-top: 1px solid var(--donation-line);
+}
+.expense-owned-products > span {
+  font-size: 12px;
+  line-height: 1.5;
+}
+@media (max-width: 560px) {
+  .staff-product-edit-row {
+    grid-template-columns: minmax(0, 1fr) 60px 85px 26px;
+    gap: 6px;
+  }
+  .staff-product-edit-row label {
+    font-size: 13px;
+  }
+  .staff-product-edit-row input {
+    padding: 9px 6px;
+  }
+}
 @media (max-width: 1100px) {
   .staff-dashboard {
     grid-template-columns: 230px minmax(0, 1fr);
@@ -10320,7 +10429,7 @@ button.shelter-life-dog-photo:focus-visible {
     grid-template-columns: 1fr 1fr;
   }
   .staff-receipt-line {
-    grid-template-columns: minmax(0, 1fr) 95px 30px;
+    grid-template-columns: minmax(0, 1fr) 75px 58px 28px;
     border-top: 1px solid var(--donation-line);
     padding-top: 14px;
   }
