@@ -1,0 +1,129 @@
+{
+  "tool": "tools.image_gen__imagegen",
+  "mode": "built-in",
+  "generationCalls": 3,
+  "attemptsPerAsset": 1,
+  "retries": 0,
+  "referencePath": "/Users/ale/Documents/ChatGPT/EarthHealth/public/care/pixel/food-enrichment.png",
+  "assets": [
+    {
+      "id": "communal-kennel",
+      "prompt": "Use case: stylized-concept. Asset type: isolated sprite for a cozy virtual dog shelter web UI. Match the inspected food-enrichment.png reference style: crisp chunky pixel-art clusters, stepped pixel silhouettes, dark chocolate-brown outlines, warm cream and honey/light brown palette, muted blue and leafy green accents, gently shaded retro game sprite, front three-quarter view. True transparent PNG background with alpha, including transparent empty space inside and around the object group. No painted background, no checkerboard, no ground shadow, no words, logos or watermark. No dogs or people. Keep the complete object silhouette within the canvas with comfortable clear margins. Do not create a sheet or multiple alternatives. Produce exactly one final image.\nPrimary request: one giant communal dog kennel, a wide low welcoming timber doghouse as the central shelter home. A large open front reveals cozy cream bedding and muted blue folded blankets inside. Warm honey-brown wood walls, broad pitched brown roof, cream roof trim. Broad horizontal shape, substantially wider than tall, landscape composition within the canvas, attractive and clearly readable at about 500 pixels wide. Roof and open front are the dominant clear forms. No exterior props or scenery.",
+      "sourcePath": "/Users/ale/.codex/generated_images/01a07be2-c81b-7f60-8e91-00b6caa198b7/exec-22bccd30-3798-4c7b-ab22-7e0fdd93c35a.png",
+      "outputPath": "/private/tmp/hundstallet-shelter-activity-assets/communal-kennel.png",
+      "sha256": "7183d6ecdf4a5462fe2da6fc51121f8038e6e70b1fd6ee958bee6cf583c1ab0d",
+      "alphaValidation": {
+        "mode": "RGBA",
+        "size": [
+          1536,
+          1024
+        ],
+        "alpha_extrema": [
+          0,
+          254
+        ],
+        "transparent_pixels": 718092,
+        "opaque_pixels": 0,
+        "partial_alpha_pixels": 854772,
+        "alpha_bbox": [
+          0,
+          9,
+          1521,
+          1024
+        ],
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visualValidation": {
+        "visualInspection": "Inspected generated PNG through view_image. Wide timber communal doghouse, open cozy bedding interior, brown pitched roof and cream trim, no dogs or people. Decorative generic bone and paw motifs added by generation. Brown diffuse halo remains around exterior silhouette.",
+        "status": "partial: real alpha exists, but exterior brown halo fails the clean isolated background requirement",
+        "alphaStatus": "Real alpha and fully transparent corners verified; maximum alpha 254 and no fully opaque pixels. No alpha modification performed."
+      },
+      "workspacePath": "/Users/ale/Documents/ChatGPT/EarthHealth/public/shelters/pixel-big-kennel.png"
+    },
+    {
+      "id": "park-walk",
+      "prompt": "Use case: stylized-concept. Asset type: isolated sprite for a cozy virtual dog shelter web UI. Match the inspected food-enrichment.png reference style: crisp chunky pixel-art clusters, stepped pixel silhouettes, dark chocolate-brown outlines, warm cream and honey/light brown palette, muted blue and leafy green accents, gently shaded retro game sprite, front three-quarter view. True transparent PNG background with alpha, including transparent empty space inside and around the object group. No painted background, no checkerboard, no ground shadow, no words, logos or watermark. No dogs or people. Keep the complete object silhouette within the canvas with comfortable clear margins. Do not create a sheet or multiple alternatives. Produce exactly one final image.\nPrimary request: one compact miniature park walk station consisting of exactly two leafy green trees, one gently curved light cream walking path and a warm wooden park bench. The tiny path and minimal grass directly around the trees form one small isolated object group, no scenery beyond that group. Compact square composition, simple bold readable forms for an icon displayed at about 130 pixels. Trees frame the path and bench without hiding them. No dogs, no people.",
+      "sourcePath": "/Users/ale/.codex/generated_images/01a07be2-c81b-7f60-8e91-00b6caa198b7/exec-0337750c-9149-41fe-b15d-b5d11db370b7.png",
+      "outputPath": "/private/tmp/hundstallet-shelter-activity-assets/park-walk.png",
+      "sha256": "52e151728dfd2d0cc86692e35999a941880e02d65dd4810ff4d9f66275034cd8",
+      "alphaValidation": {
+        "mode": "RGBA",
+        "size": [
+          1254,
+          1254
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "transparent_pixels": 797719,
+        "opaque_pixels": 1248,
+        "partial_alpha_pixels": 773549,
+        "alpha_bbox": [
+          0,
+          51,
+          1240,
+          1254
+        ],
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visualValidation": {
+        "visualInspection": "Inspected generated PNG through view_image. Exactly two leafy trees, curved cream path, wooden bench. Compact isolated park group; no dogs or people, no words or logos. Chunky brown outlined warm pixel style matches reference.",
+        "status": "ready for parent integration and target UI scale check",
+        "alphaStatus": "Real alpha, fully transparent corners, and visible cutout verified. Original generated alpha preserved."
+      },
+      "workspacePath": "/Users/ale/Documents/ChatGPT/EarthHealth/public/care/pixel/park-walk.png"
+    },
+    {
+      "id": "play-enrichment",
+      "prompt": "Use case: stylized-concept. Asset type: isolated sprite for a cozy virtual dog shelter web UI. Match the inspected food-enrichment.png reference style: crisp chunky pixel-art clusters, stepped pixel silhouettes, dark chocolate-brown outlines, warm cream and honey/light brown palette, muted blue and leafy green accents, gently shaded retro game sprite, front three-quarter view. True transparent PNG background with alpha, including transparent empty space inside and around the object group. No painted background, no checkerboard, no ground shadow, no words, logos or watermark. No dogs or people. Keep the complete object silhouette within the canvas with comfortable clear margins. Do not create a sheet or multiple alternatives. Produce exactly one final image.\nPrimary request: one compact play and enrichment station consisting of a low agility hoop on two small warm wooden feet, a short open muted blue dog agility tunnel and a few small cream and muted blue toy balls. Arrange as one compact isolated object group with clear separated silhouettes, no scenery or grass field. Square composition with chunky simple readable forms for an icon displayed at about 130 pixels. No dogs, no people.",
+      "sourcePath": "/Users/ale/.codex/generated_images/01a07be2-c81b-7f60-8e91-00b6caa198b7/exec-33d8eeb5-c844-46ca-9907-6fdd0e8a234a.png",
+      "outputPath": "/private/tmp/hundstallet-shelter-activity-assets/play-enrichment.png",
+      "sha256": "9b0bb4b4d4e68532362da8b25e90068d23e490c1a1601bb80e1caf83ca5e9e0c",
+      "alphaValidation": {
+        "mode": "RGBA",
+        "size": [
+          1254,
+          1254
+        ],
+        "alpha_extrema": [
+          0,
+          255
+        ],
+        "transparent_pixels": 1037355,
+        "opaque_pixels": 1763,
+        "partial_alpha_pixels": 533398,
+        "alpha_bbox": [
+          41,
+          52,
+          1234,
+          1254
+        ],
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "visualValidation": {
+        "visualInspection": "Inspected generated PNG through view_image. Agility hoop, blue tunnel and three balls, plus a small rope toy generated within the group. No dogs, people, words or logos. Brown outlined warm pixel style matches reference.",
+        "status": "ready for parent integration and target UI scale check",
+        "alphaStatus": "Real alpha, fully transparent corners, transparent hoop interior, and visible cutout verified. Original generated alpha preserved."
+      },
+      "workspacePath": "/Users/ale/Documents/ChatGPT/EarthHealth/public/care/pixel/play-enrichment.png"
+    }
+  ],
+  "scope": "Asset-only. No edits to Site checkout or existing reference. Exactly three built-in calls, one per asset, dispatched in one concurrent Promise.allSettled batch. No retries, variants, background removal, or post-processing.",
+  "integration": "All three original generated PNGs integrated without image processing. The kennel retains its soft brown halo. Day/night tinting is applied by the UI; original asset bytes are preserved."
+}
