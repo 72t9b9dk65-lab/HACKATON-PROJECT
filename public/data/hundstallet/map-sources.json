@@ -1,0 +1,35 @@
+{
+  "license": "ODbL 1.0",
+  "attribution": "\u00a9 OpenStreetMap contributors",
+  "licenseUrl": "https://www.openstreetmap.org/copyright",
+  "usage": "Roads, buildings and land cover in local shelter views. Simplified style, geographic coordinates retained. Public facility points are separately sourced in lib/hundstallet-shelters.ts.",
+  "sources": [
+    {
+      "shelter": "stockholm",
+      "source": "https://api.openstreetmap.org/api/0.6/map.json",
+      "retrievedAt": "2026-09-07",
+      "osmTimestamp": null,
+      "featureCount": 1616,
+      "local": "/data/hundstallet/stockholm-map.json",
+      "sha256": "8925411b0b161977d0c8adcff5bc9ab49899b13882bbfadf50848c9f1f24af47"
+    },
+    {
+      "shelter": "alingsas",
+      "source": "https://api.openstreetmap.org/api/0.6/map.json",
+      "retrievedAt": "2026-09-07",
+      "osmTimestamp": null,
+      "featureCount": 185,
+      "local": "/data/hundstallet/alingsas-map.json",
+      "sha256": "f3415beab49ed897df3c7af49d9b160abcdb36c47de7e5bf306421c0180484da"
+    },
+    {
+      "shelter": "orkelljunga",
+      "source": "https://api.openstreetmap.org/api/0.6/map.json",
+      "retrievedAt": "2026-09-07",
+      "osmTimestamp": null,
+      "featureCount": 42,
+      "local": "/data/hundstallet/orkelljunga-map.json",
+      "sha256": "303b59b859d02b8b1606d7188ac8db9d7414a8c8a60254cd73cb69f8bc2ec242"
+    }
+  ]
+}

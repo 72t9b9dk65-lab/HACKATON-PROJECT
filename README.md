@@ -13,21 +13,25 @@ Both launchers install missing dependencies and open your browser. Keep the term
 
 ## Prototype experience
 
-The homepage puts giving first: the overall donated amount and spending bars at the top, a scrollable row of pixel dog avatars below, one donation button, and the black Sweden map alongside. Selecting a dog changes the map and photo journey without changing the donor’s total.
+The homepage puts giving first: the overall donated amount and spending bars at the top, a scrollable row of pixel dog avatars below, one donation button, and the black Sweden map alongside. Selecting a dog opens its photo journey without changing the donor’s total.
 
-- Browse **Åke, Koby, and Ove** in the helped-dog carousel or select a map marker. Their names appear beneath generated breed avatars; selection keeps the map and photo journey in sync. These are real public profiles checked on 7 September 2026; pins indicate cities, not live dog locations.
-- Press **Donate 250 SEK** to simulate a contribution to shared shelter care. The overall balance, food/vet/daily-care bars, and the indirectly helped dogs update together. Each category is divided equally among the three demo beneficiaries, with whole-öre remainders assigned in a stable order. Map amounts and category totals reconcile exactly.
-- The illustrative split is **50% food / 30% vet care / 20% daily care**, stored as integer öre without rounding loss. The initial 500 SEK is a labeled shared-care example. Reloading migrates only the old built-in example; previous user-created demo gifts keep their amounts, dates, and original recipients.
-- Browse photos published on each dog's Hundstallet profile. New demo gifts add a dated entry; the final card reserves space for a future organization-posted care update.
-- The detailed map retains Sweden's coastline, islands, counties, lakes, rivers, city labels, pan, zoom, and reset controls. Dashboard tabs, rewards pages, filters, and multiple donation actions have been removed from the active experience.
+- The horizontal helped-dog carousel shows names beneath pixel avatars. The photo journey below also scrolls horizontally with swipe, keyboard, or arrow controls.
+- Click a pixel shelter to fly from Sweden to its real facility location, showing nearby OpenStreetMap roads and buildings. A rectangular, scrollable grid shows its published dog profiles. **All profiles** includes all 43 listings from the official directory on 7 September 2026, including two group listings and two trial adoptions. The single “Rehoming team” listing remains visible without an invented shelter location.
+- Selecting a grid avatar shows its published photo, official profile link, and simulated care allocation. Selecting a profile at another shelter moves the map there. Escape or **Sweden** returns to the overview.
+- Press **Donate 250 SEK** to simulate shared care for the currently imported profiles. The illustrative split is **50% food / 30% vet care / 20% daily care**, divided in integer öre among the recorded recipients. New gifts snapshot their recipient IDs; older shared gifts retain their original three beneficiaries. Totals and category allocations reconcile exactly.
+- A fresh session starts with a labeled 500 SEK example shared among all 43 profiles. Existing user records retain their dates, amounts, and recipient allocations. The map does not claim that every dog lives at its listed shelter continuously.
+- Published photos have no verified event dates. New demo gifts add a dated entry; the final card reserves space for an organization-posted care update.
+- Sweden’s coastline, counties, lakes, rivers, city labels, panning, zoom, and reset remain available. The overview background stays black.
 
 ## Data and prototype boundaries
 
-This is an independent shell, not an official Hundstallet service. Public names, profile summaries, city locations, and photographs are a manually imported snapshot. All financial amounts, allocations, and donation events are simulated. Åke's profile mentions allergy food; the app does not claim that a purchase was made for him or that Hundstallet earmarks donations to particular dogs.
+This is an independent shell, not an official Hundstallet service. Public names, profile summaries, shelter assignments, and photographs are an imported snapshot of the official public directory. All financial amounts, allocations, and donation events are simulated. Åke's profile mentions allergy food; the app does not claim that a purchase was made for him or that Hundstallet earmarks donations to particular dogs.
 
 Photo order is gallery order, not a verified care chronology. The original photos have no asserted event dates and do not prove expenditure, delivery, or outcomes. The next-update card is visibly a placeholder; donations do not generate organization updates or advance a dog's rehabilitation. Photo sources, original URLs, and hashes are recorded in `public/dogs/hundstallet/sources.json`. Copyright remains with the original rights holders.
 
-The 25 AI-generated breed illustrations are a reusable asset library, not 25 invented shelter profiles. The carousel currently uses three avatars matching the existing profiles. Ove is listed as mixed breed and uses an approximate spaniel-style illustration; this does not assert his ancestry. The real profile-photo carousel remains below the map.
+The original 25 AI-generated dog sprites are retained, with 16 additional sprites covering missing breeds and generic mixed-breed appearances. They are illustrations, not portraits or confirmed ancestry. A generated shelter icon represents all three locations and is not a rendering of the actual buildings. The real profile-photo carousel remains below the map.
+
+Public shelter addresses are verified against the official contact page; mapped facility points are sourced from OpenStreetMap, Eniro, and Hitta. The close-up uses local OpenStreetMap geography under ODbL 1.0 with visible attribution. Building coverage is incomplete around Alingsås; the prototype retains the verified address point instead of fabricating a building footprint. These maps are an exploration interface, not navigation instructions.
 
 Demo records are saved only in this browser under `hundstallet.donation-shell.v1`. If storage is unavailable, the shell works for the current session and says so. There are no payments, blockchain transactions, server accounts, or live integrations. Real giving is available on [Hundstallet's official website](https://hundstallet.se/stod-oss/).
 
@@ -45,7 +49,8 @@ Previous EarthHealth and Hundstallet flows and their local records are retained 
 
 Consulted September 7, 2026:
 
-- [Åke](https://hundstallet.se/hundar/ake/), [Koby](https://hundstallet.se/hundar/koby/), and [Ove](https://hundstallet.se/hundar/ove/): public profiles and photo galleries.
+- [Complete dog directory](https://hundstallet.se/hundar/): 43 published profiles, including groups, with names, breeds, ages, shelter assignments, status, links, and photos.
+- [Official shelter addresses](https://hundstallet.se/var-verksamhet/kontakt/) and [OpenStreetMap](https://www.openstreetmap.org/copyright): facility locations and nearby geographic context. Coordinate source links are in `lib/hundstallet-shelters.ts`; map attribution is in `public/data/hundstallet/map-sources.json`.
 - [Hundstallet’s mission and shelter locations](https://hundstallet.se/var-verksamhet/)
 - [How Hundstallet uses donations](https://hundstallet.kb.kundo.se/guide/vad-anvands-mina-pengar-till?category=gavor-och-donationer)
 - [Official giving page](https://hundstallet.se/stod-oss/)
@@ -57,10 +62,16 @@ Consulted September 7, 2026:
 
 Run `npm test`, `npm run typecheck`, and `npm run build`. Tests cover exact allocations, per-dog isolation, reload validation, sourced photo availability, map projection, and the retained earlier models.
 
-- `components/donation-shell.tsx`: active simplified map, contribution, and photo timeline.
+- `components/donation-shell.tsx`: contribution, helped-dog carousel, and horizontal photo timeline.
+- `components/shelter-map.tsx`: pixel shelter markers, animated close-up, full dog directory, and selected-dog care.
+- `lib/shelter-camera.ts`: geographic camera interpolation and facility centering.
+- `public/data/hundstallet/directory.json` and `lib/hundstallet-directory.ts`: complete sourced snapshot and typed data.
+- `scripts/import-hundstallet-directory.py`: repeatable import from a downloaded official directory HTML file; `--download` also retrieves published thumbnails.
 - `lib/donation-shell.ts`: sourced profiles, demo allocation, and local records.
 - `components/pixel-care-icon.tsx`: shared pixel icons for amounts and map markers.
-- `public/dogs/pixel-breeds/`: original 5 × 5 atlas, 25 individually cropped transparent PNGs, and breed manifest.
+- `public/dogs/pixel-breeds/`: original 5 × 5 atlas plus a 4 × 4 extension, 41 individually cropped sprites, and manifests.
+- `public/shelters/pixel-shelter.png`: transparent pixel shelter marker.
+- `assets/hundstallet-map/generation.md`: shelter and additional dog generation prompts.
 - `assets/pixel-dog-breeds/generation.md`: complete built-in image generation prompt and processing notes.
 - `scripts/crop-dog-breeds.py`: repeatable cropping and alpha validation using Pillow.
 - `public/dogs/hundstallet/`: original profile photos with a source manifest.

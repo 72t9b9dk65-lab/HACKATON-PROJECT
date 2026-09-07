@@ -4824,7 +4824,10 @@ button:not([data-slot]) {
 .donation-carousel-controls button:hover {
   background: #e7ecdf;
 }
-.donation-timeline {
+.donation-photo-track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   margin-left: -18px;
 }
 .donation-timeline-item {
@@ -5268,6 +5271,9 @@ button:not([data-slot]) {
   height: 29px;
 }
 .donation-helped-track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   margin-left: -10px;
 }
 .donation-helped-item {
@@ -5409,4 +5415,405 @@ button:not([data-slot]) {
   .donation-main .donation-map {
     min-height: 570px;
   }
+}
+
+/* Shelter exploration stays on the black map; the directory opens over it. */
+.shelter-explorer {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  overflow: hidden;
+}
+.shelter-map-svg {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+.shelter-map-svg:active {
+  cursor: grabbing;
+}
+.shelter-explorer-focused .shelter-map-svg {
+  cursor: default;
+}
+.shelter-map-svg .hs-sweden-land {
+  stroke-width: 1;
+}
+.shelter-local-building {
+  fill: #242d24;
+  stroke: #617151;
+  stroke-width: 1;
+}
+.shelter-local-road {
+  fill: none;
+  stroke: #53614c;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.shelter-local-path {
+  stroke-width: 1.6;
+  stroke-dasharray: 3 4;
+  opacity: 0.65;
+}
+.shelter-local-park {
+  fill: #111c13;
+  stroke: none;
+}
+.shelter-local-water {
+  fill: #081d23;
+  stroke: #22434a;
+  stroke-width: 1;
+}
+.shelter-city-label {
+  fill: #a0aa96;
+  font-size: 11px;
+  paint-order: stroke;
+  stroke: #0a1008;
+  stroke-width: 3;
+}
+.shelter-pixel-marker {
+  cursor: pointer;
+  outline: none;
+}
+.shelter-pixel-image {
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 4px #0009);
+}
+.shelter-pixel-marker:hover .shelter-pixel-image,
+.shelter-pixel-marker:focus-visible .shelter-pixel-image {
+  filter: drop-shadow(0 0 6px #dcffa880);
+}
+.shelter-pixel-marker:focus-visible rect {
+  stroke: #e5ffb7;
+  stroke-width: 3;
+}
+.shelter-marker-name {
+  fill: #edf5df;
+  font-size: 14px;
+  font-weight: 600;
+}
+.shelter-marker-count {
+  fill: #b0c198;
+  font-size: 11px;
+}
+.shelter-marker-amount {
+  fill: #d8ebbd;
+  font-size: 10px;
+}
+.shelter-explorer .donation-map-controls button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  color: #d6e8bf;
+}
+.shelter-explorer .donation-map-controls button:hover {
+  background: #27321f;
+}
+.shelter-explorer .donation-map-controls button:disabled {
+  opacity: 0.35;
+}
+.shelter-back {
+  position: absolute;
+  top: 23px;
+  left: 22px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #152014;
+  border: 1px solid #465239;
+  padding: 9px 12px;
+  border-radius: 7px;
+  color: #d7eac2;
+  font-size: 13px;
+}
+.shelter-back:hover {
+  background: #293922;
+}
+.shelter-location-caption {
+  position: absolute;
+  left: 22px;
+  top: 82px;
+  max-width: 135px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #d0dcca;
+  text-shadow: 0 1px 3px #000;
+}
+.shelter-location-caption small {
+  font-size: 10px;
+  color: #889880;
+}
+.shelter-local-status {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  color: #aebc9f;
+  font-size: 12px;
+}
+.shelter-directory {
+  position: absolute;
+  top: 39%;
+  left: 20px;
+  right: 20px;
+  bottom: 47px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 18px 11px;
+  border: 1px solid #556343;
+  border-radius: 12px;
+  background: #11170fec;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 18px 45px #0009;
+  color: #e5eddc;
+  outline: none;
+  animation: shelter-directory-in 0.45s ease 0.85s both;
+}
+.shelter-directory-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.shelter-directory-heading > div > span {
+  font-size: 10px;
+  letter-spacing: 1.7px;
+  color: #9eaf8c;
+}
+.shelter-directory-heading h2 {
+  font-size: 23px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  margin-top: 2px;
+}
+.shelter-directory-heading > button {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  color: #b3c69c;
+}
+.shelter-directory-heading > button:hover {
+  background: #26341d;
+}
+.shelter-directory-tabs {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #34412a;
+  flex-shrink: 0;
+}
+.shelter-directory-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #96a883;
+  padding: 0 0 10px;
+  border-bottom: 2px solid transparent;
+}
+.shelter-directory-tabs button[aria-pressed='true'] {
+  color: #d8f1b8;
+  border-color: #c5e89f;
+}
+.shelter-directory-tabs button > span {
+  font-size: 10px;
+  background: #2c3b21;
+  color: #cde4b0;
+  padding: 1px 6px;
+  border-radius: 5px;
+}
+.shelter-dog-grid {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  align-content: start;
+  gap: 9px;
+  padding: 2px 7px 8px 2px;
+  scrollbar-color: #607347 #1b2516;
+  scrollbar-width: thin;
+}
+.shelter-dog-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px 10px;
+  border: 1px solid #303d26;
+  border-radius: 8px;
+  background: #1e2918;
+  transition: background 0.15s;
+}
+.shelter-dog-card:hover {
+  background: #2e3e23;
+}
+.shelter-dog-card[aria-pressed='true'] {
+  background: #33472a;
+  border-color: #cae99f;
+}
+.shelter-dog-card img {
+  width: 94px;
+  height: 94px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  max-width: 100%;
+}
+.shelter-dog-card strong {
+  font-size: 14px;
+  text-align: center;
+  font-weight: 550;
+}
+.shelter-dog-card > span {
+  font-size: 11px;
+  color: #b3c59f;
+}
+.shelter-dog-card > small {
+  font-size: 10px;
+  color: #9cac8d;
+}
+.shelter-dog-detail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-top: 11px;
+  padding-top: 11px;
+  border-top: 1px solid #34412a;
+  min-width: 0;
+}
+.shelter-dog-detail > img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.shelter-dog-detail > div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+.shelter-dog-detail strong {
+  font-size: 14px;
+  font-weight: 550;
+}
+.shelter-dog-detail > div > span {
+  font-size: 10px;
+  color: #b6c8a3;
+  overflow-wrap: anywhere;
+}
+.shelter-dog-detail a {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 11px;
+  color: #d0ebaf;
+}
+.shelter-dog-support {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.shelter-dog-support > span {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+.shelter-dog-support small {
+  font-size: 9px;
+  font-weight: 400;
+  color: #a1b48d;
+}
+.shelter-directory-note {
+  font-size: 10px;
+  color: #a0af90;
+  margin-top: 9px;
+  flex-shrink: 0;
+}
+.shelter-explorer-focused .donation-map-credit {
+  font-size: 10px;
+}
+@keyframes shelter-directory-in {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 1100px) and (min-width: 821px) {
+  .shelter-directory {
+    left: 12px;
+    right: 12px;
+    padding: 14px 12px 10px;
+  }
+  .shelter-dog-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .shelter-dog-card img {
+    width: 78px;
+    height: 78px;
+  }
+  .shelter-location-caption {
+    max-width: 95px;
+  }
+}
+@media (max-width: 560px) {
+  .donation-map {
+    min-height: 780px;
+  }
+  .shelter-directory {
+    left: 12px;
+    right: 12px;
+    top: 35%;
+    padding: 14px 11px 10px;
+  }
+  .shelter-dog-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+  .shelter-dog-card img {
+    width: 80px;
+    height: 80px;
+  }
+  .shelter-location-caption {
+    top: 80px;
+    left: 18px;
+    max-width: 105px;
+    font-size: 11px;
+  }
+  .shelter-directory-heading h2 {
+    font-size: 20px;
+  }
+  .shelter-dog-detail > img {
+    width: 40px;
+    height: 40px;
+  }
+}
+.shelter-dog-support > span > span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
 }

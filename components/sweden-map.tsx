@@ -513,6 +513,8 @@ export default function SwedenMap({
               );
             })}
           {dogMarkers?.map((dog) => {
+            if (!dog.coordinates || !dog.shelterId) return null;
+            const markerShelterId = dog.shelterId;
             const point = prepared.projection(dog.coordinates);
             if (!point) return null;
             const x = (point[0] - cx) * zoom + cx + pan.x;
@@ -551,12 +553,12 @@ export default function SwedenMap({
                 aria-pressed={active}
                 aria-label={`Select ${dog.name} in ${dog.location}, ${kronor(dog.amountOre)} SEK in demo support`}
                 onPointerDown={(event) => event.stopPropagation()}
-                onClick={() => onSelect(dog.shelterId)}
+                onClick={() => onSelect(markerShelterId)}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
                     event.stopPropagation();
-                    onSelect(dog.shelterId);
+                    onSelect(markerShelterId);
                   }
                 }}
               >

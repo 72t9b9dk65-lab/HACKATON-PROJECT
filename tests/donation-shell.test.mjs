@@ -50,6 +50,7 @@ test('Shared support reconciles across dogs and care categories without changing
   const gifts = [1, 99, 101, 25_000, 50_000].map((amountOre, index) => ({
     id: `shared-${index}`,
     dogId: SHARED_CARE_ID,
+    recipientIds: profileDogs.map((dog) => dog.id),
     amountOre,
     createdAt: '2026-09-07T10:00:00Z',
   }));
@@ -97,7 +98,7 @@ test('The original sample moves into shared care while preserving user-created r
   assert.deepEqual(readDemoGifts(JSON.stringify(migrated)), migrated);
 });
 
-test('All 25 breed sprites exist as transparent PNGs and every active avatar maps to the atlas', () => {
+test('The original atlas and added breed sprites are transparent assets for every profile', () => {
   const manifest = JSON.parse(
     readFileSync(
       new URL('../public/dogs/pixel-breeds/manifest.json', import.meta.url),
@@ -110,7 +111,17 @@ test('All 25 breed sprites exist as transparent PNGs and every active avatar map
       .size,
     25,
   );
-  for (const sprite of manifest.sprites) {
+  const extra = JSON.parse(
+    readFileSync(
+      new URL(
+        '../public/dogs/pixel-breeds/manifest-extra.json',
+        import.meta.url,
+      ),
+    ),
+  );
+  assert.equal(extra.sprites.length, 16);
+  const sprites = [...manifest.sprites, ...extra.sprites];
+  for (const sprite of sprites) {
     const bytes = readFileSync(
       new URL(`../public${sprite.src}`, import.meta.url),
     );
@@ -126,7 +137,7 @@ test('All 25 breed sprites exist as transparent PNGs and every active avatar map
     assert.ok(sprite.visibleBounds.every((value) => value > 0 && value < 256));
   }
   for (const dog of profileDogs)
-    assert.ok(manifest.sprites.some((sprite) => sprite.src === dog.sprite));
+    assert.ok(sprites.some((sprite) => sprite.src === dog.sprite));
 });
 
 test('Corrupt or unknown persisted gifts do not enter the displayed ledger', () => {
@@ -161,7 +172,12 @@ test('Real dog profiles use attributed local photos and project into the Sweden 
   const boundary = JSON.parse(
     readFileSync(new URL('../public/data/sweden.json', import.meta.url)),
   );
-  assert.equal(new Set(profileDogs.map((dog) => dog.shelterId)).size, 3);
+  assert.equal(
+    new Set(
+      profileDogs.filter((dog) => dog.shelterId).map((dog) => dog.shelterId),
+    ).size,
+    3,
+  );
   for (const dog of profileDogs) {
     assert.ok(dog.source.startsWith('https://hundstallet.se/hundar/'));
     for (const photo of dog.photos) {
@@ -172,6 +188,7 @@ test('Real dog profiles use attributed local photos and project into the Sweden 
         ),
       );
     }
+    if (!dog.coordinates) continue;
     for (const [width, height] of [
       [900, 690],
       [550, 690],
@@ -188,5 +205,71 @@ test('Real dog profiles use attributed local photos and project into the Sweden 
       assert.ok(x > 0 && x < width && y > 0 && y < height);
       assert.ok(!prepared.outline.includes('NaN'));
     }
+  }
+});
+
+test('All published directory profiles are represented without inventing shelter assignments', () => {
+  const snapshot = JSON.parse(
+    readFileSync(
+      new URL('../public/data/hundstallet/directory.json', import.meta.url),
+    ),
+  );
+  assert.equal(snapshot.profileCount, 43);
+  assert.deepEqual(
+    profileDogs.map((dog) => dog.id).sort(),
+    snapshot.profiles.map((dog) => dog.id).sort(),
+  );
+  assert.equal(new Set(profileDogs.map((dog) => dog.id)).size, 43);
+  assert.equal(profileDogs.filter((dog) => dog.group).length, 2);
+  assert.equal(
+    profileDogs.filter((dog) => dog.status === 'Trial adoption').length,
+    2,
+  );
+  const grynet = profileDogs.find((dog) => dog.id === 'grynet-2');
+  assert.equal(grynet.shelterId, null);
+  assert.equal(grynet.coordinates, null);
+  assert.equal(grynet.location, 'Rehoming team');
+  assert.equal(
+    profileDogs.filter((dog) => dog.shelterId === 'alingsas').length,
+    15,
+  );
+  assert.equal(
+    profileDogs.filter((dog) => dog.shelterId === 'stockholm').length,
+    6,
+  );
+  assert.equal(
+    profileDogs.filter((dog) => dog.shelterId === 'orkelljunga').length,
+    21,
+  );
+});
+
+test('Directory expansion cannot redistribute historical shared gifts', () => {
+  const old = {
+    id: 'previous-shared',
+    dogId: SHARED_CARE_ID,
+    amountOre: 25000,
+    createdAt: '2026-09-07T09:00:00Z',
+  };
+  const [migrated] = readDemoGifts(JSON.stringify([old]));
+  assert.deepEqual(migrated.recipientIds, ['ake', 'koby', 'ove']);
+  assert.equal(fundingSummary([migrated]).byDog.ajjo.amountOre, 0);
+  assert.deepEqual(fundingSummary([old]), fundingSummary([migrated]));
+  const next = {
+    ...old,
+    id: 'new-shared',
+    recipientIds: profileDogs.map((dog) => dog.id),
+  };
+  const summary = fundingSummary([migrated, next]);
+  assert.equal(summary.amountOre, 50000);
+  assert.ok(summary.byDog.ajjo.amountOre > 0);
+  assert.deepEqual(readDemoGifts(JSON.stringify([migrated, next])), [
+    migrated,
+    next,
+  ]);
+  for (const recipientIds of [[], ['ake', 'ake'], ['unknown']]) {
+    assert.deepEqual(
+      readDemoGifts(JSON.stringify([{ ...next, recipientIds }])),
+      exampleGifts,
+    );
   }
 });

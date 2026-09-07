@@ -1,0 +1,461 @@
+{
+  "generatedAt": "2026-09-07",
+  "generator": "Built-in image_gen",
+  "atlas": "/dogs/pixel-breeds/atlas-extra.png",
+  "atlasSize": [
+    1254,
+    1254
+  ],
+  "description": "AI-generated breed illustrations, not photographs or assertions of an individual dog's ancestry. Ove is listed as mixed breed and uses a spaniel-style avatar.",
+  "processing": "Connected-component bounds locate each complete dog; original RGBA pixels are cropped with padding and resized using nearest-neighbor onto transparent 256 x 256 canvases.",
+  "sprites": [
+    {
+      "id": "belgian-malinois",
+      "breed": "Belgian Malinois",
+      "src": "/dogs/pixel-breeds/belgian-malinois.png",
+      "row": 1,
+      "column": 1,
+      "sourceBox": [
+        85,
+        13,
+        290,
+        313
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        57,
+        25,
+        199,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "fdcf81b5bf24e36e57dc7c36b3c966f8f450d01a7343609b27e0e7b7c49c7207"
+    },
+    {
+      "id": "smooth-collie",
+      "breed": "Smooth Collie",
+      "src": "/dogs/pixel-breeds/smooth-collie.png",
+      "row": 1,
+      "column": 2,
+      "sourceBox": [
+        382,
+        18,
+        593,
+        310
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        53,
+        24,
+        203,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "644aacf333fd24a916305b37a144125e7f4130a5212d8ae5eefc1d09024634b6"
+    },
+    {
+      "id": "german-shorthaired-pointer",
+      "breed": "German Shorthaired Pointer",
+      "src": "/dogs/pixel-breeds/german-shorthaired-pointer.png",
+      "row": 1,
+      "column": 3,
+      "sourceBox": [
+        673,
+        27,
+        905,
+        313
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        43,
+        25,
+        211,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "3bdf27044b93f832a8f4b6dd07309359c1a2a3c64c28e568ed81f92d0e38c876"
+    },
+    {
+      "id": "miniature-american-shepherd",
+      "breed": "Miniature American Shepherd",
+      "src": "/dogs/pixel-breeds/miniature-american-shepherd.png",
+      "row": 1,
+      "column": 4,
+      "sourceBox": [
+        972,
+        35,
+        1210,
+        310
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        40,
+        24,
+        216,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "d119df6c46c97ebd2b6a87ef1f0194896f819413fbaf44a822fb166e3832ce1b"
+    },
+    {
+      "id": "american-staffordshire-terrier",
+      "breed": "American Staffordshire Terrier",
+      "src": "/dogs/pixel-breeds/american-staffordshire-terrier.png",
+      "row": 2,
+      "column": 1,
+      "sourceBox": [
+        71,
+        327,
+        300,
+        616
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        45,
+        24,
+        210,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "528a2a24da0f6c2478775fd278fe0cabebe71ee118cc929afd7c0a1d3c59a081"
+    },
+    {
+      "id": "jamthund",
+      "breed": "J\u00e4mthund",
+      "src": "/dogs/pixel-breeds/jamthund.png",
+      "row": 2,
+      "column": 2,
+      "sourceBox": [
+        367,
+        312,
+        599,
+        617
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        49,
+        24,
+        206,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "b9d95de03d745ce788436f5108e2cb6adec8b766fd269f2c18934e0e3134501b"
+    },
+    {
+      "id": "german-spaniel",
+      "breed": "German Spaniel",
+      "src": "/dogs/pixel-breeds/german-spaniel.png",
+      "row": 2,
+      "column": 3,
+      "sourceBox": [
+        673,
+        334,
+        919,
+        617
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        37,
+        25,
+        218,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "2dfc62b90dfe87039e3e9381379f70836a64817c833fa6c5562c85d80a384ab5"
+    },
+    {
+      "id": "pomeranian",
+      "breed": "Pomeranian",
+      "src": "/dogs/pixel-breeds/pomeranian.png",
+      "row": 2,
+      "column": 4,
+      "sourceBox": [
+        969,
+        364,
+        1204,
+        611
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        29,
+        24,
+        227,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "dc39100c2d5b49625c137acf116770cd8cf0eac34f53288f0f35b129108b71aa"
+    },
+    {
+      "id": "shih-tzu",
+      "breed": "Shih Tzu",
+      "src": "/dogs/pixel-breeds/shih-tzu.png",
+      "row": 3,
+      "column": 1,
+      "sourceBox": [
+        63,
+        659,
+        300,
+        903
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        27,
+        24,
+        229,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "f025fb18c38b0b0d4f1fceaa841f32d80751fef73adfe4eda46f19428202b7f4"
+    },
+    {
+      "id": "german-spitz",
+      "breed": "German Spitz",
+      "src": "/dogs/pixel-breeds/german-spitz.png",
+      "row": 3,
+      "column": 2,
+      "sourceBox": [
+        367,
+        625,
+        614,
+        908
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        37,
+        24,
+        219,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "b4031d7f5d44a8be0804e8e8b7760bfbe15b11b54d013c4b678d89196bd44c2b"
+    },
+    {
+      "id": "old-english-bulldog",
+      "breed": "Old English Bulldog",
+      "src": "/dogs/pixel-breeds/old-english-bulldog.png",
+      "row": 3,
+      "column": 3,
+      "sourceBox": [
+        684,
+        639,
+        901,
+        908
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        44,
+        25,
+        212,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "ecdbc6c0b6529438c7f044ab4a0e770cc168c51e6d40b12c35dfdda426a0898b"
+    },
+    {
+      "id": "standard-schnauzer",
+      "breed": "Standard Schnauzer",
+      "src": "/dogs/pixel-breeds/standard-schnauzer.png",
+      "row": 3,
+      "column": 4,
+      "sourceBox": [
+        998,
+        637,
+        1206,
+        918
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        51,
+        24,
+        205,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "501fea44e1c3348f9cb3a712d780298d8790f5268bccbbbaf494f8d987fa7755"
+    },
+    {
+      "id": "mixed-small",
+      "breed": "Small mixed-breed avatar",
+      "src": "/dogs/pixel-breeds/mixed-small.png",
+      "row": 4,
+      "column": 1,
+      "sourceBox": [
+        75,
+        944,
+        306,
+        1215
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        40,
+        26,
+        216,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "871ead873c6953484813d98c3a14a9ac3c9c006b47be2b038c0dd023a7e8d2a1"
+    },
+    {
+      "id": "mixed-medium",
+      "breed": "Medium mixed-breed avatar",
+      "src": "/dogs/pixel-breeds/mixed-medium.png",
+      "row": 4,
+      "column": 2,
+      "sourceBox": [
+        369,
+        911,
+        631,
+        1220
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        40,
+        24,
+        215,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "c3932bdc8133a639f4bdf4dff49dfade2a85ed82c04dafd468ca1353f18e9afe"
+    },
+    {
+      "id": "mixed-large",
+      "breed": "Large mixed-breed avatar",
+      "src": "/dogs/pixel-breeds/mixed-large.png",
+      "row": 4,
+      "column": 3,
+      "sourceBox": [
+        678,
+        905,
+        949,
+        1229
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        41,
+        24,
+        215,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "d8d840e068535f896ccc4329155cd33e84e3dd109c367a1cc256ddb702fe84e3"
+    },
+    {
+      "id": "short-haired-chihuahua",
+      "breed": "Short-haired Chihuahua",
+      "src": "/dogs/pixel-breeds/short-haired-chihuahua.png",
+      "row": 4,
+      "column": 4,
+      "sourceBox": [
+        1014,
+        978,
+        1178,
+        1212
+      ],
+      "size": [
+        256,
+        256
+      ],
+      "visibleBounds": [
+        55,
+        26,
+        201,
+        232
+      ],
+      "alphaRange": [
+        0,
+        255
+      ],
+      "sha256": "331382c4caf70c44af45c494172f36274f625be24fd27a7d4105e85a9aa103df"
+    }
+  ]
+}

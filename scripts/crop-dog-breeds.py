@@ -5,6 +5,8 @@ Requires Pillow. Only crops and nearest-neighbor scales existing artwork.
 """
 from pathlib import Path
 import hashlib
+import argparse
+import math
 import json
 from PIL import Image
 
@@ -40,7 +42,15 @@ BREEDS = [
 
 
 def main():
-    atlas = Image.open(DEST / "atlas.png")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--atlas', default='atlas.png')
+    parser.add_argument('--manifest', default='manifest.json')
+    parser.add_argument('--breeds', type=Path)
+    args = parser.parse_args()
+    breeds = json.loads(args.breeds.read_text()) if args.breeds else BREEDS
+    grid = math.isqrt(len(breeds))
+    assert grid * grid == len(breeds), 'Atlas must be a square grid'
+    atlas = Image.open(DEST / args.atlas)
     assert atlas.mode == "RGBA" and atlas.getchannel("A").getextrema() == (0, 255)
     width, height = atlas.size
     mask = bytearray(atlas.getchannel("A").point(lambda a: 255 if a > 32 else 0).tobytes())
@@ -71,14 +81,14 @@ def main():
                     stack.append(neighbor)
         if count < 2000:
             continue
-        column = int(((left + right) / 2) / width * 5)
-        row = int(((top + bottom) / 2) / height * 5)
-        index = row * 5 + column
+        column = int(((left + right) / 2) / width * grid)
+        row = int(((top + bottom) / 2) / height * grid)
+        index = row * grid + column
         assert index not in boxes, "Multiple animals detected in one cell"
         boxes[index] = (max(0, left - 4), max(0, top - 4), min(width, right + 5), min(height, bottom + 5))
-    assert len(boxes) == 25, f"Expected 25 dogs, found {len(boxes)}"
+    assert len(boxes) == len(breeds), f"Expected {len(breeds)} dogs, found {len(boxes)}"
     sprites = []
-    for index, (slug, breed) in enumerate(BREEDS):
+    for index, (slug, breed) in enumerate(breeds):
         cut = atlas.crop(boxes[index])
         cut.thumbnail((208, 208), Image.Resampling.NEAREST)
         sprite = Image.new("RGBA", (256, 256))
@@ -89,8 +99,8 @@ def main():
         bounds = alpha.getbbox()
         assert bounds and bounds[0] > 0 and bounds[1] > 0 and bounds[2] < 256 and bounds[3] < 256
         assert alpha.getextrema()[0] == 0 and alpha.getextrema()[1] >= 250
-        sprites.append({"id": slug, "breed": breed, "src": f"/dogs/pixel-breeds/{slug}.png", "row": index // 5 + 1, "column": index % 5 + 1, "sourceBox": boxes[index], "size": [256, 256], "visibleBounds": bounds, "alphaRange": alpha.getextrema(), "sha256": hashlib.sha256(output.read_bytes()).hexdigest()})
-    (DEST / "manifest.json").write_text(json.dumps({"generatedAt": "2026-09-07", "generator": "Built-in image_gen", "atlas": "/dogs/pixel-breeds/atlas.png", "atlasSize": list(atlas.size), "description": "AI-generated breed illustrations, not photographs or assertions of an individual dog's ancestry. Ove is listed as mixed breed and uses a spaniel-style avatar.", "processing": "Connected-component bounds locate each complete dog; original RGBA pixels are cropped with padding and resized using nearest-neighbor onto transparent 256 x 256 canvases.", "sprites": sprites}, indent=2) + "\n")
+        sprites.append({"id": slug, "breed": breed, "src": f"/dogs/pixel-breeds/{slug}.png", "row": index // grid + 1, "column": index % grid + 1, "sourceBox": boxes[index], "size": [256, 256], "visibleBounds": bounds, "alphaRange": alpha.getextrema(), "sha256": hashlib.sha256(output.read_bytes()).hexdigest()})
+    (DEST / args.manifest).write_text(json.dumps({"generatedAt": "2026-09-07", "generator": "Built-in image_gen", "atlas": f"/dogs/pixel-breeds/{args.atlas}", "atlasSize": list(atlas.size), "description": "AI-generated breed illustrations, not photographs or assertions of an individual dog's ancestry. Ove is listed as mixed breed and uses a spaniel-style avatar.", "processing": "Connected-component bounds locate each complete dog; original RGBA pixels are cropped with padding and resized using nearest-neighbor onto transparent 256 x 256 canvases.", "sprites": sprites}, indent=2) + "\n")
     print(f"Saved and alpha-validated {len(sprites)} sprites in {DEST}")
 
 

@@ -1,10 +1,15 @@
+import { directoryProfiles } from './hundstallet-directory.ts';
+import { realShelters } from './hundstallet-shelters.ts';
+
 export type CareKind = 'food' | 'health' | 'comfort';
 export type ProfileDog = {
   id: string;
   name: string;
-  shelterId: string;
+  shelterId: string | null;
   location: string;
-  coordinates: [number, number];
+  coordinates: [number, number] | null;
+  status: string;
+  group: boolean;
   age: string;
   breed: string;
   sprite: string;
@@ -15,9 +20,8 @@ export type ProfileDog = {
   photos: { src: string; caption: string }[];
 };
 
-// Public profile snapshot, checked 7 September 2026. Positions are city-level,
-// not live animal locations. Photo order does not imply dated care events.
-export const profileDogs: ProfileDog[] = [
+// Keep the richer photo trails already used in the prototype.
+const featuredDogs = [
   {
     id: 'ake',
     name: 'Åke',
@@ -91,6 +95,24 @@ export const profileDogs: ProfileDog[] = [
   },
 ];
 
+// Every public listing is included, including trial adoptions and group profiles.
+// Unknown shelter assignments stay unknown; photos do not imply dated care events.
+export const profileDogs: ProfileDog[] = directoryProfiles.map((profile) => {
+  const featured = featuredDogs.find((dog) => dog.id === profile.id);
+  const shelter = realShelters.find((item) => item.id === profile.shelterId);
+  return {
+    ...profile,
+    coordinates: shelter?.coordinates ?? null,
+    description:
+      featured?.description ??
+      `${profile.name} is listed by Hundstallet. Visit the published profile to learn more.`,
+    food: featured?.food ?? 'Daily meals',
+    photos: featured?.photos ?? [
+      { src: profile.localPhoto, caption: `Meet ${profile.name}` },
+    ],
+  };
+});
+
 export const careKinds: {
   id: CareKind;
   label: string;
@@ -109,11 +131,14 @@ export type DemoGift = {
   dogId: string;
   amountOre: number;
   createdAt: string;
+  recipientIds?: string[];
 };
+export const LEGACY_SHARED_RECIPIENTS = ['ake', 'koby', 'ove'];
 export const exampleGifts: DemoGift[] = [
   {
     id: 'example',
     dogId: SHARED_CARE_ID,
+    recipientIds: profileDogs.map((dog) => dog.id),
     amountOre: 50_000,
     createdAt: '2026-09-07T08:00:00Z',
   },
@@ -152,9 +177,13 @@ export function fundingSummary(gifts: DemoGift[]) {
   for (const gift of gifts) {
     const recipients =
       gift.dogId === SHARED_CARE_ID
-        ? profileDogs.map((dog) => dog.id)
+        ? (gift.recipientIds ?? LEGACY_SHARED_RECIPIENTS)
         : [gift.dogId];
-    if (!recipients.every((id) => byDog[id]))
+    if (
+      !recipients.length ||
+      new Set(recipients).size !== recipients.length ||
+      !recipients.every((id) => byDog[id])
+    )
       throw new Error('Unknown demo recipient.');
     const care = careAllocation(gift.amountOre);
     amountOre += gift.amountOre;
@@ -191,6 +220,13 @@ export function readDemoGifts(raw: string | null): DemoGift[] {
         !Number.isSafeInteger(g.amountOre) ||
         g.amountOre <= 0 ||
         g.amountOre > 50_000 ||
+        (g.recipientIds !== undefined &&
+          (!Array.isArray(g.recipientIds) ||
+            !g.recipientIds.length ||
+            new Set(g.recipientIds).size !== g.recipientIds.length ||
+            !g.recipientIds.every((id) =>
+              profileDogs.some((dog) => dog.id === id),
+            ))) ||
         typeof g.createdAt !== 'string' ||
         !Number.isFinite(Date.parse(g.createdAt))
       )
@@ -198,11 +234,19 @@ export function readDemoGifts(raw: string | null): DemoGift[] {
       seen.add(g.id);
       return true;
     });
-    // Only move the built-in example into shared care. User-created legacy
-    // gifts keep their original recipient, amount, and timestamp.
+    // Freeze old shared receipts to their three original beneficiaries. New
+    // gifts snapshot the directory so future imports cannot redistribute them.
     return valid
       ? (parsed as DemoGift[]).map((gift) =>
-          gift.id === 'example' ? { ...gift, dogId: SHARED_CARE_ID } : gift,
+          gift.dogId === SHARED_CARE_ID || gift.id === 'example'
+            ? {
+                ...gift,
+                dogId: SHARED_CARE_ID,
+                recipientIds: gift.recipientIds ?? [
+                  ...LEGACY_SHARED_RECIPIENTS,
+                ],
+              }
+            : gift,
         )
       : [...exampleGifts];
   } catch {

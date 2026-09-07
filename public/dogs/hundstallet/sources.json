@@ -72,6 +72,307 @@
       "image": "https://hundstallet.se/wp-content/uploads/se/2026/09/hund2.jpg",
       "local": "/dogs/hundstallet/ove-3.jpg",
       "sha256": "188e87edc3c348bfea2c83296b7aa6841fb7dcfb682e39a0691baa377ac0cf6e"
+    },
+    {
+      "dog": "ajjo",
+      "profile": "https://hundstallet.se/hundar/ajjo/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/04/Ajjo1-1.jpg/355_355_75_Ajjo1-1.jpg.webp",
+      "local": "/dogs/hundstallet/ajjo-directory.webp",
+      "sha256": "73fab589d2029bf2adb07dcc84e0dce9997ff69901d6bbd1da41f808bc5296ca"
+    },
+    {
+      "dog": "betty-2",
+      "profile": "https://hundstallet.se/hundar/betty-2/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/07/Betty-1-1.jpg/355_355_75_Betty-1-1.jpg.webp",
+      "local": "/dogs/hundstallet/betty-2-directory.webp",
+      "sha256": "16fd406e5e46a32349c667b098d131cfd747239b9adbf9d3d8743ee9ce32c49d"
+    },
+    {
+      "dog": "bilbo",
+      "profile": "https://hundstallet.se/hundar/bilbo/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/09/Bilbo-1.jpg/355_355_75_Bilbo-1.jpg.webp",
+      "local": "/dogs/hundstallet/bilbo-directory.webp",
+      "sha256": "6be01b8eb0eed44ce1a63141f52f67fd448703c563ebf88ce6277c901bc66d8f"
+    },
+    {
+      "dog": "blackie",
+      "profile": "https://hundstallet.se/hundar/blackie/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Blackie.jpg/355_355_75_Blackie.jpg.webp",
+      "local": "/dogs/hundstallet/blackie-directory.webp",
+      "sha256": "a36013d44dbca3befcb96624da6d7e37898c1df7cb6f0f3bf0559f48bbcca5ef"
+    },
+    {
+      "dog": "blue-2",
+      "profile": "https://hundstallet.se/hundar/blue-2/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/06/Blue-2-1.jpg/355_355_75_Blue-2-1.jpg.webp",
+      "local": "/dogs/hundstallet/blue-2-directory.webp",
+      "sha256": "1a2ffeadb292d11ac2e5ae0f441c41613b858690a677e88cc4335b0891312060"
+    },
+    {
+      "dog": "ebbe",
+      "profile": "https://hundstallet.se/hundar/ebbe/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/07/Ebbe-4-1.jpg/355_355_75_Ebbe-4-1.jpg.webp",
+      "local": "/dogs/hundstallet/ebbe-directory.webp",
+      "sha256": "02dc6b1eee9529303e1e1314ca1f8040ff705f390402f24f1691519e369cfb86"
+    },
+    {
+      "dog": "ella",
+      "profile": "https://hundstallet.se/hundar/ella/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/07/Ella-3.jpg/355_355_75_Ella-3.jpg.webp",
+      "local": "/dogs/hundstallet/ella-directory.webp",
+      "sha256": "a99b71004b34d1c9269af4e52425e2d933829f7986ca13acae156e3bbfcccbe9"
+    },
+    {
+      "dog": "fluffy",
+      "profile": "https://hundstallet.se/hundar/fluffy/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/07/Fluffy-3-1.jpg/355_355_75_Fluffy-3-1.jpg.webp",
+      "local": "/dogs/hundstallet/fluffy-directory.webp",
+      "sha256": "e76aee2ad682390dc06f13d01028fcdcde7ef254c4b8d5c8870f4f1ee3f02009"
+    },
+    {
+      "dog": "frazze",
+      "profile": "https://hundstallet.se/hundar/frazze/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/07/Frazze-5.jpg/355_355_75_Frazze-5.jpg.webp",
+      "local": "/dogs/hundstallet/frazze-directory.webp",
+      "sha256": "bf0c7fac2c21b57902e95338b8e3764a88b2833ca484060074a1ea3a36ff07f8"
+    },
+    {
+      "dog": "frodo",
+      "profile": "https://hundstallet.se/hundar/frodo/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Frodo-4.jpg/355_355_75_Frodo-4.jpg.webp",
+      "local": "/dogs/hundstallet/frodo-directory.webp",
+      "sha256": "9927d0903b14358737843283c2998e72ca8cde1590a083e23b048800fdc05c86"
+    },
+    {
+      "dog": "grynet-2",
+      "profile": "https://hundstallet.se/hundar/grynet-2/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Grynet-4-1.jpg/355_355_75_Grynet-4-1.jpg.webp",
+      "local": "/dogs/hundstallet/grynet-2-directory.webp",
+      "sha256": "71787ce64f622770120a3214215a7f4144241f9779619cb9911e8cee0baa1a8b"
+    },
+    {
+      "dog": "guinness",
+      "profile": "https://hundstallet.se/hundar/guinness/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/09/Guinness-2-1.jpg/355_355_75_Guinness-2-1.jpg.webp",
+      "local": "/dogs/hundstallet/guinness-directory.webp",
+      "sha256": "e7296f774fa0a11f17a60164ff4673107668a8da60a8266f4c411ab52b13bb42"
+    },
+    {
+      "dog": "helix",
+      "profile": "https://hundstallet.se/hundar/helix/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/06/Helix-2-1.jpg/355_355_75_Helix-2-1.jpg.webp",
+      "local": "/dogs/hundstallet/helix-directory.webp",
+      "sha256": "d776d936fcdab7bd6fb3df6bc5358c70dd1c1cb31e021961f3f9663acd06af73"
+    },
+    {
+      "dog": "humla",
+      "profile": "https://hundstallet.se/hundar/humla/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Humla-1-1.jpg/355_355_75_Humla-1-1.jpg.webp",
+      "local": "/dogs/hundstallet/humla-directory.webp",
+      "sha256": "a3fcdbbfd94658beb63bb37fe810e9c885734b04bda7359a8ed210d96743c37a"
+    },
+    {
+      "dog": "inka",
+      "profile": "https://hundstallet.se/hundar/inka/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/09/Inka-4-1.jpg/355_355_75_Inka-4-1.jpg.webp",
+      "local": "/dogs/hundstallet/inka-directory.webp",
+      "sha256": "e09c5ce84e08e64b7b1917cb3efd137dd89fca51a2766568bb7fbfef6602a2db"
+    },
+    {
+      "dog": "ivan",
+      "profile": "https://hundstallet.se/hundar/ivan/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/09/Ivan-1-1.jpg/355_355_75_Ivan-1-1.jpg.webp",
+      "local": "/dogs/hundstallet/ivan-directory.webp",
+      "sha256": "3b475aac9793ad10bf6dd0081255dded0fb4aaf52d0708e101588bfa7fd45025"
+    },
+    {
+      "dog": "jack-2",
+      "profile": "https://hundstallet.se/hundar/jack-2/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/06/Jack-4-1.jpg/355_355_75_Jack-4-1.jpg.webp",
+      "local": "/dogs/hundstallet/jack-2-directory.webp",
+      "sha256": "ad2fbb3bfeee0b19bc46c961eb8bb790f4d2c30e8219d2784078e6b4a214f7f4"
+    },
+    {
+      "dog": "joan",
+      "profile": "https://hundstallet.se/hundar/joan/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/07/Joan-3-1.jpg/355_355_75_Joan-3-1.jpg.webp",
+      "local": "/dogs/hundstallet/joan-directory.webp",
+      "sha256": "ea0927e503d32c3161bb22c0567837c08b3ae17d59d90e5b9fa55286402eca60"
+    },
+    {
+      "dog": "kenzo-2",
+      "profile": "https://hundstallet.se/hundar/kenzo-2/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/kenzo-1.jpg/355_355_75_kenzo-1.jpg.webp",
+      "local": "/dogs/hundstallet/kenzo-2-directory.webp",
+      "sha256": "3f79f9610f7ea10927e0c35a46244eb11fbdde25b647cf2da65059cf05fb5af3"
+    },
+    {
+      "dog": "koby",
+      "profile": "https://hundstallet.se/hundar/koby/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Koby-3.jpg/355_355_75_Koby-3.jpg.webp",
+      "local": "/dogs/hundstallet/koby-directory.webp",
+      "sha256": "9373beb77b279baccf0590a6cb871c8a8a79183fb1737af2ae36a1e6b82781b2"
+    },
+    {
+      "dog": "legolas",
+      "profile": "https://hundstallet.se/hundar/legolas/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/09/Legolas-2.jpg/355_355_75_Legolas-2.jpg.webp",
+      "local": "/dogs/hundstallet/legolas-directory.webp",
+      "sha256": "78591c32d6620e40a40cd58c96154f489dca96974be6e139ab19ad21b646e009"
+    },
+    {
+      "dog": "lexter",
+      "profile": "https://hundstallet.se/hundar/lexter/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/07/Lexter-04-2.jpg/355_355_75_Lexter-04-2.jpg.webp",
+      "local": "/dogs/hundstallet/lexter-directory.webp",
+      "sha256": "c097436eb0a2d572d961537bfc070949e5cbfbfbb9c763970af9fc81d9088a6d"
+    },
+    {
+      "dog": "maui",
+      "profile": "https://hundstallet.se/hundar/maui/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/07/IMG_6430-1.jpg/355_355_75_IMG_6430-1.jpg.webp",
+      "local": "/dogs/hundstallet/maui-directory.webp",
+      "sha256": "bdcfb082df10ed1a2dc826c616490bd8433e29044b4899a028d8a0464802bd2c"
+    },
+    {
+      "dog": "maya",
+      "profile": "https://hundstallet.se/hundar/maya/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/04/Maya3-1.jpg/355_355_75_Maya3-1.jpg.webp",
+      "local": "/dogs/hundstallet/maya-directory.webp",
+      "sha256": "0b7f24c2d5cfd6636dcf15bb71577809dae53bf7664306d0e763fa9cd5d1a77d"
+    },
+    {
+      "dog": "milo",
+      "profile": "https://hundstallet.se/hundar/milo/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/05/Milo-2.jpg/355_355_75_Milo-2.jpg.webp",
+      "local": "/dogs/hundstallet/milo-directory.webp",
+      "sha256": "a4f4b91e30abdc1b576704f3fdb698c5daa5f464450f4eee1595bf48a1b4f517"
+    },
+    {
+      "dog": "molly-4",
+      "profile": "https://hundstallet.se/hundar/molly-4/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Molly-pomme-3.jpg/355_355_75_Molly-pomme-3.jpg.webp",
+      "local": "/dogs/hundstallet/molly-4-directory.webp",
+      "sha256": "80fbd8ba477776029f71d1809c2b239a131bf6fb1a5457c9bbb54548f8909b42"
+    },
+    {
+      "dog": "nalle",
+      "profile": "https://hundstallet.se/hundar/nalle/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/09/Nalle-4.jpg/355_355_75_Nalle-4.jpg.webp",
+      "local": "/dogs/hundstallet/nalle-directory.webp",
+      "sha256": "b653d30e77dcef5d2aa9e48df1333de8215c55676c36571a306c6249af4fc5aa"
+    },
+    {
+      "dog": "nanook",
+      "profile": "https://hundstallet.se/hundar/nanook/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/06/IMG_4585.jpg/355_355_75_IMG_4585.jpg.webp",
+      "local": "/dogs/hundstallet/nanook-directory.webp",
+      "sha256": "d40895021d658449c6337131bf7d7d0dcd48883a9b62e5e510c45948f856bc81"
+    },
+    {
+      "dog": "ove",
+      "profile": "https://hundstallet.se/hundar/ove/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/09/Hund-2-1-1.jpg/355_355_75_Hund-2-1-1.jpg.webp",
+      "local": "/dogs/hundstallet/ove-directory.webp",
+      "sha256": "21e6c19eb2a173d9329d7cae82ea563a7c4a2962708a56fcece44329a46f5a72"
+    },
+    {
+      "dog": "parla",
+      "profile": "https://hundstallet.se/hundar/parla/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Parla-1.jpg/355_355_75_Parla-1.jpg.webp",
+      "local": "/dogs/hundstallet/parla-directory.webp",
+      "sha256": "be29800a4d6010fdcdc0d781cbd6eec217ab27211cd5dabcc99f9c4a121b833e"
+    },
+    {
+      "dog": "sam",
+      "profile": "https://hundstallet.se/hundar/sam/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/07/Sam-4-2-1.jpg/355_355_75_Sam-4-2-1.jpg.webp",
+      "local": "/dogs/hundstallet/sam-directory.webp",
+      "sha256": "bda8d6b91cb375ccc4983e5d10dde43712426360ea0918624b9aefd4226cf3b0"
+    },
+    {
+      "dog": "semlan-2",
+      "profile": "https://hundstallet.se/hundar/semlan-2/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/07/Semlan.jpg/355_355_75_Semlan.jpg.webp",
+      "local": "/dogs/hundstallet/semlan-2-directory.webp",
+      "sha256": "a0a6bbdd5db1fbf102a135ccb72ddf792ef8df39f8ebe6dcc13fb298a8f9c5c6"
+    },
+    {
+      "dog": "shih-tzu-hanar",
+      "profile": "https://hundstallet.se/hundar/shih-tzu-hanar/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/06/Shihtzu-hane-2-1.jpg/355_355_75_Shihtzu-hane-2-1.jpg.webp",
+      "local": "/dogs/hundstallet/shih-tzu-hanar-directory.webp",
+      "sha256": "a80fe4f0c732e93badb249ac843bae26a93abf6a655ee5e8a4b8bd6e7420baf5"
+    },
+    {
+      "dog": "shih-tzu-tjejer",
+      "profile": "https://hundstallet.se/hundar/shih-tzu-tjejer/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/06/Hund11-2-1.jpg/355_355_75_Hund11-2-1.jpg.webp",
+      "local": "/dogs/hundstallet/shih-tzu-tjejer-directory.webp",
+      "sha256": "628cb9e1bfc0b25020978aac0057211081e71b799daf7e979c39c548f67ce3f1"
+    },
+    {
+      "dog": "signe",
+      "profile": "https://hundstallet.se/hundar/signe/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Signe-1-1.jpg/355_355_75_Signe-1-1.jpg.webp",
+      "local": "/dogs/hundstallet/signe-directory.webp",
+      "sha256": "f119d1398809593a6150675c8c95168604042ca8cc44e420e5cc546331b605c3"
+    },
+    {
+      "dog": "sigrid",
+      "profile": "https://hundstallet.se/hundar/sigrid/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Sigrid-2.jpg/355_355_75_Sigrid-2.jpg.webp",
+      "local": "/dogs/hundstallet/sigrid-directory.webp",
+      "sha256": "2f9b28eb30527b6fe2243a39161ea5690a5fc22a7125772298fcdca19c1b3e26"
+    },
+    {
+      "dog": "snoboll",
+      "profile": "https://hundstallet.se/hundar/snoboll/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Snoboll-1.jpg/355_355_75_Snoboll-1.jpg.webp",
+      "local": "/dogs/hundstallet/snoboll-directory.webp",
+      "sha256": "30e2863f907dfe60eb09c0356d818677d3b884907a69943a20df7882cfed5ea2"
+    },
+    {
+      "dog": "soffis",
+      "profile": "https://hundstallet.se/hundar/soffis/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Soffis-6-1.jpg/355_355_75_Soffis-6-1.jpg.webp",
+      "local": "/dogs/hundstallet/soffis-directory.webp",
+      "sha256": "216213d8497129367c0094da605bb59e92224be16128657344506316df10f2a3"
+    },
+    {
+      "dog": "timmy",
+      "profile": "https://hundstallet.se/hundar/timmy/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Timmy-4-3.jpg/355_355_75_Timmy-4-3.jpg.webp",
+      "local": "/dogs/hundstallet/timmy-directory.webp",
+      "sha256": "90bf649caad35749c2a0bfbbf0af83ff366e848db05ba9943602eacb28660901"
+    },
+    {
+      "dog": "todd",
+      "profile": "https://hundstallet.se/hundar/todd/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Todd-1-1.jpg/355_355_75_Todd-1-1.jpg.webp",
+      "local": "/dogs/hundstallet/todd-directory.webp",
+      "sha256": "2eaa6f7909c78f4606f5bfce9589326eaef3fd8c0a57780624026d91d7875367"
+    },
+    {
+      "dog": "uno",
+      "profile": "https://hundstallet.se/hundar/uno/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/07/Uno-3-1.jpg/355_355_75_Uno-3-1.jpg.webp",
+      "local": "/dogs/hundstallet/uno-directory.webp",
+      "sha256": "f85bf089ccc8a05859ebf058bedac4dd8821238890b77aec81b3499dfe495724"
+    },
+    {
+      "dog": "zander",
+      "profile": "https://hundstallet.se/hundar/zander/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/09/Zander-4.jpg/355_355_75_Zander-4.jpg.webp",
+      "local": "/dogs/hundstallet/zander-directory.webp",
+      "sha256": "60608c25d030338719a4df0c7a4134862921bce2db180bfb1caf1408322a7a34"
+    },
+    {
+      "dog": "ake",
+      "profile": "https://hundstallet.se/hundar/ake/",
+      "image": "https://hundstallet.se/wp-content/uploads/se/ir_cache/2026/08/Ake-1-2.jpg/355_355_75_Ake-1-2.jpg.webp",
+      "local": "/dogs/hundstallet/ake-directory.webp",
+      "sha256": "b0b560b537afd5b91d41b1dc3e7be7aa01e1740f11c957c4c607bd7c72a7afb1"
     }
   ]
 }

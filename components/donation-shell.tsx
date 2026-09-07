@@ -1,15 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import {
-  ArrowUpRight,
-  Camera,
-  Check,
-  LocateFixed,
-  Minus,
-  Plus,
-} from 'lucide-react';
-import SwedenMap from '@/components/sweden-map';
+import { ArrowUpRight, Camera, Check } from 'lucide-react';
+import ShelterMap from '@/components/shelter-map';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,7 +26,6 @@ import {
   SHELL_STORAGE_KEY,
   type DemoGift,
 } from '@/lib/donation-shell';
-import { MAX_SWEDEN_ZOOM } from '@/lib/sweden-map';
 
 export default function DonationShell() {
   const [selectedId, setSelectedId] = useState('ake');
@@ -41,8 +33,6 @@ export default function DonationShell() {
   const [gifts, setGifts] = useState<DemoGift[]>(exampleGifts);
   const [ready, setReady] = useState(false);
   const [sessionOnly, setSessionOnly] = useState(false);
-  const [zoom, setZoom] = useState(1);
-  const [resetKey, setResetKey] = useState(0);
   const [notice, setNotice] = useState('');
   const [celebrate, setCelebrate] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -75,10 +65,6 @@ export default function DonationShell() {
   const helpedDogs = profileDogs.filter(
     (item) => funding.byDog[item.id].amountOre > 0,
   );
-  const markers = profileDogs.map((item) => ({
-    ...item,
-    ...funding.byDog[item.id],
-  }));
 
   useEffect(() => {
     const index = helpedDogs.findIndex((item) => item.id === selectedId);
@@ -95,13 +81,12 @@ export default function DonationShell() {
     const gift = {
       id: crypto.randomUUID(),
       dogId: SHARED_CARE_ID,
+      recipientIds: profileDogs.map((item) => item.id),
       amountOre: DEMO_GIFT_ORE,
       createdAt: new Date().toISOString(),
     };
     setGifts((current) => [...current, gift]);
-    setNotice(
-      '250 SEK added to shared care for the dogs.',
-    );
+    setNotice('250 SEK added to shared care for the dogs.');
     setCelebrate(true);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setCelebrate(false), 1800);
@@ -251,7 +236,7 @@ export default function DonationShell() {
                   <span className="donation-status-dot" />
                   <span>
                     {amountOre
-                      ? `${kronor(amountOre)} SEK supporting ${helpedDogs.length} dogs through shared care`
+                      ? `${kronor(amountOre)} SEK supporting ${helpedDogs.length} profiles through shared care`
                       : 'Your first gift starts a shared care trail'}
                   </span>
                 </>
@@ -271,73 +256,11 @@ export default function DonationShell() {
             </div>
           </aside>
           <div className="donation-map">
-            <div className="donation-map-heading">
-              <span className="donation-eyebrow">A SECOND CHANCE, MAPPED</span>
-              <h2>Your kindness, across Sweden.</h2>
-              <p>Follow the dogs your giving helps.</p>
-            </div>
-            <SwedenMap
-              selectedId={dog.shelterId}
-              mode="impact"
-              zoom={zoom}
-              onZoom={setZoom}
-              resetKey={resetKey}
-              raised={{}}
-              dogMarkers={markers}
-              onSelect={(shelter) => {
-                const next = profileDogs.find(
-                  (item) => item.shelterId === shelter,
-                );
-                if (next) selectDog(next.id);
-              }}
+            <ShelterMap
+              selectedDogId={selectedId}
+              funding={funding}
+              onSelectDog={selectDog}
             />
-            <div className="donation-map-region">
-              <span className="donation-north">N ↑</span> SWEDEN
-            </div>
-            <div className="donation-map-key">
-              <span /> Dogs at Hundstallet <small>City-level locations</small>
-            </div>
-            <div className="donation-map-controls" aria-label="Map controls">
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Zoom in"
-                disabled={zoom >= MAX_SWEDEN_ZOOM}
-                onClick={() =>
-                  setZoom((z) => Math.min(MAX_SWEDEN_ZOOM, z * 1.3))
-                }
-              >
-                <Plus />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Zoom out"
-                disabled={zoom <= 1}
-                onClick={() => setZoom((z) => Math.max(1, z / 1.3))}
-              >
-                <Minus />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Show all of Sweden"
-                onClick={() => {
-                  setZoom(1);
-                  setResetKey((k) => k + 1);
-                }}
-              >
-                <LocateFixed />
-              </Button>
-            </div>
-            <a
-              className="donation-map-credit"
-              href="https://www.naturalearthdata.com/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Geography: Natural Earth
-            </a>
           </div>
         </section>
 
@@ -363,7 +286,7 @@ export default function DonationShell() {
                 <CarouselNext />
               </div>
             </div>
-            <CarouselContent className="donation-timeline">
+            <CarouselContent className="donation-photo-track">
               {dog.photos.map((photo, index) => (
                 <CarouselItem
                   key={photo.src}
