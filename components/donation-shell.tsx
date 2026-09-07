@@ -76,6 +76,7 @@ export default function DonationShell() {
   const { gifts, expenses } = ledger;
   const [breakdownOpen, setBreakdownOpen] = useState(false);
   const [donationOpen, setDonationOpen] = useState(false);
+  const [fullImpact, setFullImpact] = useState(true);
   const [replay, setReplay] = useState<{
     expense: DemoExpense;
     key: number;
@@ -156,8 +157,7 @@ export default function DonationShell() {
   const confirmedScene =
     draftAmount === '' &&
     frequency === 'once' &&
-    latestGift?.carePlanId === careId &&
-    latestExpenses.length > 0;
+    latestGift?.carePlanId === careId;
   const projection = projectCare({
     amountOre: draftOre ?? (confirmedScene ? latestGift.amountOre : null),
     careId,
@@ -166,7 +166,12 @@ export default function DonationShell() {
     day: timelineDay,
   });
   const previewIds = confirmedScene
-    ? [...new Set(latestExpenses.map((expense) => expense.dogId))]
+    ? fullImpact
+      ? (latestGift.recipientIds ?? [latestGift.dogId]).slice(
+          0,
+          projection.dogCount,
+        )
+      : [...new Set(latestExpenses.map((expense) => expense.dogId))]
     : previewCareRecipients(projection.dogCount, funding, careId);
 
   function changeAmount(value: string) {
@@ -196,6 +201,7 @@ export default function DonationShell() {
     setReplay({ expense, key: ++replayCounter.current });
   }
   function closeDonationToShelter() {
+    setFullImpact(true);
     focusShelterOnClose.current = true;
     setDonationOpen(false);
     setBreakdownOpen(false);
@@ -409,7 +415,9 @@ export default function DonationShell() {
                       residentIds={residentIds}
                       previewIds={previewIds}
                       projection={projection}
-                      confirmed={confirmedScene}
+                      confirmed={confirmedScene && !fullImpact}
+                      fullImpact={fullImpact}
+                      onFullImpact={setFullImpact}
                       shelterName={profile.shelterName}
                       onSelectDog={selectDog}
                       replay={replay}

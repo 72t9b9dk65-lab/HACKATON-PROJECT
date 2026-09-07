@@ -24,7 +24,7 @@ import {
   dogActivity,
   isShelterNight,
   shelterActivityLayout,
-  SHELTER_HOUR_MS,
+  shelterClock,
 } from '@/lib/shelter-activities';
 
 export type ShelterCompanion = {
@@ -44,6 +44,7 @@ export function ShelterLifeScene({
   onInspect,
   replay,
   onExitReplay,
+  fullImpact,
 }: {
   companions: ShelterCompanion[];
   projection: CareProjection;
@@ -51,10 +52,13 @@ export function ShelterLifeScene({
   onInspect: (id: string, preview: boolean) => void;
   replay: ExpenseReplay | null;
   onExitReplay: () => void;
+  fullImpact: boolean;
 }) {
   const viewport = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(900);
-  const [hour, setHour] = useState(8);
+  const [clock, setClock] = useState<{ hour: number; minute: number } | null>(
+    null,
+  );
   const [reducedMotion, setReducedMotion] = useState(false);
   const [visible, setVisible] = useState(true);
   const [focused, setFocused] = useState(false);
@@ -80,20 +84,24 @@ export function ShelterLifeScene({
     };
   }, []);
   useEffect(() => {
-    setHour(8);
-  }, [projection.date]);
-  useEffect(() => {
     setReplayStep(0);
-    setHour(replay ? expenseHour(replay.expense) : 8);
   }, [replay?.key]);
   useEffect(() => {
-    if (paused || reducedMotion || !visible || focused || replay) return;
-    const timer = window.setInterval(
-      () => setHour((current) => (current + 1) % 24),
-      SHELTER_HOUR_MS,
-    );
+    // Read wall time rather than incrementing a simulation counter. Re-sync
+    // immediately on tab return, including sleep/wake and clock adjustments.
+    if (!visible) return;
+    const sync = () => {
+      const next = shelterClock();
+      setClock((current) =>
+        current?.hour === next.hour && current.minute === next.minute
+          ? current
+          : next,
+      );
+    };
+    sync();
+    const timer = window.setInterval(sync, 1000);
     return () => window.clearInterval(timer);
-  }, [paused, reducedMotion, visible, focused, replay]);
+  }, [visible]);
   useEffect(() => {
     if (!replay || replayStep >= 2 || paused || !visible || focused) return;
     if (reducedMotion) {
@@ -106,6 +114,7 @@ export function ShelterLifeScene({
     );
     return () => window.clearTimeout(timer);
   }, [replay?.key, replayStep, paused, visible, focused, reducedMotion]);
+  const hour = replay ? expenseHour(replay.expense) : (clock?.hour ?? 12);
   const night = isShelterNight(hour);
   const activities = companions.map((dog, index) =>
     replay
@@ -196,7 +205,7 @@ export function ShelterLifeScene({
               'Daytime illustration'
             ) : (
               <>
-                {String(hour).padStart(2, '0')}:
+                {clock || replay ? String(hour).padStart(2, '0') : '--'}:
                 {replay
                   ? new Intl.DateTimeFormat('en-GB', {
                       minute: '2-digit',
@@ -204,26 +213,15 @@ export function ShelterLifeScene({
                     })
                       .format(new Date(replay.expense.recordedAt))
                       .padStart(2, '0')
-                  : '00'}
+                  : clock
+                    ? String(clock.minute).padStart(2, '0')
+                    : '--'}
               </>
             )}
           </strong>{' '}
           {night ? 'A quiet night' : 'A day at the shelter'}
         </span>
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => setHour(night ? 8 : 20)}
-          disabled={!!replay}
-          aria-label={
-            night
-              ? 'Preview daytime in the shelter'
-              : 'Preview nighttime in the shelter'
-          }
-        >
-          {night ? <Sun size={16} /> : <Moon size={16} />}{' '}
-          {night ? 'Day view' : 'Night view'}
-        </Button>
+        <span>{replay ? 'Expense replay' : 'Live clock · Stockholm'}</span>
       </div>
       <div
         className="shelter-life-viewport"
@@ -296,7 +294,7 @@ export function ShelterLifeScene({
                   <small>
                     {replay
                       ? `${kronor(replay.expense.amountOre)} SEK used`
-                      : `${projection.totalUnits} ${plan.unit} planned`}
+                      : `${projection.totalUnits} ${plan.unit} ${fullImpact ? 'provided in this estimate' : 'planned'}`}
                   </small>
                 )}
               </div>
@@ -387,7 +385,9 @@ export function ShelterLifeScene({
         <span>
           {replay
             ? 'Expense replay · does not change your balance'
-            : `Daily routine preview · ${displayDate(projection.date)}`}
+            : fullImpact
+              ? 'Full-impact estimate · routines follow Stockholm time'
+              : `Daily care forecast · ${displayDate(projection.date)} · real-time routine`}
         </span>
         {width < 760 && (
           <span>Scroll sideways to explore all activities →</span>

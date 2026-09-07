@@ -44,6 +44,8 @@ export function VirtualShelter({
   children,
   replay,
   onExitReplay,
+  fullImpact,
+  onFullImpact,
 }: {
   funding: ReturnType<typeof fundingSummary>;
   residentIds: string[];
@@ -55,6 +57,8 @@ export function VirtualShelter({
   children?: ReactNode;
   replay: ExpenseReplay | null;
   onExitReplay: () => void;
+  fullImpact: boolean;
+  onFullImpact: (full: boolean) => void;
 }) {
   const [paused, setPaused] = useState(false);
   useEffect(() => {
@@ -103,6 +107,7 @@ export function VirtualShelter({
       sprite: item.sprite,
       preview,
       careScheduled:
+        !fullImpact &&
         visitor &&
         index >= projection.activeStartIndex &&
         index < projection.activeStartIndex + projection.activeDogs,
@@ -115,6 +120,7 @@ export function VirtualShelter({
       sprite: '/dogs/pixel-breeds/mixed-medium.png',
       preview: true,
       careScheduled:
+        !fullImpact &&
         previewDogs.length + index >= projection.activeStartIndex &&
         previewDogs.length + index <
           projection.activeStartIndex + projection.activeDogs,
@@ -178,7 +184,55 @@ export function VirtualShelter({
           )}
         </div>
 
+        {!replay && (
+          <div className="shelter-impact-summary">
+            <div
+              className="shelter-impact-switch"
+              aria-label="Donation preview view"
+            >
+              <Button
+                variant="outline"
+                aria-pressed={fullImpact}
+                onClick={() => onFullImpact(true)}
+              >
+                Full impact
+              </Button>
+              <Button
+                variant="outline"
+                aria-pressed={!fullImpact}
+                onClick={() => onFullImpact(false)}
+              >
+                Selected forecast day
+              </Button>
+            </div>
+            {fullImpact && (
+              <p aria-live="polite">
+                <strong>
+                  After your {kronor(projection.committedOre)} SEK{' '}
+                  {projection.contributions > 1
+                    ? 'in projected gifts is'
+                    : 'gift is'}{' '}
+                  used
+                </strong>
+                <span>
+                  {projection.dogCount} estimated{' '}
+                  {projection.dogCount === 1 ? 'dog' : 'dogs'} helped ·{' '}
+                  {projection.totalUnits} {plan.unit} of{' '}
+                  {plan.name.toLowerCase()}.
+                </span>
+                <span>
+                  {kronor(projection.allocatedOre)} SEK converted into care
+                  {projection.reserveOre > 0
+                    ? ` · ${kronor(projection.reserveOre)} SEK remains toward the next care unit`
+                    : ''}
+                  . Preview only; your recorded balance stays unchanged.
+                </span>
+              </p>
+            )}
+          </div>
+        )}
         <ShelterLifeScene
+          fullImpact={fullImpact}
           companions={companions}
           projection={projection}
           paused={paused || inspected !== null}
@@ -192,9 +246,11 @@ export function VirtualShelter({
         <p className="virtual-shelter-note">
           {replay
             ? 'Replaying a recorded demo expense. '
-            : projection.activeDogs
-              ? `${projection.activeDogs} ${projection.activeDogs === 1 ? 'dog has' : 'dogs have'} ${plan.name.toLowerCase()} scheduled on this forecast day. `
-              : 'No care use scheduled on this forecast day. '}
+            : fullImpact
+              ? 'Showing the estimated shelter after the selected gift has funded all complete care units. '
+              : projection.activeDogs
+                ? `${projection.activeDogs} ${projection.activeDogs === 1 ? 'dog has' : 'dogs have'} ${plan.name.toLowerCase()} scheduled on this forecast day. `
+                : 'No care use scheduled on this forecast day. '}
           Daily routines and need labels are illustrative. Faded dogs preview
           possible care; they are not verified recipients.
         </p>

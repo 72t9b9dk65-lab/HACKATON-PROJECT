@@ -36,7 +36,18 @@ export type ShelterActivity =
   | (typeof shelterActivities)[number]['id']
   | 'home'
   | 'sleep';
-export const SHELTER_HOUR_MS = 1800;
+export function shelterClock(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Stockholm',
+    hourCycle: 'h23',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).formatToParts(now);
+  return {
+    hour: Number(parts.find((part) => part.type === 'hour')!.value),
+    minute: Number(parts.find((part) => part.type === 'minute')!.value),
+  };
+}
 
 export function isShelterNight(hour: number) {
   return hour >= 20 || hour < 6;

@@ -6994,6 +6994,39 @@ button:not([data-slot]) {
     background-color 1.2s,
     color 1.2s;
 }
+.shelter-impact-summary {
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--donation-line);
+  border-radius: 16px;
+  background: var(--donation-canvas);
+}
+.shelter-impact-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.shelter-impact-switch [data-slot='button'] {
+  background: var(--donation-paper);
+  color: var(--donation-muted);
+  border-color: var(--donation-line);
+}
+.shelter-impact-switch [aria-pressed='true'] {
+  background: var(--donation-selected);
+  color: var(--donation-ink);
+}
+.shelter-impact-summary p {
+  display: grid;
+  gap: 5px;
+  margin-top: 12px;
+  color: var(--donation-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.shelter-impact-summary strong {
+  color: var(--donation-ink);
+  font-size: 17px;
+}
 .shelter-life[data-night='true'] {
   --life-ink: #f5e6ce;
   --life-muted: #c1bfd0;

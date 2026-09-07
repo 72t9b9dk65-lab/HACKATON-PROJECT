@@ -7,9 +7,41 @@ import {
   shelterActivities,
   shelterActivityLayout,
   activityLabel,
+  shelterClock,
 } from '../lib/shelter-activities.ts';
 import { projectCare } from '../lib/care-impact.ts';
 import { exampleGifts } from '../lib/donation-shell.ts';
+
+test('Shelter time follows the Stockholm wall clock, including hour boundaries and daylight saving', () => {
+  assert.deepEqual(shelterClock(new Date('2026-09-07T13:00:00Z')), {
+    hour: 15,
+    minute: 0,
+  });
+  assert.deepEqual(shelterClock(new Date('2026-09-07T13:00:01.800Z')), {
+    hour: 15,
+    minute: 0,
+  });
+  assert.deepEqual(shelterClock(new Date('2026-09-07T14:00:00Z')), {
+    hour: 16,
+    minute: 0,
+  });
+  assert.deepEqual(shelterClock(new Date('2026-09-07T13:59:59Z')), {
+    hour: 15,
+    minute: 59,
+  });
+  assert.deepEqual(shelterClock(new Date('2026-12-07T13:00:00Z')), {
+    hour: 14,
+    minute: 0,
+  });
+  assert.deepEqual(shelterClock(new Date('2026-03-29T00:59:00Z')), {
+    hour: 1,
+    minute: 59,
+  });
+  assert.deepEqual(shelterClock(new Date('2026-03-29T01:00:00Z')), {
+    hour: 3,
+    minute: 0,
+  });
+});
 
 test('Every companion returns home and sleeps at night, with no nighttime station visits', () => {
   for (const careId of ['food', 'rehabilitation', 'vaccination']) {
