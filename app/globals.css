@@ -5848,3 +5848,47 @@ button:not([data-slot]) {
 .shelter-explorer .map-loading {
   color: var(--donation-muted);
 }
+
+.donation-shell .dog-display-name {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  max-width: 100%;
+  min-width: 0;
+  font-weight: 750;
+  line-height: 1.35;
+  color: var(--donation-ink);
+}
+.dog-display-name > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.dog-display-name > svg {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  color: var(--donation-accent);
+  fill: currentColor;
+  stroke-width: 1.25;
+}
+.dog-display-name > svg:first-child {
+  transform: rotate(-15deg);
+}
+.dog-display-name > svg:last-child {
+  transform: rotate(15deg);
+}
+.donation-shell .dog-breed-label {
+  color: var(--donation-muted);
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: center;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.shelter-dog-detail .dog-display-name {
+  justify-content: flex-start;
+}
+.shelter-dog-detail .dog-breed-label {
+  text-align: left;
+}

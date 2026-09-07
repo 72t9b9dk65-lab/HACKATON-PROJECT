@@ -30,6 +30,7 @@ import {
   type MapCamera,
 } from '@/lib/shelter-camera';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
+import { DogName } from '@/components/dog-name';
 
 type LocalMap = FeatureCollection<
   Geometry,
@@ -631,7 +632,8 @@ export default function ShelterMap({
                     loading="lazy"
                     draggable="false"
                   />
-                  <strong>{dog.name}</strong>
+                  <DogName name={dog.name} />
+                  <span className="dog-breed-label">{dog.breed}</span>
                   <span>{dog.group ? 'Group profile' : dog.age}</span>
                   {allProfiles && <small>{dog.location}</small>}
                   {dog.status === 'Trial adoption' && (
@@ -648,10 +650,9 @@ export default function ShelterMap({
                 height="48"
               />
               <div>
-                <strong>{selectedDog.name}</strong>
-                <span>
-                  {selectedDog.breed} · {selectedDog.location}
-                </span>
+                <DogName name={selectedDog.name} />
+                <span className="dog-breed-label">{selectedDog.breed}</span>
+                <span>{selectedDog.location}</span>
                 <a href={selectedDog.source} target="_blank" rel="noreferrer">
                   Official profile <ArrowUpRight size={12} />
                 </a>

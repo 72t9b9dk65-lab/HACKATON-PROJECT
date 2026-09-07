@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Camera, Check } from 'lucide-react';
 import ShelterMap from '@/components/shelter-map';
+import { DogName } from '@/components/dog-name';
 import { PixelCareIcon } from '@/components/pixel-care-icon';
 import { Button } from '@/components/ui/button';
 import {
@@ -185,7 +186,7 @@ export default function DonationShell() {
                       <button
                         className="donation-helped-dog"
                         aria-pressed={item.id === dog.id}
-                        aria-label={`Follow ${item.name}’s journey`}
+                        aria-label={`Follow ${item.name}’s journey, ${item.breed}`}
                         onClick={() => selectDog(item.id)}
                       >
                         <span className="donation-sprite-frame">
@@ -197,7 +198,8 @@ export default function DonationShell() {
                             draggable="false"
                           />
                         </span>
-                        <strong>{item.name}</strong>
+                        <DogName name={item.name} />
+                        <span className="dog-breed-label">{item.breed}</span>
                         <span>{item.location}</span>
                       </button>
                     </CarouselItem>
