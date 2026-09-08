@@ -303,6 +303,22 @@ export function GrowingShelter({
               const ghost =
                 z.level === 0 || (preview && z.projectedLevel > z.level);
               const size = zoneSize(z.id, shown);
+              const pool =
+                z.id === 'garden'
+                  ? progress.zones.find((area) => area.id === 'pool')
+                  : undefined;
+              const labelCenter = pool
+                ? (z.y +
+                    (size * 1.44) / 2 +
+                    pool.y -
+                    zoneSize(
+                      pool.id,
+                      Math.max(1, preview ? pool.projectedLevel : pool.level),
+                    ) /
+                      2) /
+                    2 -
+                  (z.y - size / 2)
+                : undefined;
               return (
                 <div
                   key={z.id}
@@ -338,6 +354,11 @@ export function GrowingShelter({
                       ((z.entrances as readonly string[]).includes('bottom')
                         ? ' gs-label-beside-road'
                         : '')
+                    }
+                    style={
+                      labelCenter === undefined
+                        ? undefined
+                        : { top: labelCenter }
                     }
                     onClick={() => focusArea(z.id)}
                     title={

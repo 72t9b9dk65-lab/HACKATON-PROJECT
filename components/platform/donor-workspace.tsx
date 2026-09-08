@@ -1,5 +1,4 @@
 'use client';
-import { companionProfileId } from '@/lib/platform/shelter-growth';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Heart,
@@ -30,6 +29,7 @@ import {
 } from '@/lib/platform/shelter-growth';
 import { CareImage } from './care-image';
 import { DogPortrait } from '@/components/dog-portrait';
+import { CompanionRoster } from './companion-roster';
 import { GrowingShelter } from './growing-shelter';
 import { GrowthCheckpoints } from './growth-checkpoints';
 import { ProofDialog } from './proof-dialog';
@@ -517,36 +517,12 @@ export default function DonorWorkspace({
                 </div>
               </section>
             )}
-            <div className="gs-roster">
-              <div className="gs-roster-title">
-                <strong>Your visual companions</strong>
-                <small>
-                  Visual companions · profiles may appear more than once
-                </small>
-              </div>
-              <div>
-                {progress.residentIds.map((id) => {
-                  const d = profileDogs.find(
-                    (p) => p.id === companionProfileId(id),
-                  )!;
-                  return (
-                    <button
-                      key={id}
-                      onClick={() => setDogId(companionProfileId(id))}
-                    >
-                      <DogPortrait dog={d} />
-                      <strong>{d.name}</strong>
-                    </button>
-                  );
-                })}
-                {!progress.residentIds.length && (
-                  <p>
-                    Your first companion arrives at 50 SEK donated. Up to 100
-                    companions.
-                  </p>
-                )}
-              </div>
-            </div>
+            <CompanionRoster
+              key={`${state.createdAt}:${donor.id}`}
+              storageKey={`care-companion-availability-v1:${state.createdAt}:${donor.id}`}
+              residentIds={progress.residentIds}
+              onSelect={setDogId}
+            />
           </div>
         </div>
         {filtered.length > railLayout.count && (

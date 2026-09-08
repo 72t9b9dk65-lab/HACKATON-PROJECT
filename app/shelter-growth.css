@@ -434,11 +434,39 @@
   gap: 12px;
   margin-bottom: 17px;
 }
-.gs-roster > div:last-child {
+.gs-roster-details {
   display: flex;
-  gap: 20px;
-  overflow-x: auto;
-  padding: 16px 8px 8px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.gs-roster-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 0.8rem;
+}
+.gs-roster .is-available {
+  --companion-status-color: #428459;
+}
+.gs-roster .is-adopted {
+  --companion-status-color: #d78432;
+}
+.gs-roster-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.gs-roster-legend span::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--companion-status-color);
+}
+.gs-roster-grid + .gs-roster-grid {
+  margin-top: 16px;
+  border-top: 1px solid var(--cp-line);
 }
 .gs-roster button {
   display: flex;
@@ -461,6 +489,8 @@
   height: 60px;
   object-fit: cover;
   border-radius: 14px;
+  border: 3px solid var(--companion-status-color);
+  box-sizing: border-box;
 }
 .gs-roster .dog-portrait-avatar {
   width: 34px;
@@ -1088,7 +1118,10 @@
   .gs-roster-title {
     align-items: flex-start;
     flex-direction: column;
-    gap: 3px;
+    gap: 8px;
+  }
+  .gs-roster-details {
+    align-items: flex-start;
   }
   .gs-bars > div {
     grid-template-columns: 40px 125px 1fr 80px;
@@ -1175,9 +1208,6 @@
   }
   .gs-roster {
     padding: 16px;
-  }
-  .gs-roster > div:last-child {
-    gap: 15px;
   }
   .gs-transactions {
     padding: 18px;
@@ -1772,7 +1802,7 @@
 }
 
 /* Show every companion; match the transaction rail to the complete right column. */
-.gs-roster > div:last-child {
+.gs-roster-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   gap: 26px 18px;
@@ -1786,8 +1816,8 @@
 .gs-roster button strong {
   overflow-wrap: anywhere;
 }
-.gs-roster > div:last-child > p {
-  grid-column: 1 / -1;
+.gs-roster-groups > p {
+  margin: 18px 8px 8px;
 }
 .gs-sidebar-transactions {
   flex: 0 0 auto;
@@ -1817,7 +1847,7 @@
   .gs-wallet-column {
     height: auto !important;
   }
-  .gs-roster > div:last-child {
+  .gs-roster-grid {
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: 26px 12px;
   }
@@ -1893,6 +1923,24 @@
   border-radius: 10px;
   background: transparent;
   cursor: zoom-in;
+}
+.gs-zone-garden .gs-zone-art {
+  transform: scale(1.44);
+  transform-origin: center;
+}
+.gs-zone-garden .gs-zone-label {
+  transform: translate(-50%, -50%);
+  height: 52px;
+  padding: 4px 10px;
+  gap: 1px;
+}
+.gs-zone-garden .gs-zone-label strong {
+  font-size: 20px;
+  line-height: 22px;
+}
+.gs-zone-garden .gs-zone-label span {
+  font-size: 16px;
+  line-height: 19px;
 }
 .gs-zone-art:focus-visible {
   outline: 3px solid #315a42;
