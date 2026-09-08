@@ -61,7 +61,7 @@ export async function createReceipt(
   previousHash: string,
 ): Promise<Receipt> {
   if (!dogs.some((d) => d.id === dogId))
-    throw Error('Choose an available demo dog.');
+    throw Error('Choose an available dog.');
   const receipt = {
     id: `HS-${crypto.randomUUID()}`,
     dogId,
@@ -144,7 +144,7 @@ export function badges(state: SupporterState) {
     },
     {
       name: 'A helping paw',
-      description: 'Try a demo contribution',
+      description: 'Make a contribution',
       earned: state.receipts.length > 0,
     },
   ];

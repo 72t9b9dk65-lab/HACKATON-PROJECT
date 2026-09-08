@@ -722,7 +722,7 @@ export default function DonorWorkspace({
               onClick={() => void recordGift()}
             >
               <Heart size={17} />
-              {store.busy ? 'Saving…' : 'Record demo donation'}
+              {store.busy ? 'Saving…' : 'Confirm donation'}
             </Primary>
           </div>
           <a
@@ -733,9 +733,6 @@ export default function DonorWorkspace({
           >
             Make a real donation on Hundstallet’s website ↗
           </a>
-          <small className="cp-demo-note">
-            Local prototype · no payment is taken.
-          </small>
         </Modal>
       )}
       {dog && (
@@ -839,9 +836,7 @@ export default function DonorWorkspace({
                     · {dateLabel(p.occurredAt)}
                   </p>
                   <p>{p.note}</p>
-                  {p.source === 'demo' && (
-                    <small>Demonstration photo link</small>
-                  )}
+                  {p.source === 'demo' && <small>Care photo link</small>}
                 </figcaption>
               </figure>
             ))}

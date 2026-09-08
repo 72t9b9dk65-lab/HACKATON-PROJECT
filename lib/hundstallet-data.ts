@@ -106,7 +106,7 @@ export const dogs: DogStory[] = [
       },
       {
         title: 'Getting ready for a new beginning',
-        text: 'In this next chapter of the demo, her care team prepares a home-matching plan around her needs.',
+        text: 'In this next chapter, her care team prepares a home-matching plan around her needs.',
         day: 'Day 24',
       },
       {
@@ -139,7 +139,7 @@ export const dogs: DogStory[] = [
       },
       {
         title: 'Meeting his match',
-        text: 'The next demo chapter explores how a care team might prepare a suitable home.',
+        text: 'The next chapter explores how a care team might prepare a suitable home.',
         day: 'Day 27',
       },
       {
@@ -167,7 +167,7 @@ export const dogs: DogStory[] = [
       },
       {
         title: 'Learning through play',
-        text: 'In this demo update, short training games help Bella discover a calmer rhythm.',
+        text: 'In this care update, short training games help Bella discover a calmer rhythm.',
         day: 'Day 7',
       },
       {

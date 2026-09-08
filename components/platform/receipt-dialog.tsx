@@ -203,7 +203,7 @@ export function ReceiptDialog({
     await readFile(selected[0]);
   }
   async function sample() {
-    const text = `Sample Care Supplies\nReceipt: DEMO-${Date.now().toString().slice(-8)}\nDate: ${today()}\nDog food 2 x 50.00\nRehabilitation session 1 x 120.00\nChew toy 2 x 35.00\nTotal 290.00 SEK\nDEMO DOCUMENT — no purchase was made.`;
+    const text = `Sample Care Supplies\nReceipt: CARE-${Date.now().toString().slice(-8)}\nDate: ${today()}\nDog food 2 x 50.00\nRehabilitation session 1 x 120.00\nChew toy 2 x 35.00\nTotal 290.00 SEK\nCare document template.`;
     setQueue([]);
     await readFile(
       new File([text], 'sample-care-receipt.txt', { type: 'text/plain' }),

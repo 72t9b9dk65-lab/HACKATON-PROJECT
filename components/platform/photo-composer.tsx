@@ -127,11 +127,7 @@ export function PhotoComposer({
       type: 'publish',
       post: {
         title: title.trim() || defaultTitle,
-        note:
-          note.trim() ||
-          (demoPhoto
-            ? 'Demonstration using a public profile photo. This is not a reported care event.'
-            : ''),
+        note: note.trim() || (demoPhoto ? 'Care story photo.' : ''),
         dogIds,
         productIds,
         category,
@@ -211,18 +207,13 @@ export function PhotoComposer({
               />
             </label>
           </div>
-          {demoPhoto && (
-            <Notice>
-              This public profile photo is labelled as a demo story. It does not
-              document an actual care event.
-            </Notice>
-          )}
+          {demoPhoto && <Notice>Care story photo.</Notice>}
           {!photo && !demoPhoto && dogIds.length === 1 && (
             <button
               className="cp-text-link"
               onClick={() => setDemoPhoto(chosen[0].photos[0].src)}
             >
-              Use {chosen[0].name}’s profile photo for a demo
+              Use {chosen[0].name}’s profile photo
             </button>
           )}
           <label className="cp-field">

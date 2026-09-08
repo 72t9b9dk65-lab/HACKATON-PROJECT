@@ -355,6 +355,7 @@ export function GrowingShelter({
                         ? ' gs-label-beside-road'
                         : '')
                     }
+                    data-level={preview ? z.projectedLevel : z.level}
                     style={
                       labelCenter === undefined
                         ? undefined

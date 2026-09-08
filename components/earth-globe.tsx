@@ -402,7 +402,7 @@ export default function EarthGlobe({
                     className="country-path"
                     onClick={() => pick(continents.find((t) => t.id === c.id)!)}
                   >
-                    <title>{c.id} — demo data</title>
+                    <title>{c.id} — care data</title>
                   </path>
                 ))}
               </>
@@ -427,7 +427,7 @@ export default function EarthGlobe({
                       {t.name} —{' '}
                       {t.score < 0
                         ? 'data unavailable'
-                        : `demo index ${t.score}/100`}
+                        : `care index ${t.score}/100`}
                     </title>
                   </path>
                 );

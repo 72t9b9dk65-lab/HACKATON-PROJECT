@@ -600,7 +600,9 @@ export default function StaffWorkspace() {
                 <div>
                   <strong>{donor.email || 'Sample account'}</strong>
                   <p>
-                    {donor.provider || 'Demo'}
+                    {donor.provider && donor.provider !== 'demo'
+                      ? donor.provider
+                      : 'Individual'}
                     {donor.registeredAt
                       ? ' · Registered ' + dateLabel(donor.registeredAt, false)
                       : ''}
@@ -645,7 +647,7 @@ export default function StaffWorkspace() {
         )}
         <p className="gs-prototype-note">
           {state.viewer?.demo
-            ? 'Local demo with sample identities. '
+            ? 'Active shelter workspace. '
             : 'Employee workspace. '}
           Blockchain registration uses Sepolia testnet; a fingerprint is not
           proof that care occurred.

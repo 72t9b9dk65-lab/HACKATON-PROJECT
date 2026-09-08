@@ -226,7 +226,7 @@ export default function StaffPortal() {
                   <small>
                     {item.id === PERSONAL_DONOR_ID
                       ? 'Connected donor shelter'
-                      : 'Demo donor'}
+                      : 'Donor'}
                   </small>
                   <span>{money(item.pendingOre)} available</span>
                 </span>

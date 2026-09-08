@@ -30,7 +30,7 @@ export function DogNeedBadge({
       )}
       <span className={showLabel ? undefined : 'sr-only'}>
         {kind.label}
-        {showLabel ? '' : ' · demo need'}
+        {showLabel ? '' : ' · care need'}
       </span>
     </span>
   );

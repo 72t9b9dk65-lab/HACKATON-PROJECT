@@ -238,7 +238,7 @@ function DogProfileContent({ dog }: { dog: ProfileDog }) {
       />
       <p className="dog-profile-provenance">
         Real profiles and undated photos from Hundstallet. Spending and calendar
-        updates in this prototype are demo data.
+        updates are illustrative care stories.
       </p>
     </>
   );
@@ -364,7 +364,7 @@ export function DogJourney({
                   <span>
                     {event
                       ? careUpdateStatus(event, now)
-                      : 'Recorded demo expense'}
+                      : 'Recorded care expense'}
                   </span>
                 </div>
                 <div className="care-history-title">

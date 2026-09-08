@@ -485,7 +485,7 @@ export function applyAction(
       audit(
         'gift.recorded',
         gift.id,
-        `${money(gift.amountOre)} SEK demo contribution received.`,
+        `${money(gift.amountOre)} SEK contribution received.`,
       );
       break;
     }

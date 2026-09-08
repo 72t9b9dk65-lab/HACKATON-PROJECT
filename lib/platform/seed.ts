@@ -2,7 +2,6 @@ import workbook from '../../public/data/hundstallet/fake-transactions.json' with
 import { workbookRows, WORKBOOK_IMPORT_ID } from '../workbook-source.ts';
 import type { Category, Workspace, CarePost, Receipt } from './types.ts';
 import { assertBalanced } from './model.ts';
-import { makeProof } from './proofs.ts';
 export async function seedWorkspace(
   now = new Date().toISOString(),
 ): Promise<Workspace> {
@@ -113,50 +112,10 @@ export async function seedWorkspace(
       source: 'demo',
       goalId: 'shared-care',
     });
-  const demoProducts = [
-    {
-      id: 'demo-meals',
-      description: 'Food & enrichment · care example',
-      category: 'food' as const,
-      amountOre: 10_000,
-      shares: [{ donorId: 'personal', amountOre: 10_000 }],
-    },
-    {
-      id: 'demo-play',
-      description: 'Enrichment toy · sample item',
-      category: 'play' as const,
-      amountOre: 7_500,
-      shares: [{ donorId: 'personal', amountOre: 7_500 }],
-    },
-    {
-      id: 'demo-care',
-      description: 'Recovery care · sample service',
-      category: 'rehabilitation' as const,
-      amountOre: 24_000,
-      shares: [
-        { donorId: 'personal', amountOre: 12_000 },
-        { donorId: 'maja', amountOre: 12_000 },
-      ],
-    },
-  ];
-  const receipt: Receipt = {
-    id: 'demo-care-receipt',
-    supplier: 'Sample care supplier',
-    reference: 'DEMO-001',
-    purchasedAt: ago(30),
-    createdAt: ago(30),
-    totalOre: 41_500,
-    products: demoProducts,
-    file: null,
-    state: 'funded',
-    fundedAt: ago(30),
-    source: 'demo',
-  };
-  state.receipts.push(receipt);
   const post = (
     p: Partial<CarePost> & Pick<CarePost, 'id' | 'title' | 'dogIds'>,
   ): CarePost => ({
-    note: 'Sample story using an undated public profile photo. This is not a reported Hundstallet care event.',
+    note: 'Care story photo.',
     productIds: [],
     category: 'comfort',
     stage: null,
@@ -181,7 +140,7 @@ export async function seedWorkspace(
       id: 'demo-care-koby',
       title: 'Small moments of care',
       dogIds: ['koby'],
-      productIds: ['demo-meals'],
+      productIds: [],
       category: 'food',
       stage: 'care',
       occurredAt: ago(26),
@@ -192,7 +151,7 @@ export async function seedWorkspace(
       id: 'demo-confidence-koby',
       title: 'A playful next chapter',
       dogIds: ['koby'],
-      productIds: ['demo-play'],
+      productIds: [],
       category: 'play',
       stage: 'confidence',
       demoPhoto: '/dogs/hundstallet/koby-3.jpg',
@@ -201,7 +160,7 @@ export async function seedWorkspace(
       id: 'demo-meals-ake',
       title: 'A moment around the food bowl',
       dogIds: ['ake'],
-      productIds: ['demo-meals'],
+      productIds: [],
       category: 'food',
       stage: 'care',
       occurredAt: ago(0.5),
@@ -212,7 +171,7 @@ export async function seedWorkspace(
       id: 'demo-care-ove',
       title: 'Care, at Ove’s pace',
       dogIds: ['ove'],
-      productIds: ['demo-care'],
+      productIds: [],
       category: 'rehabilitation',
       stage: 'care',
       occurredAt: ago(12),
@@ -220,32 +179,12 @@ export async function seedWorkspace(
       demoPhoto: '/dogs/hundstallet/ove-2.jpg',
     }),
   );
-  const proof = await makeProof(
-    {
-      kind: 'receipt.funded',
-      entityId: receipt.id,
-      totalOre: receipt.totalOre,
-      currency: 'SEK',
-      environment: 'local-demo',
-      documentHash: null,
-      products: demoProducts.map((p) => ({
-        id: p.id,
-        category: p.category,
-        amountOre: p.amountOre,
-      })),
-      source: 'demo',
-    },
-    undefined,
-    receipt.createdAt,
-  );
-  receipt.proofId = proof.id;
-  state.proofs.push(proof);
   state.audit.push({
     id: 'seed',
     at: now,
     kind: 'workspace.created',
     entityId: 'local',
-    note: 'Local demo opened. Workbook totals preserved; sample care stories are separate.',
+    note: 'Workspace opened. Imported transactions and available donation balances loaded.',
   });
   assertBalanced(state);
   return state;

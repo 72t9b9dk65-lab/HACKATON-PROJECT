@@ -505,7 +505,7 @@ export default function ShelterMap({
                     y={labelY + 48}
                     className="shelter-marker-amount"
                   >
-                    {kronor(total)} SEK demo care
+                    {kronor(total)} SEK care
                   </text>
                 )}
               </g>
@@ -672,7 +672,7 @@ export default function ShelterMap({
                       </span>
                     ))}
                   </span>
-                  <small>Demo care</small>
+                  <small>Care</small>
                 </div>
               )}
             </div>

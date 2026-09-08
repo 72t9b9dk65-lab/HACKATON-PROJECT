@@ -108,7 +108,7 @@ export function DogDialog({
               </div>
               <small>
                 Public profile photos · undated. Care stories below identify
-                demo moments.
+                care moments.
               </small>
             </div>
           </div>
@@ -146,7 +146,7 @@ export function DogDialog({
                     <div className="cp-timeline-date">
                       {dateLabel(post.occurredAt)}{' '}
                       <span>
-                        {post.source === 'demo' ? 'Demo story' : 'Care update'}
+                        {post.source === 'demo' ? 'Care story' : 'Care update'}
                       </span>
                     </div>
                     <Photo post={post} onClick={() => onPhoto(post)} />

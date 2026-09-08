@@ -176,7 +176,7 @@ export default function Hundstallet() {
   function downloadReceipt(r: Receipt) {
     const data = {
       notice:
-        'HACKATHON DEMO. No payment, purchase, blockchain transaction, or verified dog outcome.',
+        'Care record. No payment, purchase, blockchain transaction, or verified dog outcome.',
       ...r,
       currency: 'SEK',
       allocations: allocate(r.amountOre),
@@ -188,7 +188,7 @@ export default function Hundstallet() {
     );
     const link = document.createElement('a');
     link.href = url;
-    link.download = `hundstallet-demo-${r.id}.json`;
+    link.download = `hundstallet-receipt-${r.id}.json`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
@@ -237,7 +237,7 @@ export default function Hundstallet() {
           onClick={() => setInfoOpen(true)}
         >
           <Info size={15} />
-          Hackathon demo
+          Shelter workspace
         </Button>
       </header>
       <main>
@@ -257,7 +257,7 @@ export default function Hundstallet() {
               {page === 'explore'
                 ? 'Explore a shelter. Meet a dog. Follow the journey from care to home.'
                 : page === 'impact'
-                  ? 'See your demo contributions, their allocation, and the stories you follow.'
+                  ? 'See your contributions, their allocation, and the stories you follow.'
                   : 'Connect, learn, and celebrate the steps that matter.'}
             </p>
           </div>
@@ -349,7 +349,7 @@ export default function Hundstallet() {
                       <div>
                         <strong>{s.name}</strong>
                         <small>
-                          {dogs.find((d) => d.shelterId === s.id)!.name}’s demo
+                          {dogs.find((d) => d.shelterId === s.id)!.name}’s care
                           story
                         </small>
                       </div>
@@ -455,11 +455,11 @@ export default function Hundstallet() {
                       <i />
                       {journeyStages[stage]}
                     </span>
-                    <small>Demo journey · {stage + 1}/4</small>
+                    <small>Care journey · {stage + 1}/4</small>
                   </div>
                   <Progress
                     value={(stage + 1) * 25}
-                    aria-label={`${dog.name} demo journey progress`}
+                    aria-label={`${dog.name} care journey progress`}
                   />
                   <button className="hs-update" onClick={readUpdate}>
                     <span className="hs-update-icon">
@@ -523,7 +523,7 @@ export default function Hundstallet() {
               </div>
               <div>
                 <strong>03</strong>
-                <span>demo dog journeys</span>
+                <span>dog journeys</span>
               </div>
               <button
                 onClick={() => setPage('impact')}
@@ -575,11 +575,11 @@ export default function Hundstallet() {
                       value={c.share}
                       aria-label={`${c.name}: ${c.share}%`}
                     />
-                    <small>{c.share}% of your demo contributions</small>
+                    <small>{c.share}% of your contributions</small>
                   </div>
                 ))}
                 <p className="hs-note">
-                  These percentages are a proposed demo model, not Hundstallet’s
+                  These percentages are a proposed care model, not Hundstallet’s
                   reported spending.
                 </p>
               </section>
@@ -619,7 +619,7 @@ export default function Hundstallet() {
                           </strong>
                           <small>
                             {new Date(r.createdAt).toLocaleDateString('en-GB')}{' '}
-                            · Demo receipt
+                            · Receipt
                           </small>
                         </span>
                         <b>{sek(r.amountOre / 100)}</b>
@@ -672,7 +672,7 @@ export default function Hundstallet() {
           <section className="hs-dashboard">
             <div className="hs-pack-hero">
               <div>
-                <span className="eyebrow">THE PACK · LOCAL DEMO</span>
+                <span className="eyebrow">THE PACK</span>
                 <h2>
                   More than a donation.
                   <br />A connection.
@@ -739,7 +739,7 @@ export default function Hundstallet() {
                 <p>Let’s understand 30 dog-care stories together.</p>
                 <p className="hs-note">
                   27 fictional community reads + {state.read.length} from you.
-                  Demo only; no live community is connected.
+                  Community activity is not connected yet.
                 </p>
               </div>
               <div>
@@ -749,7 +749,7 @@ export default function Hundstallet() {
                 </strong>
                 <Progress
                   value={((27 + state.read.length) / 30) * 100}
-                  aria-label="Demo community care-story challenge"
+                  aria-label="Community care-story challenge"
                 />
               </div>
             </section>
@@ -781,7 +781,7 @@ export default function Hundstallet() {
           </DialogDescription>
           <RadioGroup
             className="hs-amounts"
-            aria-label="Demo contribution amount in Swedish kronor"
+            aria-label="Contribution amount in Swedish kronor"
             value={amount}
             onValueChange={(v) => setAmount(String(v))}
           >
@@ -860,7 +860,7 @@ export default function Hundstallet() {
                     {dog.updates[i].day} ·{' '}
                     {i <= stage
                       ? 'Example update available'
-                      : 'Upcoming demo chapter'}
+                      : 'Upcoming chapter'}
                   </small>
                 </div>
               </li>
@@ -883,7 +883,7 @@ export default function Hundstallet() {
               }))
             }
           >
-            {stage === 3 ? 'Demo story complete' : 'Preview next demo chapter'}
+            {stage === 3 ? 'Story complete' : 'Preview next chapter'}
             <ArrowRight size={17} />
           </Button>
         </DialogContent>
@@ -954,7 +954,7 @@ export default function Hundstallet() {
                 onClick={() => downloadReceipt(receipt)}
               >
                 <Download size={17} />
-                Download demo receipt
+                Download receipt
               </Button>
               <p className="hs-footnote">
                 Not proof of purchase, delivery, or tax-deductible giving.
@@ -984,7 +984,7 @@ export default function Hundstallet() {
                 Official source ↗
               </a>
             </p>
-            <h3>The demo</h3>
+            <h3>The shelter</h3>
             <p>
               Dog identities, stories, care updates, funding totals,
               percentages, and rewards are illustrative. There are no real

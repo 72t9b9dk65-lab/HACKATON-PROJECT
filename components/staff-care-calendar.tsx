@@ -253,7 +253,7 @@ function CalendarEditor() {
     <>
       <div className="staff-calendar-status">
         <span className="care-live-label">
-          <i /> Local demo · live updates on this device
+          <i /> Care calendar · updates on this device
         </span>
         <span>All times: Stockholm</span>
       </div>

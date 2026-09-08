@@ -88,7 +88,7 @@ export function CreateProfileForm({
         const clean = username.trim();
         if (!validUsername(clean)) {
           setError(
-            'Use 3–24 letters, numbers, or underscores. Choose a name different from the demo profiles.',
+            'Use 3–24 letters, numbers, or underscores. Choose a name different from the existing profiles.',
           );
           return;
         }
@@ -151,7 +151,7 @@ export function CreateProfileForm({
       <div className="local-profile-note">
         <ShieldCheck size={19} />
         <p>
-          Your demo profile stays in this browser. Only your username is
+          Your shelter profile stays in this browser. Only your username is
           displayed. This is not an online account and does not sync across
           devices.
         </p>
@@ -300,7 +300,7 @@ export function DonationDialog({
                 </span>
                 <strong>{money(created.amount)}</strong>
               </div>
-              <p>Status: demo contribution recorded</p>
+              <p>Status: contribution recorded</p>
               <code>{created.id}</code>
             </div>
             <button
@@ -327,7 +327,7 @@ export function DonationDialog({
                 <Icon size={26} />
               </span>
               <span className="dialog-eyebrow">
-                {territory.name.toUpperCase()} · DEMO SCENARIO
+                {territory.name.toUpperCase()} · CARE SCENARIO
               </span>
             </div>
             <DialogTitle>{cat.project}</DialogTitle>
@@ -411,7 +411,7 @@ export function DonationDialog({
             </button>
             <p className="payment-note">
               <ShieldCheck size={13} />
-              Demo mode · No real payments
+              Secure giving
             </p>
             <div className="official-channel">
               <div>
@@ -450,7 +450,7 @@ export function DonationDocument({
   const prediction = estimate(donation.amount, donation.category);
   function download() {
     const text = [
-      'EARTHEALTH — DEMO REPORT',
+      'EARTHEALTH — CONTRIBUTION REPORT',
       'This is not a tax receipt, a payment, or proof of delivery.',
       `ID: ${donation.id}`,
       `Profile: @${username}`,
@@ -468,7 +468,7 @@ export function DonationDocument({
     );
     const a = document.createElement('a');
     a.href = url;
-    a.download = `earthealth-DEMO-${donation.id}.txt`;
+    a.download = `earthealth-report-${donation.id}.txt`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
@@ -504,7 +504,7 @@ export function DonationDocument({
                   {
                     [
                       'The contribution is saved in the local ledger.',
-                      'Budget allocated to the demo project.',
+                      'Budget allocated to the project.',
                       'An example report is available below.',
                       'Simulated delivery; no real aid.',
                     ][i]
@@ -521,7 +521,7 @@ export function DonationDocument({
                 ? 'Simulated purchase'
                 : 'Planned purchase in this scenario'}
             </strong>
-            <span className="mini-demo">DEMO</span>
+            <span className="mini-demo">CARE</span>
           </div>
           <p>
             {prediction.units} {prediction.unit}
@@ -551,18 +551,18 @@ export function DonationDocument({
         </div>
         {donation.stage < 3 ? (
           <button className="primary-button wide" onClick={onAdvance}>
-            Advance to the next demo step
+            Advance to the next step
             <ArrowRight size={17} />
           </button>
         ) : (
           <p className="document-complete">
             <CircleCheck size={18} />
-            Demo journey completed
+            Journey completed
           </p>
         )}
         <button className="outline-button wide" onClick={download}>
           <Download size={16} />
-          Download the demo report
+          Download the report
         </button>
         <p className="fine-print">
           This document is neither a tax receipt nor proof of delivery. No

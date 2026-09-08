@@ -401,9 +401,7 @@ test('central product allocation grows the right shelters and correction restore
 });
 test('proof compares live supplier, products, allocations and document to its snapshot', async () => {
   const s = await seedWorkspace(now),
-    receipt = structuredClone(
-      s.receipts.find((r) => r.id === 'demo-care-receipt'),
-    );
+    receipt = structuredClone(s.receipts[0]);
   const evidence = await receiptEvidence(receipt);
   const proof = await makeProof(
     { evidenceVersion: 2, entityId: receipt.id, receipt: evidence },

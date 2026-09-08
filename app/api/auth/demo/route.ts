@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   try {
     requireSameOrigin(request);
     if (!demoEnabled(request))
-      throw new AccessError('Demo sign-in is disabled.', 404);
+      throw new AccessError('Local sign-in is disabled.', 404);
     const { site, origin } = context(request);
     const form = await request.formData();
     const rawEmail = form.get('email'),
@@ -24,14 +24,14 @@ export async function POST(request: Request) {
       )
         .trim()
         .toLowerCase(),
-      name = (typeof rawName === 'string' ? rawName : 'Demo employee').trim();
+      name = (typeof rawName === 'string' ? rawName : 'Staff member').trim();
     if (
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
       email.length > 200 ||
       name.length < 1 ||
       name.length > 60
     )
-      throw new Error('Enter a name and a valid demo email.');
+      throw new Error('Enter a name and a valid email.');
     const user = await registerIdentity(`demo:${site}:${email}`, {
       email,
       name,

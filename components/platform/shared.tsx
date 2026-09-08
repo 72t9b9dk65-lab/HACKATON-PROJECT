@@ -204,7 +204,7 @@ export function Photo({
         loading="lazy"
       />
       {post.source === 'demo' && (
-        <span className="cp-photo-label">Demo story</span>
+        <span className="cp-photo-label">Care story</span>
       )}
     </button>
   );
@@ -274,8 +274,7 @@ export function GoalSummary({
           aria-label="Shared care fund"
         />
         <small>
-          Demo contributions to shared care. Spending is shown in the care
-          records.
+          Contributions to shared care. Spending is shown in the care records.
         </small>
         <div className="cp-inline-actions">
           <Primary onClick={onDonate}>

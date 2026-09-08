@@ -62,16 +62,14 @@ export async function importUpdatedWorkbook(
   }
   const opening = next.gifts.find((g) => g.id === 'workbook-opening');
   if (!opening)
-    throw new Error(
-      'Missing demo opening funding for the imported transactions.',
-    );
+    throw new Error('Missing opening funding for the imported transactions.');
   opening.amountOre += fundingDelta;
   next.audit.push({
     id: crypto.randomUUID(),
     at: now,
     kind: 'workbook.imported',
     entityId: WORKBOOK_IMPORT_ID,
-    note: `Imported 102 source transactions. Demo opening funding adjusted by ${fundingDelta} öre to match the expense source; other donations preserved.`,
+    note: `Imported 102 source transactions. Opening funding adjusted by ${fundingDelta} öre to match the expense source; other donations preserved.`,
   });
   next.commands.push(WORKBOOK_IMPORT_ID);
   assertBalanced(next);

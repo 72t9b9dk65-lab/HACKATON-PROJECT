@@ -162,7 +162,7 @@ export function CarePlanner({
           : ''}
         {frequency === 'monthly'
           ? 'Monthly plans are saved as forecasts. No automatic charges or future gifts are recorded.'
-          : 'Demo donation. No payment is taken. A first care expense is simulated; the rest stays pending.'}{' '}
+          : 'Your contribution supports shared care. Allocated expenses appear in your transaction history; the remaining balance stays pending.'}{' '}
         {carePlan(careId).detail}
       </p>
       {monthlyPlan && (

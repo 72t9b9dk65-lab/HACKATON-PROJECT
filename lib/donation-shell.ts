@@ -154,7 +154,7 @@ export function careAllocation(amountOre: number) {
     amountOre < 0 ||
     amountOre > 100_000_000
   )
-    throw new Error('Invalid demo amount.');
+    throw new Error('Invalid donation amount.');
   const food = Math.floor(amountOre * 0.5);
   const health = Math.floor(amountOre * 0.3);
   return { food, health, comfort: amountOre - food - health };
@@ -219,7 +219,7 @@ export function fundingSummary(gifts: DemoGift[]) {
       new Set(recipients).size !== recipients.length ||
       !recipients.every((id) => byDog[id])
     )
-      throw new Error('Unknown demo recipient.');
+      throw new Error('Unknown recipient.');
     const care = giftAllocation(gift);
     amountOre += gift.amountOre;
     for (const kind of careKinds) {

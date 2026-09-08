@@ -40,7 +40,7 @@ export function DonationBalance({
       aria-controls="personal-shelter-view"
     >
       <span className="donation-wallet-heading">
-        Your total donated <small>DEMO</small>
+        Your total donated <small>SEK</small>
       </span>
       <strong className="donation-wallet-total">
         {kronor(spending.totalOre)} <small>SEK</small>
@@ -291,7 +291,7 @@ export function ExpenseTransactions({
                     {transaction.legacy &&
                     !transaction.photos.length &&
                     workbookTransaction(transaction.legacy)
-                      ? ' (demo match)'
+                      ? ' (matched)'
                       : ''}{' '}
                     · {kronor(transaction.amountOre)} SEK
                   </span>

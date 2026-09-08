@@ -65,7 +65,7 @@ export default function ExploreWorkspace() {
         title={post?.title ?? 'Care moment'}
         description={
           post
-            ? `${dateLabel(post.occurredAt)} · ${post.source === 'demo' ? 'Demo story' : 'Care update'}`
+            ? `${dateLabel(post.occurredAt)} · ${post.source === 'demo' ? 'Care story' : 'Care update'}`
             : undefined
         }
       >

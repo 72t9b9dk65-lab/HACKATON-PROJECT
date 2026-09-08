@@ -130,7 +130,7 @@ export function VirtualShelter({
                 <i className="virtual-preview-dot" />{' '}
                 {confirmed ? visiblePreviewIds.length : projection.dogCount}{' '}
                 {confirmed
-                  ? 'dogs in this demo gift'
+                  ? 'dogs supported by this gift'
                   : 'estimated care recipients in preview'}
               </span>
             )}
@@ -283,9 +283,9 @@ export function VirtualShelter({
         </div>
         <p className="virtual-shelter-note">
           {replay
-            ? 'Replaying a recorded demo expense. '
+            ? 'Replaying a recorded care expense. '
             : !previewActive
-              ? 'Your shelter companions have recorded demo care expenses. '
+              ? 'Your shelter companions have recorded care expenses. '
               : fullImpact
                 ? 'Showing the estimated shelter after the selected gift has funded all complete care units. '
                 : projection.activeDogs
@@ -318,7 +318,7 @@ export function VirtualShelter({
             </span>
           )}
         </div>
-        <div className="dogs-in-need-legend" aria-label="Demo need labels">
+        <div className="dogs-in-need-legend" aria-label="Care need labels">
           {needKinds.map((need) => (
             <DogNeedBadge key={need.id} need={need.id} showLabel />
           ))}
@@ -342,7 +342,7 @@ export function VirtualShelter({
                 openDog(item.id, 'waiting');
                 onSelectDog(item.id);
               }}
-              aria-label={`Meet ${item.name}, ${item.breed}. Demo needs: ${dogNeeds(
+              aria-label={`Meet ${item.name}, ${item.breed}. Care needs: ${dogNeeds(
                 item.id,
               )
                 .map((id) => needKinds.find((kind) => kind.id === id)!.label)
@@ -365,7 +365,7 @@ export function VirtualShelter({
               </span>
               <DogName name={item.name} />
               <span className="dog-in-need-breed">{item.breed}</span>
-              <small>Demo needs</small>
+              <small>Care needs</small>
             </button>
           ))}
           {waitingDogs.length === 0 && (
@@ -376,8 +376,9 @@ export function VirtualShelter({
           )}
         </div>
         <p className="dogs-in-need-note">
-          Badges are demo scenarios, including urgency; they are not medical
-          reports from Hundstallet. Group listings remain on the Sweden map.
+          Badges describe care scenarios, including urgency; they are not
+          medical reports from Hundstallet. Group listings remain on the Sweden
+          map.
         </p>
       </section>
     </>

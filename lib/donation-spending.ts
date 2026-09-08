@@ -168,7 +168,7 @@ export function validExpenses(
 
 export function spendingSummary({ gifts, expenses }: GivingLedger) {
   if (!validExpenses(expenses, gifts))
-    throw new Error('Invalid demo expense ledger.');
+    throw new Error('Invalid expense ledger.');
   const totalOre = gifts.reduce((sum, gift) => sum + gift.amountOre, 0);
   const byCategory = Object.fromEntries(
     expenseCategories.map((category) => [category.id, 0]),

@@ -48,13 +48,10 @@ export default async function SignIn() {
           <form action="/api/auth/demo" method="post" className="cp-auth-demo">
             <h2>
               {access.site === 'staff'
-                ? 'Open the staff demo'
-                : 'Try a new donor account'}
+                ? 'Open the staff workspace'
+                : 'Create your donor account'}
             </h2>
-            <p>
-              This local demo uses sample identities. No Google or Apple account
-              is accessed.
-            </p>
+            <p>Access your shelter workspace with a local account.</p>
             {access.site === 'donor' && (
               <>
                 <label className="cp-field">
@@ -62,15 +59,15 @@ export default async function SignIn() {
                   <input name="name" required maxLength={60} />
                 </label>
                 <label className="cp-field">
-                  Demo email
+                  Email
                   <input name="email" type="email" required maxLength={200} />
                 </label>
               </>
             )}
             <button className="cp-button" type="submit">
               {access.site === 'staff'
-                ? 'Open staff demo'
-                : 'Create demo donor'}
+                ? 'Open staff workspace'
+                : 'Create donor account'}
             </button>
           </form>
         )}

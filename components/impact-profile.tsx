@@ -90,7 +90,7 @@ export function ImpactProfile({
         </div>
         <span className="profile-device">
           <ShieldCheck size={16} />
-          Demo profile on this device
+          Shelter profile
         </span>
       </div>
       <div className="personal-stats">
@@ -110,7 +110,7 @@ export function ImpactProfile({
           <Users />
           <span>People potentially helped</span>
           <strong>{number(people)}</strong>
-          <small>Demo estimate of simulated deliveries</small>
+          <small>Estimated deliveries</small>
         </div>
       </div>
       <div className="ledger-heading">
@@ -166,7 +166,7 @@ export function ImpactProfile({
                     month: 'long',
                     year: 'numeric',
                   })}
-                  <span>Demo donation</span>
+                  <span>Donation</span>
                 </p>
                 <div className="donation-card-stage">
                   <span>{stages[d.stage]}</span>
@@ -174,7 +174,7 @@ export function ImpactProfile({
                 </div>
                 <Progress
                   value={(d.stage + 1) * 25}
-                  aria-label={`Demo progress: ${stages[d.stage]}`}
+                  aria-label={`Progress: ${stages[d.stage]}`}
                 />
                 <p className="donation-card-impact">
                   <Package size={15} />
@@ -258,7 +258,7 @@ export function CommunityPanel({
       <div className="leaderboard-heading">
         <Trophy size={17} />
         <h3>The kindness leaderboard</h3>
-        <span>DEMO</span>
+        <span>CARE</span>
       </div>
       <Table className="leaderboard-table">
         <TableHeader>

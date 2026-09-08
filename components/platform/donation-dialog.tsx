@@ -215,7 +215,7 @@ export function DonationDialog({
             ? 'Saving…'
             : monthly
               ? 'Record gift & save plan'
-              : 'Record demo donation'}
+              : 'Confirm donation'}
           <ArrowRight size={17} />
         </Primary>
       </div>

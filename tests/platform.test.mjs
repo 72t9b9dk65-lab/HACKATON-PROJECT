@@ -20,6 +20,7 @@ import {
   appendProofs,
   canonical,
   makeProof,
+  receiptEvidence,
   sha256,
   verifyChain,
   verifyProof,
@@ -60,7 +61,7 @@ const post = (changes = {}) => ({
   title: 'A care moment',
   note: 'Recorded by staff.',
   dogIds: ['koby'],
-  productIds: ['demo-play'],
+  productIds: ['fixture-play'],
   category: 'play',
   stage: null,
   photo: file,
@@ -69,6 +70,55 @@ const post = (changes = {}) => ({
   liveHours: 2,
   ...changes,
 });
+
+// Photo and correction tests create their own funded purchase instead of
+// relying on a historical receipt in the application seed.
+async function seedWithCare() {
+  const state = await seed();
+  const care = {
+    id: 'fixture-care-receipt',
+    supplier: 'Test care supplier',
+    reference: 'TEST-CARE',
+    purchasedAt: now,
+    createdAt: now,
+    totalOre: 12500,
+    products: [
+      {
+        id: 'fixture-play',
+        description: 'Chew toy',
+        category: 'play',
+        amountOre: 7500,
+        shares: [{ donorId: 'personal', amountOre: 7500 }],
+      },
+      {
+        id: 'fixture-meals',
+        description: 'Dog food',
+        category: 'food',
+        amountOre: 5000,
+        shares: [{ donorId: 'personal', amountOre: 5000 }],
+      },
+    ],
+    file: null,
+    state: 'funded',
+    fundedAt: now,
+    source: 'staff',
+  };
+  const proof = await makeProof(
+    {
+      kind: 'receipt.funded',
+      entityId: care.id,
+      evidenceVersion: 2,
+      receipt: await receiptEvidence(care),
+    },
+    undefined,
+    now,
+  );
+  care.proofId = proof.id;
+  state.receipts.push(care);
+  state.proofs.push(proof);
+  assertBalanced(state);
+  return state;
+}
 
 test('the new shared workspace preserves all 102 workbook rows, precision and total', async () => {
   const s = await seed();
@@ -98,6 +148,22 @@ test('the new shared workspace preserves all 102 workbook rows, precision and to
   assert.equal(
     balances(s).reduce((n, d) => n + d.donated, 0),
     929500,
+  );
+  assert.equal(s.receipts.length, 102);
+  assert.ok(
+    s.receipts.every(
+      (r) => r.id !== 'demo-care-receipt' && r.reference !== 'DEMO-001',
+    ),
+  );
+  assert.ok(s.posts.every((p) => p.productIds.length === 0 && p.stage));
+  assert.equal(s.proofs.length, 0);
+  assert.equal(
+    balances(s).reduce((n, d) => n + d.used, 0),
+    479500,
+  );
+  assert.equal(
+    balances(s).reduce((n, d) => n + d.pending, 0),
+    450000,
   );
 });
 test('a gift increases available funds, never creates a dog or an automatic future payment', async () => {
@@ -326,24 +392,24 @@ test('pending receipt edits do not spend money; confirmed products cannot be edi
   );
 });
 test('corrections retain the purchase and release funds exactly once', async () => {
-  const s = await seed();
+  const s = await seedWithCare();
   const used = balances(s).reduce((n, d) => n + d.used, 0);
   const shares = structuredClone(s.receipts.at(-1).products);
   const n = apply(s, {
     type: 'void',
-    receiptId: 'demo-care-receipt',
+    receiptId: 'fixture-care-receipt',
     reason: 'Supplier refunded this purchase.',
   });
   assert.equal(
     balances(n).reduce((sum, d) => sum + d.used, 0),
-    used - 41500,
+    used - 12500,
   );
   assert.deepEqual(n.receipts.at(-1).products, shares);
   assert.deepEqual(supportedDogs(n, 'personal', Date.parse(now)), []);
   assert.throws(() =>
     apply(n, {
       type: 'void',
-      receiptId: 'demo-care-receipt',
+      receiptId: 'fixture-care-receipt',
       reason: 'Another refund.',
     }),
   );
@@ -385,7 +451,7 @@ test('workbook itemization restores actual products without changing historical 
   assertBalanced(n);
 });
 test('every live moment requires a photo, known dogs, and matching funded products', async () => {
-  const s = await seed();
+  const s = await seedWithCare();
   for (const change of [
     { photo: null },
     { dogIds: [] },
@@ -408,7 +474,7 @@ test('every live moment requires a photo, known dogs, and matching funded produc
   assert.deepEqual(balances(n), balances(s));
 });
 test('publication and expiry follow wall time while the photo remains in the timeline', async () => {
-  const s = await seed();
+  const s = await seedWithCare();
   const future = '2026-09-07T14:00:00.000Z';
   const n = apply(s, {
     type: 'publish',
@@ -426,7 +492,7 @@ test('publication and expiry follow wall time while the photo remains in the tim
   );
 });
 test('multiple photos cannot multiply the same product cost; shared dogs reconcile to the item', async () => {
-  let s = await seed();
+  let s = await seedWithCare();
   s = apply(s, {
     type: 'publish',
     post: post({ dogIds: ['koby', 'ove', 'ake'] }),
@@ -443,7 +509,7 @@ test('multiple photos cannot multiply the same product cost; shared dogs reconci
     .filter((p) => linked.has(p.product.id))
     .reduce((n, p) => n + p.contribution, 0);
   assert.equal(total, itemTotal);
-  assert.equal(total, 29500);
+  assert.equal(total, 7500);
 });
 test('following costs nothing and journey milestones do not invent financial support', async () => {
   const s = await seed();
@@ -466,7 +532,7 @@ test('following costs nothing and journey milestones do not invent financial sup
   assert.deepEqual(balances(home), balances(n));
 });
 test('withdrawing a photo stops it driving the shelter and preserves its audit entry', async () => {
-  const s = await seed();
+  const s = await seedWithCare();
   const n = apply(s, { type: 'publish', post: post() });
   const id = n.posts.at(-1).id;
   const withdrawn = apply(n, {
@@ -502,11 +568,11 @@ test('fingerprints detect any changed product amount or document and form a veri
   assert.ok(!JSON.stringify(proof.payload).includes('/dogs/'));
 });
 test('corrections append a new proof without rewriting the original record', async () => {
-  const s = await seed();
+  const s = await seedWithCare();
   const before = structuredClone(s.proofs[0]);
   const n = apply(s, {
     type: 'void',
-    receiptId: 'demo-care-receipt',
+    receiptId: 'fixture-care-receipt',
     reason: 'Supplier refund after a duplicate delivery.',
   });
   await appendProofs(s, n, now);
@@ -515,7 +581,7 @@ test('corrections append a new proof without rewriting the original record', asy
   assert.equal(await verifyChain(n.proofs), true);
 });
 test('direct financial changes and unverified network labels cannot become an anchor', async () => {
-  const s = await seed();
+  const s = await seedWithCare();
   assert.throws(
     () =>
       apply(s, {
@@ -588,12 +654,12 @@ test('allocation conserves every öre through many irregular affordable purchase
 });
 
 test('a newly published photo drives live activity even when it was taken earlier', async () => {
-  const s = await seed();
+  const s = await seedWithCare();
   const n = apply(s, {
     type: 'publish',
     post: post({
       category: 'food',
-      productIds: ['demo-meals'],
+      productIds: ['fixture-meals'],
       occurredAt: '2026-09-06T12:00:00.000Z',
       publishAt: now,
     }),

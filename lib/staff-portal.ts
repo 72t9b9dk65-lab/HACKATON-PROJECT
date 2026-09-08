@@ -313,7 +313,7 @@ export function portalTransactions(
       category: expense.category,
       amountOre: expense.amountOre,
       recordedAt: expense.recordedAt,
-      supplier: 'Imported demo transaction',
+      supplier: 'Imported transaction',
       allocations: staff.distribution?.allocations[expense.id] ?? [
         { donorId: PERSONAL_DONOR_ID, amountOre: expense.amountOre },
       ],

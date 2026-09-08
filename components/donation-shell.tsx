@@ -453,7 +453,7 @@ export default function DonationShell() {
                   {openingFunding &&
                     `${kronor(openingFunding.amountOre)} SEK sample opening funding`}
                   {myGifts.length > 0 &&
-                    ` · ${myGifts.length} demo ${myGifts.length === 1 ? 'gift' : 'gifts'} added`}
+                    ` · ${myGifts.length} ${myGifts.length === 1 ? 'gift' : 'gifts'} added`}
                 </span>
                 <span>
                   {sessionOnly ? 'This session only' : 'Saved on this device'}

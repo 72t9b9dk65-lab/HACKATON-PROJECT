@@ -442,7 +442,7 @@ export default function SwedenMap({
                   tabIndex={0}
                   className="hs-shelter-marker"
                   aria-pressed={active}
-                  aria-label={`${s.name} shelter. ${mode === 'impact' ? `${sek(raised[s.id] ?? s.raised)} in demo support` : 'View the dog care story'}`}
+                  aria-label={`${s.name} shelter. ${mode === 'impact' ? `${sek(raised[s.id] ?? s.raised)} in support` : 'View the dog care story'}`}
                   onPointerDown={(e) => e.stopPropagation()}
                   onClick={() => onSelect(s.id)}
                   onKeyDown={(e) => {
@@ -506,7 +506,7 @@ export default function SwedenMap({
                     }
                   >
                     {mode === 'impact'
-                      ? `${percentage}% demo funded`
+                      ? `${percentage}% funded`
                       : 'Meet the dogs'}
                   </text>
                 </g>
@@ -551,7 +551,7 @@ export default function SwedenMap({
                 role="button"
                 tabIndex={0}
                 aria-pressed={active}
-                aria-label={`Select ${dog.name} in ${dog.location}, ${kronor(dog.amountOre)} SEK in demo support`}
+                aria-label={`Select ${dog.name} in ${dog.location}, ${kronor(dog.amountOre)} SEK in support`}
                 onPointerDown={(event) => event.stopPropagation()}
                 onClick={() => onSelect(markerShelterId)}
                 onKeyDown={(event) => {
@@ -625,7 +625,7 @@ export default function SwedenMap({
                     {careKinds.map((kind, index) => (
                       <g key={kind.id} opacity={allocation[kind.id] ? 1 : 0.3}>
                         <title>
-                          {kind.label}: {kronor(allocation[kind.id])} SEK (demo)
+                          {kind.label}: {kronor(allocation[kind.id])} SEK
                         </title>
                         <PixelCareIcon
                           kind={kind.id}

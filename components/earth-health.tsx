@@ -121,7 +121,7 @@ export default function EarthHealth() {
       donationsRef.current = state.donations;
     } catch {
       setStorageWarning(
-        'Unable to read your local profile. You can create a new demo profile.',
+        'Unable to read your local profile. You can create a new shelter profile.',
       );
     }
   }, []);
@@ -255,7 +255,7 @@ export default function EarthHealth() {
           {
             name: 'navigate_earthhealth_territory',
             description:
-              'Open a demo territory on the globe and show its needs. Does not create profiles or donations.',
+              'Open a territory on the globe and show its needs. Does not create profiles or donations.',
             inputSchema: {
               type: 'object',
               properties: {
@@ -279,7 +279,7 @@ export default function EarthHealth() {
               const t = allTerritories.find(
                 (t) => t.id === (input as { territoryId: unknown }).territoryId,
               );
-              if (!t) throw Error('Demo territory is unavailable.');
+              if (!t) throw Error('Territory is unavailable.');
               flushSync(() => {
                 setPage('explore');
                 setMode('needs');
@@ -391,7 +391,7 @@ export default function EarthHealth() {
           </div>
           <button className="demo-badge" onClick={() => setInfo(true)}>
             <span />
-            Prototype · Demo data
+            Explore care
             <Info size={14} />
           </button>
         </div>
@@ -483,7 +483,7 @@ export default function EarthHealth() {
               <div className="map-context">
                 <span className="live-dot" />
                 {level === 'cities'
-                  ? 'Demo cities · Approximate project areas'
+                  ? 'Cities · Approximate project areas'
                   : category !== 'all'
                     ? categories.find((c) => c.id === category)?.label
                     : mode === 'needs'
@@ -625,7 +625,7 @@ export default function EarthHealth() {
                         <span />
                         {needLabel(selected.score)} priority
                       </span>
-                      <span className="data-caption">Demo scenario</span>
+                      <span className="data-caption">Care scenario</span>
                     </div>
                     <p className="territory-description">
                       Everyone deserves water, food, healthcare, and a safe
@@ -702,7 +702,7 @@ export default function EarthHealth() {
                             selected.goal) *
                             100,
                         )}
-                        aria-label="Percentage of demo fundraising goal"
+                        aria-label="Percentage of fundraising goal"
                       />
                       <div className="funding-foot">
                         <span>
@@ -712,7 +712,7 @@ export default function EarthHealth() {
                               selected.goal) *
                               100,
                           )}
-                          % of the demo goal
+                          % of the fundraising goal
                         </span>
                         <span>Every contribution counts</span>
                       </div>
@@ -747,14 +747,14 @@ export default function EarthHealth() {
                     <Globe2 size={36} />
                     <h3>This place deserves attention.</h3>
                     <p>
-                      We have not added a demo scenario for {selected.name}.
+                      We have not added a care scenario for {selected.name}.
                       White indicates missing data, not an absence of need.
                     </p>
                     <button
                       className="primary-button"
                       onClick={() => navigate(territories[0])}
                     >
-                      Explore a demo territory
+                      Explore a territory
                       <ArrowRight size={17} />
                     </button>
                   </div>
@@ -808,11 +808,11 @@ export default function EarthHealth() {
                 {profile ? 7 : 6}
                 {!profile && <span>+ you</span>}
               </strong>
-              <span>donors in the demo community</span>
+              <span>donors in the community</span>
             </div>
             <div className="impact-stat">
               <strong>{territories.length}</strong>
-              <span>territories with demo scenarios</span>
+              <span>territories with care projects</span>
             </div>
             <button
               className="circle-arrow"
@@ -837,7 +837,7 @@ export default function EarthHealth() {
           <DialogTitle>A transparent prototype.</DialogTitle>
           <DialogDescription>
             earthealth connects people with needs around the world. This is an
-            early demonstration.
+            early release.
           </DialogDescription>
           <div className="info-block">
             <h3>Example data</h3>
@@ -852,9 +852,9 @@ export default function EarthHealth() {
             <p>
               Synthetic index from 0–100: dark red 85–100, orange 70–84, sand
               50–69, green 30–49, blue 0–29. The Aid view shows the funded share
-              of the demo goal. White means data is unavailable. Continents
-              aggregate demo countries only; city areas are approximate project
-              areas, not municipal boundaries.
+              of the fundraising goal. White means data is unavailable.
+              Continents aggregate participating countries only; city areas are
+              approximate project areas, not municipal boundaries.
             </p>
             <h3>Geography and official channels</h3>
             <p>
@@ -906,9 +906,7 @@ export default function EarthHealth() {
         <DialogContent className="eh-dialog">
           {impactSelected && (
             <>
-              <span className="dialog-eyebrow">
-                AID AROUND THE WORLD · DEMO
-              </span>
+              <span className="dialog-eyebrow">AID AROUND THE WORLD</span>
               <DialogTitle>
                 {impactSelected.name}: every contribution adds up.
               </DialogTitle>
@@ -916,8 +914,8 @@ export default function EarthHealth() {
                 {money(
                   impactSelected.raised + (extraRaised[impactSelected.id] ?? 0),
                 )}{' '}
-                in demo contributions, towards a goal of{' '}
-                {money(impactSelected.goal)}.
+                in contributions, towards a goal of {money(impactSelected.goal)}
+                .
               </DialogDescription>
               <div className="impact-distribution">
                 {categories.map((c) => {
@@ -948,7 +946,7 @@ export default function EarthHealth() {
                                 (extraRaised[impactSelected.id] ?? 0))) *
                             100
                           }
-                          aria-label={`Demo share ${c.label}`}
+                          aria-label={`Category share ${c.label}`}
                         />
                       </div>
                       <b>{money(funds)}</b>
@@ -969,7 +967,7 @@ export default function EarthHealth() {
         <DialogContent className="eh-dialog search-dialog">
           <DialogTitle>Where would you like to help?</DialogTitle>
           <DialogDescription>
-            Search for a continent, country, or demo city.
+            Search for a continent, country, or city.
           </DialogDescription>
           <Command shouldFilter={false} className="place-command">
             <CommandInput
@@ -979,7 +977,7 @@ export default function EarthHealth() {
             />
             <CommandList>
               <CommandEmpty>
-                No places found. Try a country or a demo city.
+                No places found. Try a country or a city.
               </CommandEmpty>
               {searchResults.map((t) => (
                 <CommandItem
@@ -992,7 +990,7 @@ export default function EarthHealth() {
                     {t.name}
                     <small>
                       {t.countryName ?? t.continent}
-                      {t.score < 0 ? ' · no demo data' : ''}
+                      {t.score < 0 ? ' · data unavailable' : ''}
                     </small>
                   </span>
                   <ChevronRight size={17} />

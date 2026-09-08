@@ -85,7 +85,7 @@ export async function saveWorkspace(
 export function localOnly(request: Request) {
   const url = new URL(request.url);
   if (!['localhost', '127.0.0.1', '[::1]'].includes(url.hostname))
-    throw new Error('This independent demo is local-only.');
+    throw new Error('This workspace is available locally.');
   const origin = request.headers.get('origin');
   if (origin && origin !== url.origin)
     throw new Error('Request origin does not match this workspace.');
