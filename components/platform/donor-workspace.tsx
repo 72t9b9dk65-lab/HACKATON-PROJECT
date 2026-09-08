@@ -35,7 +35,6 @@ import { GrowthCheckpoints } from './growth-checkpoints';
 import { ProofDialog } from './proof-dialog';
 import {
   Header,
-  Footer,
   LoadingWorkspace,
   Modal,
   Notice,
@@ -516,14 +515,6 @@ export default function DonorWorkspace({
                     </div>
                   ))}
                 </div>
-                <div className="gs-stats-foot">
-                  <b>{rows.length} allocated items</b>
-                  <b>
-                    {receipts.filter((r) => r.state === 'funded').length} funded
-                    transactions
-                  </b>
-                  <span>{money(donor.pending)} SEK still available</span>
-                </div>
               </section>
             )}
             <div className="gs-roster">
@@ -586,7 +577,6 @@ export default function DonorWorkspace({
           September 2026.
         </p>
       </main>
-      <Footer />
       {donating && state.viewer?.demo === false && (
         <Modal
           open

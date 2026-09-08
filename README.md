@@ -11,14 +11,18 @@ Requires Node.js 22.13+.
 ```sh
 npm ci
 npm run db:local
-npm run dev:isolated
+npm run dev
 ```
 
 - Donor: http://127.0.0.1:3001/
-- Staff: http://127.0.0.1:3001/staff
+- Staff: http://127.0.0.1:3002/
 - Independent proof checker: http://127.0.0.1:3001/verify
 
-The original checkout can remain on port 3000. Financial state uses project-local D1/SQLite and uploads use local R2; preserve `.wrangler/state/` to retain this demo. There is no payment capture or production authentication.
+`npm run dev` (also `npm run dev:isolated`) starts both sites in one terminal. Keep that terminal running, then use **Staff workspace** and choose **Open staff demo**. Both processes stop together with Ctrl+C. On another computer, install dependencies and apply the local database migrations there using the commands above; no separate staff dependencies are needed.
+
+If an older checkout shows “can’t connect” after clicking Staff workspace, run `npm run dev:staff` in a second terminal alongside its donor server. After updating to the combined startup command, stop those older processes first so ports 3001 and 3002 are free. Advanced/manual startup remains available through `npm run dev:donor` and `npm run dev:staff`.
+
+These addresses run on the computer where the commands are executed. Each computer has its own local demo data. Financial state uses project-local D1/SQLite and uploads use local R2; preserve `.wrangler/state/` to retain this demo. There is no payment capture; real sign-in requires the configuration described in [Connected donor and staff demo](docs/connected-workspace.md).
 
 On macOS, `npm run ocr:build` prepares Apple Vision/PDFKit receipt reading. Images/PDFs stay local. Staff can also upload text, paste extracted text or enter product lines. OCR suggestions always require review.
 

@@ -624,16 +624,6 @@
 .gs-bars strong {
   text-align: right;
 }
-.gs-stats-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  padding-top: 25px;
-  border-top: 1px solid var(--cp-line);
-  margin-top: auto;
-  font-size: 0.875rem;
-  flex-wrap: wrap;
-}
 .gs-preview-banner {
   display: flex;
   align-items: center;

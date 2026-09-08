@@ -6,7 +6,8 @@ The donor website and employee portal have separate origins and use the same D1 
 
 - Donor website: http://127.0.0.1:3001/
 - Staff portal: http://127.0.0.1:3002/
-- Run `npm run db:local` once after updating the schema, `npm run dev:isolated`, and `npm run dev:staff` in another terminal. The second process proxies the staff origin into the same Worker; it does not create a second database.
+- Run `npm ci` and `npm run db:local` on a fresh checkout, then `npm run dev` (or `npm run dev:isolated`). One command starts both sites; Ctrl+C stops both. The staff process proxies its origin into the same Worker; it does not create a second database. No extra staff dependencies are needed.
+- For manual startup, use `npm run dev:donor` and `npm run dev:staff` in separate terminals instead of the combined command. With the combined command, `CARE_DONOR_PORT` and `CARE_STAFF_PORT` can select distinct local ports; the default origin settings follow those ports. Do not run both startup methods simultaneously.
 - Open `/signin` on the donor website to create a named demo donor. Its balance starts at zero. Its account immediately appears in the staff donor list. The original anonymous donor preview remains available in demo mode.
 - Open the staff origin and choose **Open staff demo**. This is explicitly a local demonstration, not employee identity verification. The staff page is not served at `/staff` on the donor origin.
 - Google and Apple buttons are unavailable until their configuration exists. Demo sign-in never contacts either provider.

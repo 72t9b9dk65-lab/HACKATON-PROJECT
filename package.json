@@ -6,14 +6,15 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "vinext dev",
+    "dev": "node scripts/local/dev-portals.mjs",
     "build": "vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",
     "format": "oxfmt",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "typecheck": "tsc --noEmit",
-    "dev:isolated": "vinext dev --host 127.0.0.1 --port 3001",
+    "dev:isolated": "node scripts/local/dev-portals.mjs",
+    "dev:donor": "vinext dev",
     "db:local": "wrangler d1 migrations apply CARE_DB --local --config wrangler.local.jsonc",
     "ocr:build": "mkdir -p .local/swift-cache && swiftc -O -module-cache-path .local/swift-cache scripts/local/ReceiptVision.swift -o .local/receipt-vision",
     "test:platform": "node --experimental-strip-types --test tests/platform.test.mjs",
