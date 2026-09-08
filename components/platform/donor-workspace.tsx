@@ -194,7 +194,7 @@ export default function DonorWorkspace({
     .filter((z) => z.nextThresholdOre !== null)
     .sort((a, b) => a.remainingOre - b.remainingOre)[0];
   const parsed = parseMoney(amount),
-    valid = parsed !== null && parsed >= 100 && parsed <= 1_000_000;
+    valid = parsed !== null && parsed >= 5_000 && parsed <= 1_000_000;
   async function recordGift() {
     if (!valid) return;
     if (
@@ -584,63 +584,67 @@ export default function DonorWorkspace({
           title="Help their world grow"
           description="Your donation stays pending until staff assign it to purchased care products."
         >
-          <div className="gs-amount-presets">
-            {[50, 100, 250, 500, 1000].map((n) => (
-              <Button
-                key={n}
-                variant={amount === String(n) ? 'default' : 'outline'}
-                aria-pressed={amount === String(n)}
-                onClick={() => setAmount(String(n))}
-              >
-                {n.toLocaleString('en-GB')} SEK
-              </Button>
-            ))}
-          </div>
           <ol
             className="gs-donation-example-cards"
             aria-label="Donation examples"
           >
             {[
               {
+                amount: 100,
                 file: 'food-enrichment-2-days.png',
                 title: 'Food and enrichment for 2 days',
                 panel: '0 0 768 488',
               },
               {
+                amount: 250,
                 file: 'vet-care-rehab-2-days.png',
                 title: 'Vet care and rehabilitation for 2 days',
                 height: 488,
               },
               {
+                amount: 500,
                 file: 'food-enrichment-10-days.png',
                 title: 'Food and enrichment for 10 days',
                 panel: '0 488 768 536',
               },
               {
+                amount: 1000,
                 file: 'vet-exam-vaccination.png',
                 title: 'Vet examination and vaccination',
                 height: 536,
               },
             ].map((card) => (
               <li className="gs-donation-example-card" key={card.file}>
-                {card.panel ? (
-                  // The complete sheet contains both food cards; render their panels without editing the supplied files.
-                  <svg viewBox={card.panel} aria-label={card.title}>
-                    <title>{card.title}</title>
-                    <image
-                      href="/care/donation-cards/food-enrichment-10-days.png"
-                      width="1536"
-                      height="1024"
+                <Button
+                  type="button"
+                  variant={
+                    amount === String(card.amount) ? 'default' : 'outline'
+                  }
+                  aria-pressed={amount === String(card.amount)}
+                  onClick={() => setAmount(String(card.amount))}
+                >
+                  {card.amount} SEK
+                </Button>
+                <div className="gs-card-image-wrap">
+                  {card.panel ? (
+                    // The complete sheet contains both food cards; render their panels without editing the supplied files.
+                    <svg viewBox={card.panel} aria-label={card.title}>
+                      <title>{card.title}</title>
+                      <image
+                        href="/care/donation-cards/food-enrichment-10-days.png"
+                        width="1536"
+                        height="1024"
+                      />
+                    </svg>
+                  ) : (
+                    <CareImage
+                      src={'/care/donation-cards/' + card.file}
+                      alt={card.title}
+                      width={768}
+                      height={card.height}
                     />
-                  </svg>
-                ) : (
-                  <CareImage
-                    src={'/care/donation-cards/' + card.file}
-                    alt={card.title}
-                    width={768}
-                    height={card.height}
-                  />
-                )}
+                  )}
+                </div>
               </li>
             ))}
           </ol>
@@ -703,7 +707,9 @@ export default function DonorWorkspace({
             </div>
           ) : (
             <Notice kind="error">
-              Enter 1–10,000 SEK, with up to two decimal places.
+              {parsed !== null && parsed > 1_000_000
+                ? 'The maximum donation is 10,000 SEK.'
+                : 'Enter 50+ SEK, with up to two decimal places.'}
             </Notice>
           )}
           {store.error && <Notice kind="error">{store.error}</Notice>}
@@ -727,14 +733,6 @@ export default function DonorWorkspace({
               {store.busy ? 'Saving…' : 'Confirm donation'}
             </Primary>
           </div>
-          <a
-            className="cp-real-gift"
-            href="https://hundstallet.se/stod-oss/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Make a real donation on Hundstallet’s website ↗
-          </a>
         </Modal>
       )}
       {dog && (

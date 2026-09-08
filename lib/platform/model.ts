@@ -459,10 +459,10 @@ export function applyAction(
       const d = donor(action.donorId);
       if (
         !validMoney(action.amountOre) ||
-        action.amountOre < 100 ||
+        action.amountOre < 5_000 ||
         action.amountOre > 1_000_000
       )
-        throw new Error('Choose an amount between 1 and 10,000 SEK.');
+        throw new Error('Choose an amount between 50 and 10,000 SEK.');
       if (!categories.some((c) => c.id === action.category))
         throw new Error('Choose a care example.');
       const gift = {

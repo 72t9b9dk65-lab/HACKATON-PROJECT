@@ -706,25 +706,6 @@
   margin-top: 23px !important;
   max-width: 1000px;
 }
-.gs-amount-presets {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  width: 100%;
-}
-.gs-amount-presets > button {
-  min-width: 0;
-  width: 100%;
-  height: auto;
-  min-height: 56px;
-  padding: 12px 16px;
-  font-size: 1.2rem;
-  font-weight: 700;
-  white-space: normal;
-}
-.gs-amount-presets > button:last-child {
-  grid-column: 1 / -1;
-}
 .gs-donation-example-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -735,6 +716,25 @@
   list-style: none;
 }
 .gs-donation-example-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  scroll-snap-align: start;
+}
+.gs-donation-example-card > button {
+  width: 100%;
+  height: auto;
+  min-height: 48px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  white-space: normal;
+}
+.gs-donation-example-card .gs-card-image-wrap {
   display: grid;
   place-items: center;
   aspect-ratio: 3 / 2;
@@ -742,10 +742,9 @@
   border: 1px solid var(--cp-line);
   border-radius: 12px;
   background: #f7f4e9;
-  scroll-snap-align: start;
 }
-.gs-donation-example-card > img,
-.gs-donation-example-card > svg {
+.gs-card-image-wrap > img,
+.gs-card-image-wrap > svg {
   display: block;
   width: 100%;
   height: 100%;
@@ -1047,6 +1046,14 @@
 .gs-donor-portfolios > aside small {
   display: block;
   margin-top: 4px;
+}
+.gs-transaction-file > strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.gs-transaction-file > span,
+.gs-transaction-file .cp-file-picker {
+  font-size: 0.875rem;
 }
 .gs-photo-upload {
   display: flex;

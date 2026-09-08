@@ -195,7 +195,7 @@ test('SEK parsing uses integer öre; invalid precision, NaN and outside limits f
   for (const input of ['', '-2', '1e3', '1,100', '0', 'Infinity', '2.005'])
     assert.equal(parseMoney(input), null);
   const s = await seed();
-  for (const amountOre of [0, NaN, 1.2, -100, 1, 99, 1000001])
+  for (const amountOre of [0, NaN, 1.2, -100, 1, 99, 100, 4999, 1000001])
     assert.throws(
       () =>
         apply(s, {
@@ -205,8 +205,22 @@ test('SEK parsing uses integer öre; invalid precision, NaN and outside limits f
           monthly: false,
           category: 'food',
         }),
-      /between 1 and/,
+      /between 50 and/,
     );
+  const before = balances(s).find((d) => d.id === 'personal').pending;
+  for (const amountOre of [5000, 5001, 1000000]) {
+    const next = apply(s, {
+      type: 'donate',
+      donorId: 'personal',
+      amountOre,
+      monthly: false,
+      category: 'food',
+    });
+    assert.equal(
+      balances(next).find((d) => d.id === 'personal').pending,
+      before + amountOre,
+    );
+  }
 });
 test('priced units are expanded exactly, with differing prices preserved', () => {
   const rows = expandLines(

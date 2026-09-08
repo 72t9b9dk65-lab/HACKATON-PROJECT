@@ -41,6 +41,45 @@ import {
   CategoryIcon,
   dateLabel,
 } from './shared';
+
+function TransactionFileDialog({ onClose }: { onClose: () => void }) {
+  const [fileName, setFileName] = useState('');
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title="Add transaction file"
+      description="Choose a transaction export from your accounting app."
+    >
+      <div className="cp-upload-zone gs-transaction-file">
+        <Upload size={28} />
+        <strong>{fileName || 'Accounting export'}</strong>
+        <span>CSV or Excel file</span>
+        <label className="cp-file-picker">
+          {fileName ? 'Choose another file' : 'Choose file'}
+          <input
+            type="file"
+            accept=".csv,.xlsx,.xls"
+            aria-label="Choose transaction file"
+            onChange={(e) => setFileName(e.target.files?.[0]?.name ?? '')}
+          />
+        </label>
+      </div>
+      <Notice>
+        Automatic import is coming soon. Once connected, your export will be
+        read automatically so you can review the transactions before saving.
+        Files are not uploaded yet.
+      </Notice>
+      <div className="cp-modal-actions">
+        <Button variant="ghost" onClick={onClose}>
+          Close
+        </Button>
+        <Primary disabled>Read transactions</Primary>
+      </div>
+    </Modal>
+  );
+}
+
 function ProductPhotoDialog({
   store,
   product,
@@ -198,11 +237,12 @@ function ProductPhotoDialog({
 export default function StaffWorkspace() {
   const store = useCareWorkspace();
   const [recordingGift, setRecordingGift] = useState(false);
+  const [addingTransactionFile, setAddingTransactionFile] = useState(false);
   const [tab, setTab] = useState<'receipts' | 'donors'>('receipts'),
     [search, setSearch] = useState(''),
     [filter, setFilter] = useState('all'),
     [limit, setLimit] = useState(12);
-  const [editor, setEditor] = useState<Receipt | true | null>(null),
+  const [editor, setEditor] = useState<Receipt | null>(null),
     [allocation, setAllocation] = useState<string | null>(null),
     [photoProduct, setPhotoProduct] = useState<Product | null>(null),
     [proofId, setProofId] = useState<string | null>(null),
@@ -450,15 +490,15 @@ export default function StaffWorkspace() {
         <div className="gs-staff-heading">
           <div>
             <h1>Care, accounted for.</h1>
-            <p>Upload receipts. Check products. Allocate once.</p>
+            <p>Import transactions. Check products. Allocate once.</p>
           </div>
           <Primary
             onClick={() => {
               store.clearError();
-              setEditor(true);
+              setAddingTransactionFile(true);
             }}
           >
-            <Plus size={20} /> Add receipts or invoices
+            <Plus size={20} /> Add transaction file
           </Primary>
         </div>
         {(message || store.error) && (
@@ -653,6 +693,11 @@ export default function StaffWorkspace() {
           proof that care occurred.
         </p>
       </main>
+      {addingTransactionFile && (
+        <TransactionFileDialog
+          onClose={() => setAddingTransactionFile(false)}
+        />
+      )}
       {recordingGift && (
         <ReceivedGiftDialog
           store={store}
@@ -663,7 +708,7 @@ export default function StaffWorkspace() {
       {editor && (
         <ReceiptDialog
           store={store}
-          receipt={editor === true ? undefined : editor}
+          receipt={editor}
           onClose={() => setEditor(null)}
           onSaved={setMessage}
         />
