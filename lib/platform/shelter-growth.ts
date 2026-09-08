@@ -206,7 +206,8 @@ export function areaAsset(
   level: number,
 ) {
   const folder = zone.id === 'garden' ? 'garden-v3' : 'grid-v2';
-  return `/care/${folder}/${zone.family}-livello-${level}.webp`;
+  const format = zone.id === 'medical' ? 'png' : 'webp';
+  return `/care/${folder}/${zone.family}-livello-${level}.${format}`;
 }
 
 /** Nine area centres form four squares; each edge joins facing entrances directly. */

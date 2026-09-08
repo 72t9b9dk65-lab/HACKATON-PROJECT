@@ -1,6 +1,17 @@
 'use client';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Plus, Minus, Maximize, Moon, Sun, LockKeyhole } from 'lucide-react';
+import {
+  Plus,
+  Minus,
+  Maximize,
+  Moon,
+  Sun,
+  LockKeyhole,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ChevronDown,
+} from 'lucide-react';
 import { CareImage } from './care-image';
 import { profileDogs } from '@/lib/donation-shell';
 import { money } from '@/lib/platform/model';
@@ -15,6 +26,7 @@ import {
   type ShelterNetwork,
   zoneSize,
   type ShelterProgress,
+  type ZoneId,
 } from '@/lib/platform/shelter-growth';
 import { Button } from '@/components/ui/button';
 type Props = {
@@ -38,6 +50,8 @@ export function GrowingShelter({
   const [dimensions, setDimensions] = useState({ width: 900, height: 660 });
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [focusedArea, setFocusedArea] = useState<ZoneId | null>(null);
+  const [dragging, setDragging] = useState(false);
   const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(
     null,
   );
@@ -71,10 +85,59 @@ export function GrowingShelter({
   );
   const baseScale = Math.max(dimensions.width < 600 ? 0.5 : 0, fitScale);
   const scale = baseScale * zoom;
+  const areaOrder = [...progress.zones].sort((a, b) => a.y - b.y || a.x - b.x);
+  const selected = progress.zones.find((z) => z.id === focusedArea);
+  const selectedIndex = areaOrder.findIndex((z) => z.id === focusedArea);
+  const adjacentAreas = selected
+    ? network.connections
+        .filter((edge) => edge.from === selected.id || edge.to === selected.id)
+        .map((edge) => {
+          const zone = progress.zones.find(
+            (z) => z.id === (edge.from === selected.id ? edge.to : edge.from),
+          )!;
+          const direction =
+            zone.x < selected.x
+              ? 'left'
+              : zone.x > selected.x
+                ? 'right'
+                : zone.y < selected.y
+                  ? 'up'
+                  : 'down';
+          return { zone, direction };
+        })
+    : [];
   const offset = {
-    x: (dimensions.width - WORLD_WIDTH * scale) / 2 + pan.x,
-    y: (dimensions.height - WORLD_HEIGHT * scale) / 2 + pan.y,
+    x: dimensions.width / 2 - (selected?.x ?? WORLD_WIDTH / 2) * scale + pan.x,
+    y:
+      dimensions.height / 2 - (selected?.y ?? WORLD_HEIGHT / 2) * scale + pan.y,
   };
+  function focusArea(id: ZoneId) {
+    if (!focusedArea) {
+      // Reserve room for side arrows and the badge beneath the largest tile.
+      // One shared scale lets navigation keep exactly the same magnification.
+      const largest = Math.max(
+        ...progress.zones.map((z) =>
+          zoneSize(z.id, Math.max(1, preview ? z.projectedLevel : z.level)),
+        ),
+      );
+      const focusScale = Math.max(
+        0.25,
+        Math.min(
+          (dimensions.width - 112) / largest,
+          (dimensions.height - 48) / (largest + 184),
+          2,
+        ),
+      );
+      setZoom(focusScale / baseScale);
+    }
+    setFocusedArea(id);
+    setPan({ x: 0, y: 0 });
+  }
+  function showWholeShelter() {
+    setFocusedArea(null);
+    setZoom(fitScale / baseScale);
+    setPan({ x: 0, y: 0 });
+  }
   const formatted = new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Europe/Stockholm',
     weekday: 'long',
@@ -99,7 +162,38 @@ export function GrowingShelter({
       onDog={onDog}
     />
   );
+  function visitAdjacentArea(id: ZoneId) {
+    focusArea(id);
+    // Keep keyboard navigation available when a direction disappears at an edge.
+    requestAnimationFrame(() => {
+      viewport.current
+        ?.querySelector<HTMLButtonElement>(`[data-zone-focus="${id}"]`)
+        ?.focus({ preventScroll: true });
+    });
+  }
+  function navigateAreasWithKeys(e: React.KeyboardEvent<HTMLButtonElement>) {
+    if (!selected || e.defaultPrevented) return;
+    const directions: Record<string, string> = {
+      ArrowLeft: 'left',
+      ArrowRight: 'right',
+      ArrowUp: 'up',
+      ArrowDown: 'down',
+    };
+    const direction = directions[e.key];
+    if (direction) {
+      e.preventDefault();
+      const neighbor = adjacentAreas.find(
+        (area) => area.direction === direction,
+      );
+      if (neighbor) visitAdjacentArea(neighbor.zone.id);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      showWholeShelter();
+    }
+  }
   function panWithKeys(e: React.KeyboardEvent<HTMLButtonElement>) {
+    navigateAreasWithKeys(e);
+    if (e.defaultPrevented) return;
     const moves: Record<string, { x: number; y: number }> = {
       ArrowLeft: { x: 70, y: 0 },
       ArrowRight: { x: -70, y: 0 },
@@ -138,9 +232,10 @@ export function GrowingShelter({
       </header>
       <div
         ref={viewport}
-        className="gs-viewport"
+        className={'gs-viewport' + (dragging ? ' is-dragging' : '')}
         onPointerDown={(e) => {
           if ((e.target as HTMLElement).closest('button')) return;
+          setDragging(true);
           drag.current = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
           e.currentTarget.setPointerCapture(e.pointerId);
         }}
@@ -159,9 +254,11 @@ export function GrowingShelter({
         }}
         onPointerUp={() => {
           drag.current = null;
+          setDragging(false);
         }}
         onPointerCancel={() => {
           drag.current = null;
+          setDragging(false);
         }}
       >
         <div
@@ -210,14 +307,23 @@ export function GrowingShelter({
                 }
                 style={{ left: z.x, top: z.y, width: size, height: size }}
               >
-                <CareImage
-                  src={areaAsset(z, shown)}
-                  alt={z.name + ' level ' + shown}
-                  width={480}
-                  height={480}
-                  draggable={false}
-                  loading="eager"
-                />
+                <button
+                  className="gs-zone-art"
+                  data-zone-focus={z.id}
+                  onKeyDown={navigateAreasWithKeys}
+                  onClick={() => focusArea(z.id)}
+                  aria-label={'Zoom into ' + z.name}
+                  aria-pressed={focusedArea === z.id}
+                >
+                  <CareImage
+                    src={areaAsset(z, shown)}
+                    alt={z.name + ' level ' + shown}
+                    width={480}
+                    height={480}
+                    draggable={false}
+                    loading="eager"
+                  />
+                </button>
                 <button
                   className={
                     'gs-zone-label' +
@@ -262,13 +368,43 @@ export function GrowingShelter({
           {preview &&
             progress.potentialIds.map((id, i) => resident(id, i, true))}
         </div>
+        {selected && (
+          <>
+            {adjacentAreas.map(({ zone, direction }) => {
+              const Icon =
+                direction === 'left'
+                  ? ChevronLeft
+                  : direction === 'right'
+                    ? ChevronRight
+                    : direction === 'up'
+                      ? ChevronUp
+                      : ChevronDown;
+              return (
+                <Button
+                  key={direction}
+                  className={'gs-area-arrow gs-area-' + direction}
+                  onKeyDown={navigateAreasWithKeys}
+                  variant="outline"
+                  aria-label={'Go ' + direction + ' to ' + zone.name}
+                  title={zone.name}
+                  onClick={() => visitAdjacentArea(zone.id)}
+                >
+                  <Icon size={26} />
+                </Button>
+              );
+            })}
+            <span className="sr-only" aria-live="polite">
+              {selected.name}, area {selectedIndex + 1} of {areaOrder.length}
+            </span>
+          </>
+        )}
         <div className="gs-map-tools">
           <Button
             variant="outline"
             aria-label="Zoom in"
             title="Zoom in · arrow keys move the map"
             onKeyDown={panWithKeys}
-            onClick={() => setZoom((z) => Math.min(2, z + 0.2))}
+            onClick={() => setZoom((z) => Math.min(4 / baseScale, z + 0.2))}
           >
             <Plus size={18} />
           </Button>
@@ -283,13 +419,16 @@ export function GrowingShelter({
           </Button>
           <Button
             variant="outline"
-            aria-label="Fit whole shelter"
-            title="Fit whole shelter · arrow keys move the map"
+            aria-label={
+              selected ? 'Back to whole shelter' : 'Fit whole shelter'
+            }
+            title={
+              selected
+                ? 'Back to whole shelter · Escape'
+                : 'Fit whole shelter · arrow keys move the map'
+            }
             onKeyDown={panWithKeys}
-            onClick={() => {
-              setZoom(fitScale / baseScale);
-              setPan({ x: 0, y: 0 });
-            }}
+            onClick={showWholeShelter}
           >
             <Maximize size={17} />
           </Button>
@@ -311,7 +450,11 @@ export function GrowingShelter({
             ? 'Donation preview · faded areas show potential growth'
             : 'Your virtual shelter grows with your total donations.'}
         </span>
-        <small>Drag to explore · virtual routines</small>
+        <small>
+          {selected
+            ? 'Use arrows to explore · Escape to see the shelter'
+            : 'Click an area to explore · Drag to move'}
+        </small>
       </footer>
     </section>
   );

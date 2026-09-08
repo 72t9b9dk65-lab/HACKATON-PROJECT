@@ -478,7 +478,7 @@
       "left",
       "bottom"
     ],
-    "path": "/care/grid-v2/cura-livello-1.webp",
+    "path": "/care/grid-v2/cura-livello-1.png",
     "source": "originals/care-levels-1-4.png",
     "quadrantCrop": [
       0,
@@ -503,7 +503,7 @@
       "left",
       "bottom"
     ],
-    "path": "/care/grid-v2/cura-livello-2.webp",
+    "path": "/care/grid-v2/cura-livello-2.png",
     "source": "originals/care-levels-1-4.png",
     "quadrantCrop": [
       627,
@@ -528,7 +528,7 @@
       "left",
       "bottom"
     ],
-    "path": "/care/grid-v2/cura-livello-3.webp",
+    "path": "/care/grid-v2/cura-livello-3.png",
     "source": "originals/care-levels-1-4.png",
     "quadrantCrop": [
       0,
@@ -553,7 +553,7 @@
       "left",
       "bottom"
     ],
-    "path": "/care/grid-v2/cura-livello-4.webp",
+    "path": "/care/grid-v2/cura-livello-4.png",
     "source": "originals/care-levels-1-4.png",
     "quadrantCrop": [
       627,
@@ -578,7 +578,7 @@
       "left",
       "bottom"
     ],
-    "path": "/care/grid-v2/cura-livello-5.webp",
+    "path": "/care/grid-v2/cura-livello-5.png",
     "source": "originals/care-level-5.png",
     "quadrantCrop": null,
     "contentBounds": [
