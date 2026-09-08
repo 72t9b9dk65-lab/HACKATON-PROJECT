@@ -35,7 +35,7 @@ const localBindingConfig = {
     : [],
 };
 
-export default defineConfig(async () => {
+export default defineConfig(async ({ command }) => {
   // Keep Wrangler and Miniflare state project-local. These are non-secret tool
   // settings; application environment belongs in ignored `.env*` files.
   process.env.WRANGLER_WRITE_LOGS ??= 'false';
@@ -67,7 +67,19 @@ export default defineConfig(async () => {
           : true,
         remoteBindings: false,
         tunnel: false,
-        config: localBindingConfig,
+        config: {
+          ...localBindingConfig,
+          vars:
+            command === 'serve'
+              ? {
+                  CARE_MODE: process.env.CARE_MODE || 'demo',
+                  CARE_PUBLIC_ORIGIN:
+                    process.env.CARE_PUBLIC_ORIGIN || 'http://127.0.0.1:3001',
+                  CARE_STAFF_ORIGIN:
+                    process.env.CARE_STAFF_ORIGIN || 'http://127.0.0.1:3002',
+                }
+              : {},
+        },
       }),
     ],
   };

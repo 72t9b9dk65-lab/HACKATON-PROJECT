@@ -1,8 +1,7 @@
 'use client';
+import { companionProfileId } from '@/lib/platform/shelter-growth';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
-  Plus,
-  Minus,
   Maximize,
   Moon,
   Sun,
@@ -34,7 +33,6 @@ type Props = {
   clock: number;
   preview: boolean;
   onDog: (id: string) => void;
-  onDonate: () => void;
   growthSummary: ReactNode;
   previewControls?: ReactNode;
 };
@@ -43,7 +41,6 @@ export function GrowingShelter({
   clock,
   preview,
   onDog,
-  onDonate,
   growthSummary,
   previewControls,
 }: Props) {
@@ -160,11 +157,6 @@ export function GrowingShelter({
     day: 'numeric',
     month: 'long',
   }).format(clock);
-  const time = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/Stockholm',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(clock);
   const resident = (id: string, index: number, ghost = false) => (
     <ShelterDog
       key={id}
@@ -235,13 +227,6 @@ export function GrowingShelter({
           {moment.night ? <Moon size={25} /> : <Sun size={25} />}
           <span>
             <strong>{formatted}</strong>
-            <small>
-              {new Intl.DateTimeFormat('en-GB', {
-                timeZone: 'Europe/Stockholm',
-                year: 'numeric',
-              }).format(clock)}{' '}
-              · {time} Stockholm
-            </small>
           </span>
         </div>
         {growthSummary}
@@ -354,10 +339,11 @@ export function GrowingShelter({
                         ? ' gs-label-beside-road'
                         : '')
                     }
-                    onClick={onDonate}
+                    onClick={() => focusArea(z.id)}
                     title={
                       z.nextThresholdOre !== null
-                        ? money(z.remainingOre) + ' SEK more donated to upgrade'
+                        ? money(z.remainingOre) +
+                          ' SEK more assigned to care to upgrade'
                         : 'Fully upgraded'
                     }
                     aria-label={
@@ -365,7 +351,8 @@ export function GrowingShelter({
                       (z.level ? ' level ' + z.level : ' locked') +
                       '. ' +
                       (z.nextThresholdOre
-                        ? money(z.remainingOre) + ' SEK more donated to upgrade'
+                        ? money(z.remainingOre) +
+                          ' SEK more assigned to care to upgrade'
                         : 'Fully upgraded')
                     }
                   >
@@ -428,41 +415,26 @@ export function GrowingShelter({
             </span>
           </>
         )}
-        <div className="gs-map-tools">
-          <Button
-            variant="outline"
-            aria-label="Zoom in"
-            title="Zoom in · arrow keys move the map"
-            onKeyDown={panWithKeys}
-            onClick={() => setZoom((z) => Math.min(4 / baseScale, z + 0.2))}
-          >
-            <Plus size={18} />
-          </Button>
-          <Button
-            variant="outline"
-            aria-label="Zoom out"
-            title="Zoom out · arrow keys move the map"
-            onKeyDown={panWithKeys}
-            onClick={() => setZoom((z) => Math.max(0.5, z - 0.2))}
-          >
-            <Minus size={18} />
-          </Button>
-          <Button
-            variant="outline"
-            aria-label={
-              selected ? 'Back to whole shelter' : 'Fit whole shelter'
-            }
-            title={
-              selected
-                ? 'Back to whole shelter · Escape'
-                : 'Fit whole shelter · arrow keys move the map'
-            }
-            onKeyDown={panWithKeys}
-            onClick={showWholeShelter}
-          >
-            <Maximize size={17} />
-          </Button>
-        </div>
+        <span className="gs-map-hint">click on the areas to zoom on them</span>
+        {(selected || zoom > 1.01) && (
+          <div className="gs-map-tools">
+            <Button
+              variant="outline"
+              aria-label={
+                selected ? 'Back to whole shelter' : 'Fit whole shelter'
+              }
+              title={
+                selected
+                  ? 'Back to whole shelter · Escape'
+                  : 'Fit whole shelter · arrow keys move the map'
+              }
+              onKeyDown={panWithKeys}
+              onClick={showWholeShelter}
+            >
+              <Maximize size={17} />
+            </Button>
+          </div>
+        )}
         {!progress.residentIds.length &&
           !(preview && progress.potentialIds.length) && (
             <div className="gs-empty">
@@ -474,18 +446,6 @@ export function GrowingShelter({
             </div>
           )}
       </div>
-      <footer className="gs-map-footer">
-        <span>
-          {preview
-            ? 'Donation preview · faded areas show potential growth'
-            : 'Your virtual shelter grows with your total donations.'}
-        </span>
-        <small>
-          {selected
-            ? 'Use arrows to explore · Escape to see the shelter'
-            : 'Click an area to explore · Drag to move'}
-        </small>
-      </footer>
     </section>
   );
 }
@@ -556,13 +516,23 @@ function ShelterDog({
 }) {
   const element = useRef<HTMLButtonElement>(null);
   const elapsed = useRef(0);
-  const dog = profileDogs.find((d) => d.id === id)!;
+  const dog = profileDogs.find((d) => d.id === companionProfileId(id))!;
   const sleeping = !ghost && dogIsSleeping(id, poseMoment);
   const columns = Math.min(
-    7,
+    10,
     Math.ceil(Math.sqrt(progress.residentIds.length)),
   );
-  const dogSize = sleeping ? Math.min(65, 240 / columns) : 76;
+  const restArea =
+    progress.zones.find((z) => z.id === 'kennel' && z.level > 0) ??
+    progress.zones[0];
+  const restWidth = Math.min(
+    240,
+    zoneSize(restArea.id, Math.max(1, restArea.level)) - 80,
+  );
+  const rows = Math.ceil(progress.residentIds.length / columns);
+  const dogSize = sleeping
+    ? Math.min(65, restWidth / columns)
+    : Math.max(44, 76 - Math.max(0, progress.residentIds.length - 20) * 0.4);
   useEffect(() => {
     const node = element.current;
     if (!node) return;
@@ -588,8 +558,11 @@ function ShelterDog({
           point = {
             x:
               kennel.x +
-              ((index % columns) - (columns - 1) / 2) * (240 / columns),
-            y: kennel.y - 60 + Math.floor(index / columns) * (220 / columns),
+              ((index % columns) - (columns - 1) / 2) * (restWidth / columns),
+            y:
+              kennel.y +
+              (Math.floor(index / columns) - (rows - 1) / 2) *
+                Math.min(restWidth / columns, 180 / rows),
           };
         } else {
           const period = 42 + (seed % 24);
@@ -629,7 +602,18 @@ function ShelterDog({
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [id, index, ghost, progress.zones, network, sleeping, reduced, columns]);
+  }, [
+    id,
+    index,
+    ghost,
+    progress.zones,
+    network,
+    sleeping,
+    reduced,
+    columns,
+    restWidth,
+    rows,
+  ]);
   return (
     <button
       ref={element}
@@ -638,7 +622,7 @@ function ShelterDog({
       aria-label={
         dog.name + (ghost ? ' — donation preview' : ' — open public profile')
       }
-      onClick={() => onDog(id)}
+      onClick={() => onDog(companionProfileId(id))}
     >
       {sleeping && (
         <span className="gs-sleep" aria-label="Sleeping">

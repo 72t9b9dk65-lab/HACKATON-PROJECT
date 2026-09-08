@@ -100,7 +100,11 @@ export async function appendProofs(
       kind: event.kind,
       entityId: event.entityId,
       currency: 'SEK',
-      environment: 'local-demo',
+      environment: next.gifts.some(
+        (g) => g.source === 'demo' || g.source === 'workbook',
+      )
+        ? 'local-demo'
+        : 'care-ledger',
     };
     if (receipt)
       Object.assign(payload, {
@@ -165,7 +169,9 @@ export async function receiptEvidence(receipt: Receipt) {
         amountOre: p.amountOre,
         contributions: await Promise.all(
           p.shares.map(async (share) => ({
-            supporter: await sha256('supporter:' + share.donorId),
+            supporter:
+              share.supporterHash ??
+              (await sha256('supporter:' + share.donorId)),
             amountOre: share.amountOre,
           })),
         ),

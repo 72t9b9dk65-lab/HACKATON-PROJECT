@@ -26,6 +26,7 @@ import {
 } from '@/lib/platform/model';
 import { profileDogs } from '@/lib/donation-shell';
 import type { Receipt, Product, FileRecord } from '@/lib/platform/types';
+import { ReceivedGiftDialog } from './received-gift-dialog';
 import { ReceiptDialog } from './receipt-dialog';
 import { AllocationDialog } from './allocation-dialog';
 import { ProofDialog } from './proof-dialog';
@@ -196,6 +197,7 @@ function ProductPhotoDialog({
 }
 export default function StaffWorkspace() {
   const store = useCareWorkspace();
+  const [recordingGift, setRecordingGift] = useState(false);
   const [tab, setTab] = useState<'receipts' | 'donors'>('receipts'),
     [search, setSearch] = useState(''),
     [filter, setFilter] = useState('all'),
@@ -233,7 +235,7 @@ export default function StaffWorkspace() {
     { donated: 0, pending: 0, used: 0 },
   );
   const donor = wallets.find((d) => d.id === selectedDonor) ?? wallets[0],
-    items = donorProducts(state, donor.id);
+    items = donor ? donorProducts(state, donor.id) : [];
   const filtered = state.receipts
     .filter(
       (r) =>
@@ -493,9 +495,14 @@ export default function StaffWorkspace() {
               <Users size={17} /> Donors
             </Button>
           </div>
-          <Button variant="outline" onClick={exportLedger}>
-            <Download size={16} /> Export ledger
-          </Button>
+          <div className="cp-inline-actions">
+            <Button variant="outline" onClick={() => setRecordingGift(true)}>
+              Record received donation
+            </Button>
+            <Button variant="outline" onClick={exportLedger}>
+              <Download size={16} /> Export ledger
+            </Button>
+          </div>
         </div>
         {tab === 'receipts' ? (
           <section className="gs-transactions">
@@ -566,12 +573,12 @@ export default function StaffWorkspace() {
               </Button>
             )}
           </section>
-        ) : (
+        ) : donor ? (
           <div className="gs-donor-portfolios">
             <aside>
               {wallets.map((d) => (
                 <button
-                  className={d.id === donor.id ? 'active' : ''}
+                  className={d.id === donor?.id ? 'active' : ''}
                   key={d.id}
                   onClick={() => setSelectedDonor(d.id)}
                 >
@@ -590,13 +597,15 @@ export default function StaffWorkspace() {
                     SEK pending · {money(donor.used)} SEK used
                   </p>
                 </div>
-                <a
-                  href={'/?donor=' + donor.id}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open shelter ↗
-                </a>
+                <div>
+                  <strong>{donor.email || 'Sample account'}</strong>
+                  <p>
+                    {donor.provider || 'Demo'}
+                    {donor.registeredAt
+                      ? ' · Registered ' + dateLabel(donor.registeredAt, false)
+                      : ''}
+                  </p>
+                </div>
               </header>
               <div className="gs-product-list">
                 {items.map(({ product, receipt, contribution }) => (
@@ -628,12 +637,27 @@ export default function StaffWorkspace() {
               )}
             </section>
           </div>
+        ) : (
+          <Notice>
+            No registered donors yet. New donor accounts appear here
+            automatically.
+          </Notice>
         )}
         <p className="gs-prototype-note">
-          Local prototype with sample donor accounts. Blockchain registration
-          uses Sepolia testnet; a fingerprint is not proof that care occurred.
+          {state.viewer?.demo
+            ? 'Local demo with sample identities. '
+            : 'Employee workspace. '}
+          Blockchain registration uses Sepolia testnet; a fingerprint is not
+          proof that care occurred.
         </p>
       </main>
+      {recordingGift && (
+        <ReceivedGiftDialog
+          store={store}
+          onClose={() => setRecordingGift(false)}
+          onSaved={setMessage}
+        />
+      )}
       {editor && (
         <ReceiptDialog
           store={store}

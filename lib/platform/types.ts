@@ -8,6 +8,7 @@ export type Category =
   | 'comfort';
 export type Stage = 'arrived' | 'care' | 'confidence' | 'ready' | 'home';
 export type FileRecord = {
+  restricted?: boolean;
   id: string;
   name: string;
   type: string;
@@ -19,6 +20,9 @@ export type Donor = {
   id: string;
   name: string;
   shelterName: string;
+  email?: string;
+  provider?: string;
+  registeredAt?: string;
   following: string[];
   seenUpdates: string[];
   monthly: { amountOre: number; startedAt: string; category: Category } | null;
@@ -29,9 +33,15 @@ export type Gift = {
   amountOre: number;
   at: string;
   goalId?: string;
-  source: 'demo' | 'workbook';
+  source: 'demo' | 'workbook' | 'confirmed';
+  reference?: string;
+  method?: 'swish' | 'bank' | 'other';
 };
-export type Share = { donorId: string; amountOre: number };
+export type Share = {
+  donorId: string;
+  amountOre: number;
+  supporterHash?: string;
+};
 export type Product = {
   id: string;
   description: string;
@@ -94,8 +104,18 @@ export type AuditEvent = {
   kind: string;
   entityId: string;
   note: string;
+  actorId?: string;
 };
 export type Workspace = {
+  viewer?: {
+    id: string;
+    email: string;
+    name: string;
+    provider: string;
+    createdAt: string;
+    role: 'donor' | 'staff';
+    demo: boolean;
+  };
   version: 1;
   revision: number;
   createdAt: string;
@@ -122,6 +142,14 @@ export type ReceiptDraft = {
   file: FileRecord | null;
 };
 export type Action =
+  | {
+      type: 'record-gift';
+      donorId: string;
+      amountOre: number;
+      reference: string;
+      method: 'swish' | 'bank' | 'other';
+      receivedAt: string;
+    }
   | {
       type: 'donate';
       donorId: string;

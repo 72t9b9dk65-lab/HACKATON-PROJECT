@@ -406,6 +406,55 @@ export function applyAction(
     );
   };
   switch (action.type) {
+    case 'record-gift': {
+      const d = donor(action.donorId);
+      if (!validMoney(action.amountOre) || action.amountOre > 100_000_000)
+        throw new Error('Enter a valid received amount.');
+      if (!['swish', 'bank', 'other'].includes(action.method))
+        throw new Error('Select a payment method.');
+      const reference = required(
+        action.reference,
+        'a payment reference',
+        120,
+      ).trim();
+      if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(action.receivedAt) ||
+        !Number.isFinite(Date.parse(action.receivedAt)) ||
+        action.receivedAt > now.slice(0, 10)
+      )
+        throw new Error('Enter the date the payment was received.');
+      const existing = state.gifts.find(
+        (g) =>
+          g.method === action.method &&
+          g.reference?.toLowerCase() === reference.toLowerCase(),
+      );
+      if (existing) {
+        if (
+          existing.donorId !== d.id ||
+          existing.amountOre !== action.amountOre
+        )
+          throw new Error(
+            'This payment reference is already registered with different details.',
+          );
+        break;
+      }
+      const gift = {
+        id: id(),
+        donorId: d.id,
+        amountOre: action.amountOre,
+        at: action.receivedAt,
+        source: 'confirmed' as const,
+        method: action.method,
+        reference,
+      };
+      state.gifts.push(gift);
+      audit(
+        'gift.recorded',
+        gift.id,
+        `${money(gift.amountOre)} SEK received via ${action.method}; reference ${reference}.`,
+      );
+      break;
+    }
     case 'donate': {
       const d = donor(action.donorId);
       if (

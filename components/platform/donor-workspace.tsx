@@ -1,12 +1,11 @@
 'use client';
+import { companionProfileId } from '@/lib/platform/shelter-growth';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Heart,
   ArrowUpRight,
   BarChart3,
   ShieldCheck,
-  Image as ImageIcon,
-  Search,
   X,
   Eye,
   ArrowRight,
@@ -58,8 +57,7 @@ export default function DonorWorkspace() {
   const [dogId, setDogId] = useState<string | null>(null),
     [receiptId, setReceiptId] = useState<string | null>(null),
     [proofReceiptId, setProofReceiptId] = useState<string | null>(null);
-  const [query, setQuery] = useState(''),
-    [limit, setLimit] = useState(10),
+  const [limit, setLimit] = useState(10),
     [message, setMessage] = useState('');
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -123,10 +121,13 @@ export default function DonorWorkspace() {
       observer.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [state, query, limit, view, previewActive]);
+  }, [state, limit, view, previewActive]);
   if (!state) return <LoadingWorkspace store={store} />;
   const donor =
-    balances(state).find((d) => d.id === donorId) ?? balances(state)[0];
+    balances(state).find(
+      (d) =>
+        d.id === (state.viewer?.role === 'donor' ? state.viewer.id : donorId),
+    ) ?? balances(state)[0];
   const donatedOre = Math.max(0, donor.used) + Math.max(0, donor.pending);
   const previewMaximumOre = Math.max(
     donatedOre,
@@ -154,17 +155,7 @@ export default function DonorWorkspace() {
         r.products.some((p) => p.shares.some((s) => s.donorId === donor.id)),
     )
     .sort((a, b) => b.purchasedAt.localeCompare(a.purchasedAt));
-  const filtered = receipts.filter((r) =>
-    (
-      r.supplier +
-      ' ' +
-      r.reference +
-      ' ' +
-      r.products.map((p) => p.description).join(' ')
-    )
-      .toLowerCase()
-      .includes(query.toLowerCase()),
-  );
+  const filtered = receipts;
   const selected = state.receipts.find((r) => r.id === receiptId),
     proofReceipt = state.receipts.find((r) => r.id === proofReceiptId);
   const dog = profileDogs.find((d) => d.id === dogId);
@@ -195,7 +186,7 @@ export default function DonorWorkspace() {
       setPreview(null);
       setMessage(
         money(parsed!) +
-          ' SEK added to pending. Your virtual shelter has grown; funds remain pending until assigned to care products.',
+          ' SEK added to pending. Your companions have grown; area upgrades unlock when staff assign care products.',
       );
     }
   }
@@ -228,8 +219,8 @@ export default function DonorWorkspace() {
           <div>
             <strong>Next: {nextZone.name}</strong>
             <small>
-              Level {nextZone.level + 1} · {money(nextZone.remainingOre)} SEK to
-              unlock
+              Level {nextZone.level + 1} · {money(nextZone.remainingOre)} SEK of
+              care to unlock
             </small>
           </div>
         </div>
@@ -250,11 +241,6 @@ export default function DonorWorkspace() {
     </section>
   );
   const renderTransaction = (r: (typeof receipts)[number]) => {
-    const photo = posts.find((p) =>
-      p.productIds.some((id) =>
-        r.products.some((product) => product.id === id),
-      ),
-    );
     const proof = state.proofs.find((p) => p.id === r.proofId);
     return (
       <article
@@ -263,63 +249,52 @@ export default function DonorWorkspace() {
           'gs-transaction ' + (r.state === 'voided' ? 'is-reversed' : '')
         }
       >
-        <button
-          className="gs-transaction-main"
-          onClick={() => setReceiptId(r.id)}
-        >
-          <CategoryIcon category={r.products[0].category} />
-          <span>
+        <div className="gs-transaction-heading">
+          <button
+            className="gs-transaction-main"
+            aria-label={'Open transaction: ' + r.supplier + ' · ' + r.reference}
+            onClick={() => setReceiptId(r.id)}
+          >
+            <CategoryIcon category={r.products[0].category} />
+            <span>
+              <strong>
+                {r.source === 'workbook'
+                  ? r.products[0].description
+                  : r.supplier}
+              </strong>
+              <small>
+                {dateLabel(r.purchasedAt, false)} ·{' '}
+                {r.source === 'workbook' ? 'Imported record' : r.reference}
+              </small>
+            </span>
+          </button>
+        </div>
+        <div className="gs-transaction-summary">
+          <span className="gs-transaction-amount">
             <strong>
-              {r.source === 'workbook' ? r.products[0].description : r.supplier}
+              {r.state === 'voided' ? '↩ ' : ''}
+              {money(shareTotal(r))} SEK
             </strong>
             <small>
-              {dateLabel(r.purchasedAt, false)} ·{' '}
-              {r.source === 'workbook' ? 'Imported record' : r.reference}
+              {r.state === 'voided'
+                ? 'Returned to pending'
+                : 'Your contribution'}
             </small>
           </span>
-        </button>
-        <span className="gs-transaction-amount">
-          <strong>
-            {r.state === 'voided' ? '↩ ' : ''}
-            {money(shareTotal(r))} SEK
-          </strong>
-          <small>
-            {r.state === 'voided' ? 'Returned to pending' : 'Your contribution'}
-          </small>
-        </span>
-        <button
-          className="gs-photo-slot"
-          aria-label={
-            photo
-              ? 'View transaction photo'
-              : 'Open transaction — photo unavailable'
-          }
-          onClick={() => setReceiptId(r.id)}
-        >
-          {photo ? (
-            <CareImage
-              src={photo.photo?.url ?? photo.demoPhoto}
-              alt="Care photo"
-              width={120}
-              height={120}
-            />
-          ) : (
-            <ImageIcon size={22} />
-          )}
-        </button>
-        <Button
-          className="gs-blockchain-status"
-          variant="outline"
-          onClick={() => setProofReceiptId(r.id)}
-        >
-          <span>
-            <ShieldCheck size={16} />{' '}
-            {proof?.anchors.length
-              ? 'Verified by blockchain'
-              : 'Blockchain verification'}
-          </span>
-          <small>Click for more info</small>
-        </Button>
+          <Button
+            className="gs-blockchain-status"
+            variant="outline"
+            onClick={() => setProofReceiptId(r.id)}
+          >
+            <span>
+              <ShieldCheck size={16} />{' '}
+              {proof?.anchors.length
+                ? 'Verified by blockchain'
+                : 'Blockchain verification'}
+            </span>
+            <small>Click for more info</small>
+          </Button>
+        </div>
       </article>
     );
   };
@@ -401,7 +376,12 @@ export default function DonorWorkspace() {
             <section className="gs-transactions gs-sidebar-transactions">
               <header>
                 <div>
-                  <h2>Your care transactions</h2>
+                  <div className="gs-transaction-title">
+                    <h2>Your care transactions</h2>
+                    <span aria-label={`${receipts.length} transactions`}>
+                      {receipts.length}
+                    </span>
+                  </div>
                   <Button
                     className="gs-spending-toggle"
                     variant={view === 'statistics' ? 'default' : 'outline'}
@@ -414,18 +394,6 @@ export default function DonorWorkspace() {
                   </Button>
                   <p>Purchased products funded by your donations.</p>
                 </div>
-                <label className="gs-search">
-                  <Search size={17} />
-                  <input
-                    aria-label="Search transactions"
-                    placeholder="Search transactions"
-                    value={query}
-                    onChange={(e) => {
-                      setQuery(e.target.value);
-                      setLimit(10);
-                    }}
-                  />
-                </label>
               </header>
               <div className="gs-transaction-list">
                 {filtered.slice(0, railLayout.count).map((receipt) => (
@@ -524,7 +492,6 @@ export default function DonorWorkspace() {
                 clock={clock}
                 preview={preview !== null}
                 onDog={setDogId}
-                onDonate={() => setDonating(true)}
               />
             ) : (
               <section className="gs-statistics">
@@ -565,21 +532,29 @@ export default function DonorWorkspace() {
               <div className="gs-roster-title">
                 <strong>Your visual companions</strong>
                 <small>
-                  Public Hundstallet profiles · illustrative selection
+                  Visual companions · profiles may appear more than once
                 </small>
               </div>
               <div>
                 {progress.residentIds.map((id) => {
-                  const d = profileDogs.find((p) => p.id === id)!;
+                  const d = profileDogs.find(
+                    (p) => p.id === companionProfileId(id),
+                  )!;
                   return (
-                    <button key={id} onClick={() => setDogId(id)}>
+                    <button
+                      key={id}
+                      onClick={() => setDogId(companionProfileId(id))}
+                    >
                       <DogPortrait dog={d} />
                       <strong>{d.name}</strong>
                     </button>
                   );
                 })}
                 {!progress.residentIds.length && (
-                  <p>Your first companion arrives at 50 SEK donated.</p>
+                  <p>
+                    Your first companion arrives at 50 SEK donated. Up to 100
+                    companions.
+                  </p>
                 )}
               </div>
             </div>
@@ -614,7 +589,29 @@ export default function DonorWorkspace() {
         </p>
       </main>
       <Footer />
-      {donating && (
+      {donating && state.viewer?.demo === false && (
+        <Modal
+          open
+          onClose={() => setDonating(false)}
+          title="Support the dogs"
+          description="Make your gift through Hundstallet’s official donation page."
+        >
+          <p>
+            Use the email linked to your shelter:{' '}
+            <strong>{state.viewer.email}</strong>. Once staff match your
+            received payment, your balance and companions update here.
+          </p>
+          <a
+            className="cp-button"
+            href="https://hundstallet.se/stod-oss/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Donate with Hundstallet ↗
+          </a>
+        </Modal>
+      )}
+      {donating && state.viewer?.demo !== false && (
         <Modal
           open
           onClose={() => setDonating(false)}
@@ -815,7 +812,7 @@ export default function DonorWorkspace() {
               </figure>
             ))}
           <div className="cp-modal-actions">
-            {selected.file && (
+            {selected.file && !selected.file.restricted && (
               <a
                 className="cp-text-link"
                 href={selected.file.url}

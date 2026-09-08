@@ -103,28 +103,25 @@ export function Header({
 }) {
   return (
     <header className="cp-header">
-      <a className="cp-brand" href={staff ? '/staff' : '/'}>
+      <a className="cp-brand" href={'/'}>
         <CareImage src="/shelters/pixel-shelter.png" alt="" />
         <span>
           HUNDSTALLET
           <small>{staff ? 'Care workspace' : 'Your growing shelter'}</small>
         </span>
       </a>
-      {heading ?? (
-        <span className="cp-demo-pill">Local demo · no payments</span>
-      )}
+      {heading ?? <span className="cp-demo-pill">Care records</span>}
       <div className="cp-header-actions">
         {showSync && <SyncState online={online} />}
         {children}
-        <a
-          className="cp-text-link"
-          href={staff ? '/' : '/staff'}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {staff ? 'Donor shelter' : 'Staff workspace'}{' '}
-          <ArrowUpRight size={15} />
-        </a>
+        <Link className="cp-text-link" href="/signin">
+          Account
+        </Link>
+        <form action="/api/auth/logout" method="post">
+          <button className="cp-text-link" type="submit">
+            Sign out
+          </button>
+        </form>
       </div>
     </header>
   );

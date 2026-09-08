@@ -1,7 +1,14 @@
+import { requirePrincipal } from '@/lib/platform/auth';
+import {
+  authorizeAction,
+  workspaceFor,
+  requireSameOrigin,
+  apiError,
+} from '@/lib/platform/access-policy';
 import {
   readWorkspace,
   saveWorkspace,
-  localOnly,
+  ensureDonor,
   bindings,
 } from '@/lib/platform/storage';
 import { applyAction } from '@/lib/platform/model';
@@ -10,17 +17,16 @@ import { profileDogs } from '@/lib/donation-shell';
 import type { Command, FileRecord } from '@/lib/platform/types';
 export async function GET(request: Request) {
   try {
-    localOnly(request);
-    const state = await readWorkspace();
-    return Response.json(state, { headers: { 'Cache-Control': 'no-store' } });
+    const principal = await requirePrincipal(request);
+    const state =
+      principal.site === 'donor'
+        ? await ensureDonor(principal.user)
+        : await readWorkspace();
+    return Response.json(await workspaceFor(state, principal), {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (error) {
-    return Response.json(
-      {
-        error:
-          error instanceof Error ? error.message : 'Workspace unavailable.',
-      },
-      { status: 503 },
-    );
+    return apiError(error);
   }
 }
 async function validFile(file: FileRecord | null | undefined) {
@@ -36,7 +42,8 @@ async function validFile(file: FileRecord | null | undefined) {
 }
 export async function POST(request: Request) {
   try {
-    localOnly(request);
+    requireSameOrigin(request);
+    const principal = await requirePrincipal(request);
     if (Number(request.headers.get('content-length') ?? 0) > 200_000)
       throw new Error('This entry is too large.');
     const raw = await request.text();
@@ -50,8 +57,10 @@ export async function POST(request: Request) {
       !command.action
     )
       throw new Error('Invalid request.');
+    authorizeAction(principal, command.action);
     const current = await readWorkspace();
-    if (current.commands.includes(command.id)) return Response.json(current);
+    if (current.commands.includes(command.id))
+      return Response.json(await workspaceFor(current, principal));
     if (current.revision !== command.revision)
       return Response.json(
         {
@@ -84,7 +93,7 @@ export async function POST(request: Request) {
       );
       const proof = current.proofs.find((p) => p.id === receipt?.proofId);
       if (receipt && proof && (await verifyReceipt(proof, receipt)) === 'match')
-        return Response.json(current);
+        return Response.json(await workspaceFor(current, principal));
     }
     const now = new Date().toISOString();
     const next = applyAction(
@@ -93,20 +102,18 @@ export async function POST(request: Request) {
       now,
       profileDogs.filter((d) => !d.group).map((d) => d.id),
     );
+    for (const event of next.audit.slice(current.audit.length))
+      event.actorId = principal.user.id;
     next.commands = [...current.commands, command.id];
     await appendProofs(current, next, now);
-    return Response.json(await saveWorkspace(next, current.revision));
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Could not save this change.';
     return Response.json(
-      {
-        error:
-          message === 'CONFLICT'
-            ? 'The records changed. Refresh and try again.'
-            : message,
-      },
-      { status: message === 'CONFLICT' ? 409 : 400 },
+      await workspaceFor(
+        await saveWorkspace(next, current.revision),
+        principal,
+      ),
+      { headers: { 'Cache-Control': 'no-store' } },
     );
+  } catch (error) {
+    return apiError(error);
   }
 }

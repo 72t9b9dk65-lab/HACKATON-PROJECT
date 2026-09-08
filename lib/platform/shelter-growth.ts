@@ -1,18 +1,26 @@
 // Virtual progression is a visual reward, never a claim about an individual dog's costs.
 // Cumulative donated SEK, not a price charged for each dog.
-const COMPANION_THRESHOLDS_SEK = [
-  50, 100, 150, 200, 300, 400, 500, 700, 1000, 1250, 1500, 1750, 2000,
-];
+export const MAX_COMPANIONS = 100;
 export function companionThresholdOre(count: number) {
   if (count <= 0) return 0;
+  if (count > MAX_COMPANIONS) return Infinity;
   return (
-    (COMPANION_THRESHOLDS_SEK[count - 1] ??
-      2000 + (count - COMPANION_THRESHOLDS_SEK.length) * 250) * 100
+    (count <= 20
+      ? count * 50
+      : count <= 50
+        ? 1000 + (count - 20) * 100
+        : 4000 + (count - 50) * 200) * 100
   );
+}
+export function companionProfileId(id: string) {
+  return id.split('::')[0];
 }
 export function companionCount(totalOre: number, maximum: number) {
   let count = 0;
-  while (count < maximum && companionThresholdOre(count + 1) <= totalOre)
+  while (
+    count < Math.min(maximum, MAX_COMPANIONS) &&
+    companionThresholdOre(count + 1) <= totalOre
+  )
     count++;
   return count;
 }
@@ -136,7 +144,7 @@ export function companionOrder(
   donorId: string,
   catalog: { id: string; group?: boolean }[],
 ) {
-  return catalog
+  const order = catalog
     .filter((d) => !d.group)
     .map((d) => d.id)
     .sort(
@@ -144,20 +152,32 @@ export function companionOrder(
         hashSeed(donorId + ':' + a + ':shelter-v1') -
           hashSeed(donorId + ':' + b + ':shelter-v1') || a.localeCompare(b),
     );
+  return order.length
+    ? Array.from({ length: MAX_COMPANIONS }, (_, i) =>
+        i < order.length
+          ? order[i]
+          : `${order[i % order.length]}::${Math.floor(i / order.length)}`,
+      )
+    : [];
 }
 export function thresholds(zone: (typeof zones)[number]) {
-  return (
-    zone.id === 'garden'
-      ? [0, 4, 8, 16, 28]
-      : [0, 3, 7, 15, 27].map((n) => n + zone.first)
-  ).map(companionThresholdOre);
+  const amounts: Record<ZoneId, number[]> = {
+    garden: [0, 200, 700, 2750, 5750],
+    kennel: [50, 200, 700, 2750, 5750],
+    food: [100, 300, 1000, 3000, 6000],
+    water: [150, 400, 1250, 3250, 6250],
+    play: [200, 500, 1500, 3500, 6500],
+    pool: [300, 700, 1750, 3750, 6750],
+    wellbeing: [400, 1000, 2000, 4000, 7000],
+    medical: [700, 1500, 2500, 4500, 7500],
+    sport: [1250, 2000, 3000, 5000, 8000],
+  };
+  return amounts[zone.id].map((n) => n * 100);
 }
-export function maximumShelterDonationOre(catalog: { group?: boolean }[]) {
-  return Math.max(
-    companionThresholdOre(catalog.filter((dog) => !dog.group).length),
-    ...zones.map((zone) => thresholds(zone)[4]),
-  );
+export function maximumShelterDonationOre(_catalog: { group?: boolean }[]) {
+  return companionThresholdOre(MAX_COMPANIONS);
 }
+
 export function shelterProgress(
   donorId: string,
   usedOre: number,
@@ -183,14 +203,14 @@ export function shelterProgress(
     ),
     zones: zones.map((zone) => {
       const steps = thresholds(zone);
-      const level = steps.filter((s) => s <= donated).length;
+      const level = steps.filter((s) => s <= used).length;
       const next = steps[level] ?? null;
       return {
         ...zone,
         level,
         projectedLevel: steps.filter((s) => s <= potential).length,
         nextThresholdOre: next,
-        remainingOre: next === null ? 0 : next - donated,
+        remainingOre: next === null ? 0 : next - used,
         donationGapOre: next === null ? 0 : Math.max(0, next - donated),
       };
     }),

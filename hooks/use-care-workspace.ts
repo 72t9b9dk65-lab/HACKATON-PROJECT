@@ -20,7 +20,14 @@ export function useCareWorkspace() {
     try {
       const response = await fetch('/api/platform', { cache: 'no-store' });
       const data = (await response.json()) as Workspace & { error?: string };
-      if (!response.ok) throw new Error(data.error);
+      if (!response.ok) {
+        if (response.status === 401) {
+          setState(null);
+          ref.current = null;
+          window.location.assign('/signin');
+        }
+        throw new Error(data.error);
+      }
       accept(data);
     } catch (e) {
       setOnline(false);

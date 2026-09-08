@@ -42,3 +42,7 @@ next-env.d.ts
 
 # Local hackathon runtime
 /.local/
+
+!.env.example
+.dev.vars
+.dev.vars.*

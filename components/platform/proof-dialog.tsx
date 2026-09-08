@@ -196,12 +196,16 @@ export function ProofDialog({
               <FileCheck2 size={20} />
               <span>
                 <strong>Original receipt</strong>
-                {receipt?.file ? (
+                {receipt?.file && !receipt.file.restricted ? (
                   <a href={receipt.file.url} target="_blank" rel="noreferrer">
                     Open {receipt.file.name} ↗
                   </a>
                 ) : (
-                  <small>No original document attached.</small>
+                  <small>
+                    {receipt?.file?.restricted
+                      ? 'Original document held privately by staff. Its fingerprint is included below.'
+                      : 'No original document attached.'}
+                  </small>
                 )}
               </span>
             </p>
@@ -295,8 +299,8 @@ export function ProofDialog({
           </details>
           <p className="cp-fine-print">
             A blockchain record proves inclusion of a fingerprint, not that a
-            purchase or care event occurred. This prototype does not
-            authenticate a Hundstallet staff signer.
+            purchase or care event occurred. Staff access and blockchain
+            transaction signatures are separate checks.
           </p>
         </>
       )}

@@ -7,6 +7,7 @@ import {
   companionThresholdOre,
   companionCount,
   companionOrder,
+  companionProfileId,
   buildShelterNetwork,
   pointOnRoute,
   tileSize,
@@ -33,10 +34,13 @@ import {
 import { validateAnchorResponse } from '../lib/platform/anchor-validation.ts';
 const now = '2026-09-08T10:00:00.000Z';
 test('cumulative donated thresholds include pending and exact one-ore boundaries', () => {
-  const steps = [
-    50, 100, 150, 200, 300, 400, 500, 700, 1000, 1250, 1500, 1750, 2000, 2250,
-    2500,
-  ];
+  const steps = Array.from({ length: 100 }, (_, i) =>
+    i < 20
+      ? (i + 1) * 50
+      : i < 50
+        ? 1000 + (i - 19) * 100
+        : 4000 + (i - 49) * 200,
+  );
   steps.forEach((sek, i) => {
     assert.equal(companionThresholdOre(i + 1), sek * 100);
     assert.equal(
@@ -80,10 +84,7 @@ test('growth preview reaches every upgrade using anonymous companions without ch
   );
   assert.ok(maximum >= donated);
   assert.ok(full.zones.every((zone) => zone.projectedLevel === 5));
-  assert.equal(
-    full.residentIds.length + full.potentialIds.length,
-    profileDogs.filter((dog) => !dog.group).length,
-  );
+  assert.equal(full.residentIds.length + full.potentialIds.length, 100);
   assert.deepEqual(full.residentIds, owned.residentIds);
   assert.deepEqual(
     full.zones.map((zone) => zone.level),
@@ -119,7 +120,11 @@ test('random companion prefixes are stable on reload, catalog reordering and rev
     companionOrder('personal', [...profileDogs].reverse()),
   );
   assert.equal(order.length, new Set(order).size);
-  assert.ok(order.every((id) => !profileDogs.find((d) => d.id === id).group));
+  assert.ok(
+    order.every(
+      (id) => !profileDogs.find((d) => d.id === companionProfileId(id)).group,
+    ),
+  );
   assert.notDeepEqual(order, companionOrder('alex', profileDogs));
   const high = shelterProgress('personal', 900000, 0, 0, profileDogs);
   const low = shelterProgress('personal', 15000, 0, 0, profileDogs);
@@ -231,13 +236,7 @@ test('central product allocation grows the right shelters and correction restore
       0,
       profileDogs,
     );
-    assert.equal(
-      p.residentIds.length,
-      Math.min(
-        profileDogs.filter((d) => !d.group).length,
-        companionCount(wallet.donated, profileDogs.length),
-      ),
-    );
+    assert.equal(p.residentIds.length, companionCount(wallet.donated, 100));
   }
   apply({
     type: 'void',

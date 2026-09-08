@@ -23,6 +23,27 @@ export function localReceiptReader(): Plugin {
             (req.headers.origin && req.headers.origin !== `http://${host}`)
           )
             return reply(403, { error: 'Local workspace only.' });
+          const staffOrigin =
+            process.env.CARE_STAFF_ORIGIN || 'http://127.0.0.1:3002';
+          if (
+            `http://${host}` !== staffOrigin ||
+            req.headers.origin !== staffOrigin
+          )
+            return reply(403, {
+              error: 'Use the employee portal to read receipts.',
+            });
+          const auth = await fetch(staffOrigin + '/api/auth/session', {
+            headers: { cookie: req.headers.cookie || '' },
+            signal: AbortSignal.timeout(5000),
+          });
+          const identity = (await auth.json()) as {
+            site?: string;
+            user?: unknown;
+          };
+          if (!auth.ok || identity.site !== 'staff' || !identity.user)
+            return reply(401, {
+              error: 'Sign in to the employee portal first.',
+            });
           const type = req.headers['content-type'] ?? '';
           const ext = (
             {

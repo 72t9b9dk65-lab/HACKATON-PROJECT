@@ -8,6 +8,13 @@
       "when": 1788811839562,
       "tag": "0000_rare_mystique",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1788859459601,
+      "tag": "0001_lame_katie_power",
+      "breakpoints": true
     }
   ]
 }

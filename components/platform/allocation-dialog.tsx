@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { ArrowRight, LockKeyhole, LoaderCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { shelterProgress } from '@/lib/platform/shelter-growth';
+import { profileDogs } from '@/lib/donation-shell';
 import { allocateProducts, balances, money } from '@/lib/platform/model';
 import type { CareStore } from '@/hooks/use-care-workspace';
 import { Modal, Notice, Primary, CategoryIcon } from './shared';
@@ -84,20 +86,49 @@ export function AllocationDialog({
       {!error && (
         <>
           <div className="cp-allocation-wallets">
-            {plan.map((d) => (
-              <div key={d.id}>
-                <strong>{d.name}</strong>
-                <span>
-                  {money(d.pending)} <ArrowRight size={14} />{' '}
-                  {money(d.pending - d.cost)} SEK
-                </span>
-                <small>
-                  {d.cost
-                    ? `${money(d.cost)} SEK used for these products`
-                    : 'No change'}
-                </small>
-              </div>
-            ))}
+            {plan.map((d) => {
+              const before = shelterProgress(
+                d.id,
+                d.used,
+                d.pending,
+                0,
+                profileDogs,
+              );
+              const after = shelterProgress(
+                d.id,
+                d.used + d.cost,
+                d.pending - d.cost,
+                0,
+                profileDogs,
+              );
+              const upgrades = after.zones.filter(
+                (z) => z.level > before.zones.find((b) => b.id === z.id)!.level,
+              );
+              return (
+                <div key={d.id}>
+                  <strong>{d.name}</strong>
+                  <span>
+                    {money(d.pending)} <ArrowRight size={14} />{' '}
+                    {money(d.pending - d.cost)} SEK
+                  </span>
+                  <small>
+                    {d.cost
+                      ? `${money(d.cost)} SEK used for these products`
+                      : 'No change'}
+                  </small>
+                  {upgrades.length > 0 && (
+                    <small>
+                      {upgrades
+                        .map((z) => `${z.name} → Level ${z.level}`)
+                        .join(' · ')}
+                    </small>
+                  )}
+                  {d.cost > 0 && !upgrades.length && (
+                    <small>Progress towards the next area upgrade</small>
+                  )}
+                </div>
+              );
+            })}
           </div>
           <details className="cp-details" open>
             <summary>Purchased items and their contributors</summary>

@@ -19,7 +19,9 @@
     "test:platform": "node --experimental-strip-types --test tests/platform.test.mjs",
     "lint:platform": "oxlint components/platform lib/platform app/api hooks/use-care-workspace.ts scripts/local/receipt-plugin.ts",
     "test:api": "node --experimental-strip-types scripts/local/verify-api.mjs",
-    "photos:build": "node scripts/local/build-photo-previews.mjs"
+    "photos:build": "node scripts/local/build-photo-previews.mjs",
+    "dev:staff": "node scripts/local/staff-portal.mjs",
+    "test:connected": "node --experimental-strip-types scripts/local/verify-connected.mjs"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
@@ -32,6 +34,7 @@
     "drizzle-orm": "^0.45.2",
     "embla-carousel-react": "8.5.2",
     "input-otp": "1.4.2",
+    "jose": "^6.2.12",
     "lucide-react": "1.31.0",
     "react": "19.2.6",
     "react-day-picker": "9.8.1",

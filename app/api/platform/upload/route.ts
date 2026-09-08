@@ -1,8 +1,11 @@
-import { bindings, localOnly } from '@/lib/platform/storage';
+import { requirePrincipal } from '@/lib/platform/auth';
+import { requireSameOrigin, apiError } from '@/lib/platform/access-policy';
+import { bindings } from '@/lib/platform/storage';
 import { sha256 } from '@/lib/platform/proofs';
 export async function POST(request: Request) {
   try {
-    localOnly(request);
+    requireSameOrigin(request);
+    await requirePrincipal(request, true);
     if (Number(request.headers.get('content-length') ?? 0) > 12_600_000)
       throw new Error('Choose a file smaller than 12 MB.');
     const form = await request.formData();
@@ -55,9 +58,6 @@ export async function POST(request: Request) {
       .run();
     return Response.json(metadata);
   } catch (error) {
-    return Response.json(
-      { error: error instanceof Error ? error.message : 'Upload failed.' },
-      { status: 400 },
-    );
+    return apiError(error);
   }
 }
