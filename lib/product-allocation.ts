@@ -140,6 +140,8 @@ export function expandProductUnits(
 ): ProductDraft[] {
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100)
     throw new Error('Enter a quantity from 1 to 100.');
+  if (typeof name !== 'string' || !name.trim())
+    throw new Error('Enter a product name and valid unit price.');
   const products = Array.from({ length: quantity }, (_, index) => ({
     id: `${id}:${index + 1}`,
     name: quantity === 1 ? name : `${name} (${index + 1}/${quantity})`,

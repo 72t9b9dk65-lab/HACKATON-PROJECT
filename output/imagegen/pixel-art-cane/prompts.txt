@@ -1,0 +1,24 @@
+Mode: built-in image_gen
+
+prato-rettangolare.png
+Use case: stylized-concept. Style: authentic crisp pixel art for a cozy 2D dog-care game, deliberately visible square pixels, clean stepped contours, limited colors, flat pixel shading, no antialiasing, no blur, no photorealism, no typography, no labels, no logos, no watermark. Create one standalone image of a rectangular lawn seen from directly vertically overhead, orthographic plan view. Portrait composition: the rectangle's long axis runs vertically. Lush green grass with subtle varied tiny pixel grass tufts across an open usable lawn, tidy straight rectangular boundaries, small natural pixel variations along edges. Entire rectangle visible centered with narrow transparent margin. True transparent background outside lawn. No horizon, no perspective, no isometric angle, no fence, no furniture, no paths, no animals.
+
+cuccia-con-cuscini.png
+Use case: stylized-concept. Style: authentic crisp pixel art for a cozy 2D dog-care game, deliberately visible square pixels, clean stepped contours, limited colors, flat pixel shading, no antialiasing, no blur, no photorealism, no typography, no labels, no logos, no watermark. Create one standalone image of a large comfortable wooden dog kennel with cushions, viewed exactly from directly overhead in orthographic plan view. The entrance MUST be at the bottom edge facing downward toward bottom of image. Use a roofless cutaway so the spacious interior and several soft cushions are clearly visible from above. Rectangular warm wooden enclosure with left, top and right walls and a clear wide entrance gap centered in bottom wall, large soft padded bed and cozy pillows inside. Entire object visible centered with margin, transparent background. No dog, no surrounding scenery, no lettering, no perspective, no isometric view. Visually legible construction and cozy cushions.
+
+scaffale-6-ripiani.png
+Use case: stylized-concept. Style: authentic crisp pixel art for a cozy 2D dog-care game, deliberately visible square pixels, clean stepped contours, limited colors, flat pixel shading, no antialiasing, no blur, no photorealism, no typography, no labels, no logos, no watermark. Create one standalone image of a wooden shelving unit with EXACTLY SIX usable horizontal shelf levels, evenly spaced, viewed straight from the front so all six shelves can be counted clearly. Tall upright rectangular shelving unit, two sturdy side uprights, exactly six wooden horizontal shelf boards including the lowest shelf, six spacious open storage tiers. EMPTY shelves, no objects. Warm natural wood with restrained pixel highlights and texture, clean consistent pixel grid. Entire object visible centered in portrait composition with transparent background and margin. No additional ledges, no extra seventh shelf, no scenery.
+
+griglia-50-oggetti-cane.png
+Use case: stylized-concept. Style: authentic crisp pixel art for a cozy 2D dog-care game, deliberately visible square pixels, clean stepped contours, limited colors, flat pixel shading, no antialiasing, no blur, no photorealism, no typography, no labels, no logos, no watermark. Create one carefully organized sprite sheet containing EXACTLY 50 DIFFERENT generic items that can be purchased for a dog, arranged as exactly 5 columns by 10 rows. Portrait canvas. Every equal-size cell contains ONE complete centered item silhouette, plenty of empty space, aligned regular grid, no cell borders, no text or numbers. Transparent background. Consistent pixel scale and clean highly legible sprites. Follow this exact row-major layout with no duplicates, no missing or extra objects:
+Row 1: tennis ball; flying disc; knotted rope tug toy; rubber bone chew toy; plush teddy bear.
+Row 2: squeaky rubber duck; red rubber treat-stuffing cone toy; spiked sensory ball; treat puzzle board; agility tunnel.
+Row 3: kibble food sack; canned dog food; dog biscuit; dental chew stick; dog jerky pouch.
+Row 4: stainless steel food bowl; ceramic water bowl; slow feeder bowl; portable pet water bottle; automatic food dispenser.
+Row 5: dog collar; walking leash; harness; retractable leash reel; dog identification tag.
+Row 6: oval padded dog bed; folded fleece blanket; rectangular sleeping cushion; pet carrier; wire travel crate.
+Row 7: slicker grooming brush; grooming comb; dog shampoo bottle; nail clipper; paw balm tin.
+Row 8: dog toothbrush; absorbent bath towel; grooming glove; paw washer cup; dog bath tub.
+Row 9: dog raincoat; winter dog sweater; set of dog booties represented as one grouped product; dog bandana; dog life jacket.
+Row 10: poop bag dispenser; poop scoop; clicker trainer; treat belt pouch; pet access ramp.
+All items in matching charming 2D pixel-art game inventory style, recognizable shapes, cohesive palette, no brands, no animals, no decorative filler.

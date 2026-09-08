@@ -12,6 +12,7 @@ import {
   parseReceiptAmount,
   distributeTransactions,
   portalTransactions,
+  setTransactionProducts,
 } from '../lib/staff-portal.ts';
 import { workbookLedger } from '../lib/workbook-transactions.ts';
 import { SHARED_CARE_ID } from '../lib/donation-shell.ts';
@@ -43,7 +44,17 @@ const input = (amountOre = 40000) => ({
     src: 'data:application/pdf;base64,JVBERg==',
   },
   lines: [
-    { id: 'line-1', description: 'Dog meals', category: 'food', amountOre },
+    {
+      id: 'line-1',
+      description: 'Dog meals',
+      category: 'food',
+      amountOre,
+      products: Array.from({ length: 4 }, (_, i) => ({
+        id: `meal-${i}`,
+        name: `Meal ${i + 1}`,
+        amountOre: Math.floor(amountOre / 4) + (i < amountOre % 4 ? 1 : 0),
+      })),
+    },
   ],
 });
 const photo = {
@@ -154,7 +165,7 @@ test('recording a receipt updates every portfolio once with no premature dog ass
   );
 });
 
-test('multiple receipt lines share the full invoice equally, without repeated rounding bias', () => {
+test('multiple one-cent products balance the invoice without splitting any unit', () => {
   const receipt = {
     ...input(),
     lines: Array.from({ length: 13 }, (_, i) => ({
@@ -200,7 +211,7 @@ test('an unaffordable or invalid invoice never partially debits any wallet', () 
           { id: 'bad', description: '', amountOre: 10, category: 'invalid' },
         ],
       }),
-    /Invalid/,
+    /Invalid|Product prices/,
   );
   assert.equal(JSON.stringify(initial), before);
   const corrupt = recordReceipt(initial, withPending, input());
@@ -304,22 +315,32 @@ test('receipt amount parsing handles decimal SEK exactly and rejects ambiguous v
     assert.equal(parseReceiptAmount(value), null);
 });
 
-test('distribute reassigns imported costs evenly within balances without charging twice', () => {
-  const initial = emptyStaffLedger();
+test('itemizing and redistributing assigns whole products without charging twice', () => {
+  const empty = emptyStaffLedger();
+  assert.throws(
+    () => distributeTransactions(empty, base, '2026-09-07T16:00:00Z'),
+    /Enter purchased products/,
+  );
+  const tx = portalTransactions(empty, base).find(
+    (t) => t.amountOre === 2400 && t.category === 'play',
+  );
+  assert.ok(tx);
+  const initial = postTransactionPhoto(empty, base, tx.id, photo);
   const original = JSON.stringify(initial);
+  const drafts = [200, 300, 400, 600, 900].map((amountOre, i) => ({
+    id: `bone-${i}`,
+    name: `Bone ${i + 1}`,
+    amountOre,
+  }));
+  const itemized = setTransactionProducts(initial, base, tx.id, drafts);
   const distributed = distributeTransactions(
-    initial,
+    itemized,
     base,
     '2026-09-07T16:00:00Z',
   );
   assert.equal(JSON.stringify(initial), original);
+  assert.deepEqual(distributed.photos, initial.photos);
   const donors = donorPortfolios(distributed, base);
-  assert.deepEqual(Object.fromEntries(donors.map((d) => [d.id, d.usedOre])), {
-    personal: 139150,
-    'demo-alex': 120000,
-    'demo-maja': 80000,
-    'demo-noah': 139150,
-  });
   assert.equal(
     donors.reduce((sum, d) => sum + d.usedOre, 0),
     478300,
@@ -333,12 +354,23 @@ test('distribute reassigns imported costs evenly within balances without chargin
       (d) => d.pendingOre >= 0 && d.pendingOre + d.usedOre === d.donatedOre,
     ),
   );
-  for (const transaction of portalTransactions(distributed, base)) {
-    assert.equal(
-      transaction.allocations.reduce((sum, share) => sum + share.amountOre, 0),
-      transaction.amountOre,
-    );
-  }
+  const assigned = portalTransactions(distributed, base).find(
+    (t) => t.id === tx.id,
+  );
+  assert.deepEqual(
+    assigned.products.map(({ donorId: _donorId, ...product }) => product),
+    drafts,
+  );
+  assert.ok(
+    assigned.products.every((p) => donors.some((d) => d.id === p.donorId)),
+  );
+  const untouched = portalTransactions(initial, base).filter(
+    (t) => t.id !== tx.id,
+  );
+  assert.deepEqual(
+    portalTransactions(distributed, base).filter((t) => t.id !== tx.id),
+    untouched,
+  );
   for (const donor of donors) {
     const view = projectDonor(distributed, base, donor.id);
     assert.equal(
@@ -356,18 +388,28 @@ test('distribute reassigns imported costs evenly within balances without chargin
       view.transactions.reduce((sum, tx) => sum + tx.amountOre, 0),
       donor.usedOre,
     );
+    const owned = view.transactions.find((t) => t.id === tx.id);
+    if (owned) {
+      assert.ok(owned.products.every((p) => p.donorId === donor.id));
+      assert.equal(
+        owned.products.reduce((sum, p) => sum + p.amountOre, 0),
+        owned.amountOre,
+      );
+    }
   }
   const repeated = distributeTransactions(
     distributed,
     base,
     '2026-09-07T16:01:00Z',
   );
-  assert.deepEqual(
-    repeated.distribution.allocations,
-    distributed.distribution.allocations,
-  );
+  assert.deepEqual(repeated.products, distributed.products);
   assert.deepEqual(donorPortfolios(repeated, base), donors);
   assert.deepEqual(readStaffLedger(JSON.stringify(repeated)), repeated);
+  assert.throws(
+    () => setTransactionProducts(initial, base, tx.id, drafts.slice(1)),
+    /add up exactly/,
+  );
+  assert.equal(JSON.stringify(initial), original);
 });
 
 test('distribution includes receipts, preserves evidence and still permits later purchases', () => {
@@ -408,7 +450,16 @@ test('distribution includes receipts, preserves evidence and still permits later
     ...input(10000),
     id: 'receipt-2',
     reference: 'INV-105',
-    lines: [{ ...input(10000).lines[0], id: 'line-2' }],
+    lines: [
+      {
+        ...input(10000).lines[0],
+        id: 'line-2',
+        products: input(10000).lines[0].products.map((p) => ({
+          ...p,
+          id: p.id + '-next',
+        })),
+      },
+    ],
   });
   assert.equal(
     donorPortfolios(next, withPending).reduce((sum, d) => sum + d.usedOre, 0),
@@ -418,10 +469,22 @@ test('distribution includes receipts, preserves evidence and still permits later
 });
 
 test('stored distributions reject missing transactions, invalid sums and unknown donors', () => {
-  const good = distributeTransactions(
-    emptyStaffLedger(),
-    base,
-    '2026-09-07T16:00:00Z',
+  const good = {
+    ...emptyStaffLedger(),
+    distribution: {
+      updatedAt: '2026-09-07T16:00:00Z',
+      allocations: Object.fromEntries(
+        base.expenses.map((e) => [
+          e.id,
+          [{ donorId: 'personal', amountOre: e.amountOre }],
+        ]),
+      ),
+    },
+  };
+  assert.deepEqual(readStaffLedger(JSON.stringify(good)), good);
+  assert.deepEqual(
+    donorPortfolios(good, base),
+    donorPortfolios(emptyStaffLedger(), base),
   );
   const missing = structuredClone(good);
   missing.distribution.allocations.missing = [
@@ -436,5 +499,80 @@ test('stored distributions reject missing transactions, invalid sums and unknown
   assert.throws(
     () => readStaffLedger(JSON.stringify(unknown)),
     /Invalid transaction distribution/,
+  );
+});
+
+test('a single purchased item is paid in full by one donor', () => {
+  const receipt = input();
+  receipt.lines[0].products = [
+    { id: 'one-item', name: 'Food bag', amountOre: 40000 },
+  ];
+  const saved = recordReceipt(emptyStaffLedger(), withPending, receipt);
+  const line = saved.receipts[0].lines[0];
+  assert.equal(line.products.length, 1);
+  assert.deepEqual(line.allocations, [
+    { donorId: line.products[0].donorId, amountOre: 40000 },
+  ]);
+});
+
+test('indivisible products cannot overdraw a donor even with sufficient pooled funds', () => {
+  const initial = emptyStaffLedger();
+  const before = JSON.stringify(initial);
+  const receipt = input(250000);
+  receipt.lines[0].products = [
+    { id: 'large-item', name: 'Equipment', amountOre: 250000 },
+  ];
+  assert.throws(
+    () => recordReceipt(initial, withPending, receipt),
+    /individual donor balances/,
+  );
+  assert.equal(JSON.stringify(initial), before);
+});
+
+test('product ownership and identifiers are validated before committing a receipt', () => {
+  const saved = recordReceipt(emptyStaffLedger(), withPending, input());
+  const duplicate = {
+    ...input(),
+    id: 'receipt-2',
+    reference: 'INV-105',
+    lines: [{ ...input().lines[0], id: 'line-2' }],
+  };
+  assert.throws(
+    () => recordReceipt(saved, withPending, duplicate),
+    /identifiers must be unique/,
+  );
+  const corrupt = structuredClone(saved);
+  corrupt.receipts[0].lines[0].products[0].donorId = 'unknown';
+  assert.throws(
+    () => readStaffLedger(JSON.stringify(corrupt)),
+    /Invalid receipt products/,
+  );
+});
+
+test('itemization replaces an old equal split while preserving its transaction evidence', () => {
+  const tx = portalTransactions(emptyStaffLedger(), base).find(
+    (t) => t.amountOre === 2400 && t.category === 'play',
+  );
+  const legacy = {
+    ...emptyStaffLedger(),
+    distribution: {
+      updatedAt: '2026-09-07T16:00:00Z',
+      allocations: {
+        [tx.id]: ['personal', 'demo-alex', 'demo-maja', 'demo-noah'].map(
+          (donorId) => ({ donorId, amountOre: 600 }),
+        ),
+      },
+    },
+  };
+  const before = donorPortfolios(legacy, base);
+  const next = setTransactionProducts(legacy, base, tx.id, [
+    { id: 'bone', name: 'Chew bone', amountOre: 2400 },
+  ]);
+  const itemized = portalTransactions(next, base).find((t) => t.id === tx.id);
+  assert.equal(itemized.allocations.length, 1);
+  assert.equal(itemized.allocations[0].amountOre, 2400);
+  assert.equal(
+    donorPortfolios(next, base).reduce((s, d) => s + d.usedOre, 0),
+    before.reduce((s, d) => s + d.usedOre, 0),
   );
 });
