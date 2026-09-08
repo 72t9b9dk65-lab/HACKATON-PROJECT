@@ -1,0 +1,942 @@
+[
+  {
+    "id": "cibo-livello-1",
+    "family": "cibo",
+    "level": 1,
+    "entrances": [
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cibo-livello-1.webp",
+    "source": "originals/kitchen-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      0,
+      627,
+      627
+    ],
+    "contentBounds": [
+      149,
+      126,
+      529,
+      537
+    ],
+    "transparentFraction": 0.2559
+  },
+  {
+    "id": "cibo-livello-2",
+    "family": "cibo",
+    "level": 2,
+    "entrances": [
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cibo-livello-2.webp",
+    "source": "originals/kitchen-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      0,
+      1254,
+      627
+    ],
+    "contentBounds": [
+      69,
+      104,
+      534,
+      546
+    ],
+    "transparentFraction": 0.212
+  },
+  {
+    "id": "cibo-livello-3",
+    "family": "cibo",
+    "level": 3,
+    "entrances": [
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cibo-livello-3.webp",
+    "source": "originals/kitchen-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      627,
+      627,
+      1254
+    ],
+    "contentBounds": [
+      58,
+      34,
+      612,
+      515
+    ],
+    "transparentFraction": 0.2658
+  },
+  {
+    "id": "cibo-livello-4",
+    "family": "cibo",
+    "level": 4,
+    "entrances": [
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cibo-livello-4.webp",
+    "source": "originals/kitchen-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      627,
+      1254,
+      1254
+    ],
+    "contentBounds": [
+      12,
+      3,
+      606,
+      522
+    ],
+    "transparentFraction": 0.2534
+  },
+  {
+    "id": "cibo-livello-5",
+    "family": "cibo",
+    "level": 5,
+    "entrances": [
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cibo-livello-5.webp",
+    "source": "originals/kitchen-level-5.png",
+    "quadrantCrop": null,
+    "contentBounds": [
+      74,
+      56,
+      1222,
+      1145
+    ],
+    "transparentFraction": 0.1626
+  },
+  {
+    "id": "cuccia-livello-1",
+    "family": "cuccia",
+    "level": 1,
+    "entrances": [
+      "top",
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cuccia-livello-1.webp",
+    "source": "originals/home-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      0,
+      627,
+      627
+    ],
+    "contentBounds": [
+      134,
+      131,
+      494,
+      504
+    ],
+    "transparentFraction": 0.1727
+  },
+  {
+    "id": "cuccia-livello-2",
+    "family": "cuccia",
+    "level": 2,
+    "entrances": [
+      "top",
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cuccia-livello-2.webp",
+    "source": "originals/home-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      0,
+      1254,
+      627
+    ],
+    "contentBounds": [
+      92,
+      103,
+      496,
+      525
+    ],
+    "transparentFraction": 0.168
+  },
+  {
+    "id": "cuccia-livello-3",
+    "family": "cuccia",
+    "level": 3,
+    "entrances": [
+      "top",
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cuccia-livello-3.webp",
+    "source": "originals/home-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      627,
+      627,
+      1254
+    ],
+    "contentBounds": [
+      85,
+      36,
+      543,
+      512
+    ],
+    "transparentFraction": 0.1497
+  },
+  {
+    "id": "cuccia-livello-4",
+    "family": "cuccia",
+    "level": 4,
+    "entrances": [
+      "top",
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cuccia-livello-4.webp",
+    "source": "originals/home-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      627,
+      1254,
+      1254
+    ],
+    "contentBounds": [
+      35,
+      22,
+      582,
+      546
+    ],
+    "transparentFraction": 0.1388
+  },
+  {
+    "id": "cuccia-livello-5",
+    "family": "cuccia",
+    "level": 5,
+    "entrances": [
+      "top",
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cuccia-livello-5.webp",
+    "source": "originals/home-level-5.png",
+    "quadrantCrop": null,
+    "contentBounds": [
+      87,
+      76,
+      1214,
+      1182
+    ],
+    "transparentFraction": 0.1483
+  },
+  {
+    "id": "gioco-livello-1",
+    "family": "gioco",
+    "level": 1,
+    "entrances": [
+      "left",
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/gioco-livello-1.webp",
+    "source": "originals/playground-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      0,
+      627,
+      627
+    ],
+    "contentBounds": [
+      124,
+      97,
+      549,
+      532
+    ],
+    "transparentFraction": 0.204
+  },
+  {
+    "id": "gioco-livello-2",
+    "family": "gioco",
+    "level": 2,
+    "entrances": [
+      "left",
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/gioco-livello-2.webp",
+    "source": "originals/playground-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      0,
+      1254,
+      627
+    ],
+    "contentBounds": [
+      68,
+      97,
+      512,
+      539
+    ],
+    "transparentFraction": 0.1883
+  },
+  {
+    "id": "gioco-livello-3",
+    "family": "gioco",
+    "level": 3,
+    "entrances": [
+      "left",
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/gioco-livello-3.webp",
+    "source": "originals/playground-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      627,
+      627,
+      1254
+    ],
+    "contentBounds": [
+      57,
+      22,
+      589,
+      530
+    ],
+    "transparentFraction": 0.1981
+  },
+  {
+    "id": "gioco-livello-4",
+    "family": "gioco",
+    "level": 4,
+    "entrances": [
+      "left",
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/gioco-livello-4.webp",
+    "source": "originals/playground-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      627,
+      1254,
+      1254
+    ],
+    "contentBounds": [
+      5,
+      9,
+      597,
+      535
+    ],
+    "transparentFraction": 0.2457
+  },
+  {
+    "id": "gioco-livello-5",
+    "family": "gioco",
+    "level": 5,
+    "entrances": [
+      "left",
+      "right",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/gioco-livello-5.webp",
+    "source": "originals/playground-level-5.png",
+    "quadrantCrop": null,
+    "contentBounds": [
+      80,
+      71,
+      1176,
+      1166
+    ],
+    "transparentFraction": 0.0807
+  },
+  {
+    "id": "sport-livello-1",
+    "family": "sport",
+    "level": 1,
+    "entrances": [
+      "left",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/sport-livello-1.webp",
+    "source": "originals/sports-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      0,
+      627,
+      627
+    ],
+    "contentBounds": [
+      120,
+      132,
+      511,
+      527
+    ],
+    "transparentFraction": 0.202
+  },
+  {
+    "id": "sport-livello-2",
+    "family": "sport",
+    "level": 2,
+    "entrances": [
+      "left",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/sport-livello-2.webp",
+    "source": "originals/sports-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      0,
+      1254,
+      627
+    ],
+    "contentBounds": [
+      69,
+      117,
+      514,
+      527
+    ],
+    "transparentFraction": 0.223
+  },
+  {
+    "id": "sport-livello-3",
+    "family": "sport",
+    "level": 3,
+    "entrances": [
+      "left",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/sport-livello-3.webp",
+    "source": "originals/sports-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      627,
+      627,
+      1254
+    ],
+    "contentBounds": [
+      52,
+      17,
+      592,
+      520
+    ],
+    "transparentFraction": 0.2214
+  },
+  {
+    "id": "sport-livello-4",
+    "family": "sport",
+    "level": 4,
+    "entrances": [
+      "left",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/sport-livello-4.webp",
+    "source": "originals/sports-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      627,
+      1254,
+      1254
+    ],
+    "contentBounds": [
+      14,
+      0,
+      609,
+      524
+    ],
+    "transparentFraction": 0.2278
+  },
+  {
+    "id": "sport-livello-5",
+    "family": "sport",
+    "level": 5,
+    "entrances": [
+      "left",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/sport-livello-5.webp",
+    "source": "originals/sports-level-5.png",
+    "quadrantCrop": null,
+    "contentBounds": [
+      46,
+      81,
+      1209,
+      1155
+    ],
+    "transparentFraction": 0.1761
+  },
+  {
+    "id": "cura-livello-1",
+    "family": "cura",
+    "level": 1,
+    "entrances": [
+      "top",
+      "left",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cura-livello-1.webp",
+    "source": "originals/care-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      0,
+      627,
+      627
+    ],
+    "contentBounds": [
+      123,
+      86,
+      531,
+      559
+    ],
+    "transparentFraction": 0.2741
+  },
+  {
+    "id": "cura-livello-2",
+    "family": "cura",
+    "level": 2,
+    "entrances": [
+      "top",
+      "left",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cura-livello-2.webp",
+    "source": "originals/care-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      0,
+      1254,
+      627
+    ],
+    "contentBounds": [
+      30,
+      86,
+      547,
+      560
+    ],
+    "transparentFraction": 0.2186
+  },
+  {
+    "id": "cura-livello-3",
+    "family": "cura",
+    "level": 3,
+    "entrances": [
+      "top",
+      "left",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cura-livello-3.webp",
+    "source": "originals/care-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      627,
+      627,
+      1254
+    ],
+    "contentBounds": [
+      54,
+      8,
+      589,
+      527
+    ],
+    "transparentFraction": 0.1715
+  },
+  {
+    "id": "cura-livello-4",
+    "family": "cura",
+    "level": 4,
+    "entrances": [
+      "top",
+      "left",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cura-livello-4.webp",
+    "source": "originals/care-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      627,
+      1254,
+      1254
+    ],
+    "contentBounds": [
+      0,
+      6,
+      584,
+      531
+    ],
+    "transparentFraction": 0.2213
+  },
+  {
+    "id": "cura-livello-5",
+    "family": "cura",
+    "level": 5,
+    "entrances": [
+      "top",
+      "left",
+      "bottom"
+    ],
+    "path": "/care/grid-v2/cura-livello-5.webp",
+    "source": "originals/care-level-5.png",
+    "quadrantCrop": null,
+    "contentBounds": [
+      84,
+      86,
+      1162,
+      1144
+    ],
+    "transparentFraction": 0.1319
+  },
+  {
+    "id": "abbeveraggio-livello-1",
+    "family": "abbeveraggio",
+    "level": 1,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/grid-v2/abbeveraggio-livello-1.webp",
+    "source": "originals/water-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      0,
+      627,
+      627
+    ],
+    "contentBounds": [
+      57,
+      63,
+      571,
+      581
+    ],
+    "transparentFraction": 0.1557
+  },
+  {
+    "id": "abbeveraggio-livello-2",
+    "family": "abbeveraggio",
+    "level": 2,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/grid-v2/abbeveraggio-livello-2.webp",
+    "source": "originals/water-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      0,
+      1254,
+      627
+    ],
+    "contentBounds": [
+      66,
+      62,
+      586,
+      581
+    ],
+    "transparentFraction": 0.1461
+  },
+  {
+    "id": "abbeveraggio-livello-3",
+    "family": "abbeveraggio",
+    "level": 3,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/grid-v2/abbeveraggio-livello-3.webp",
+    "source": "originals/water-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      627,
+      627,
+      1254
+    ],
+    "contentBounds": [
+      54,
+      17,
+      585,
+      550
+    ],
+    "transparentFraction": 0.1451
+  },
+  {
+    "id": "abbeveraggio-livello-4",
+    "family": "abbeveraggio",
+    "level": 4,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/grid-v2/abbeveraggio-livello-4.webp",
+    "source": "originals/water-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      627,
+      1254,
+      1254
+    ],
+    "contentBounds": [
+      57,
+      17,
+      589,
+      551
+    ],
+    "transparentFraction": 0.145
+  },
+  {
+    "id": "abbeveraggio-livello-5",
+    "family": "abbeveraggio",
+    "level": 5,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/grid-v2/abbeveraggio-livello-5.webp",
+    "source": "originals/water-level-5.png",
+    "quadrantCrop": null,
+    "contentBounds": [
+      71,
+      29,
+      1184,
+      1160
+    ],
+    "transparentFraction": 0.1153
+  },
+  {
+    "id": "piscina-livello-1",
+    "family": "piscina",
+    "level": 1,
+    "entrances": [
+      "top",
+      "left",
+      "right"
+    ],
+    "path": "/care/grid-v2/piscina-livello-1.webp",
+    "source": "originals/pool-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      0,
+      627,
+      627
+    ],
+    "contentBounds": [
+      87,
+      73,
+      549,
+      542
+    ],
+    "transparentFraction": 0.3312
+  },
+  {
+    "id": "piscina-livello-2",
+    "family": "piscina",
+    "level": 2,
+    "entrances": [
+      "top",
+      "left",
+      "right"
+    ],
+    "path": "/care/grid-v2/piscina-livello-2.webp",
+    "source": "originals/pool-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      0,
+      1254,
+      627
+    ],
+    "contentBounds": [
+      78,
+      73,
+      541,
+      543
+    ],
+    "transparentFraction": 0.3355
+  },
+  {
+    "id": "piscina-livello-3",
+    "family": "piscina",
+    "level": 3,
+    "entrances": [
+      "top",
+      "left",
+      "right"
+    ],
+    "path": "/care/grid-v2/piscina-livello-3.webp",
+    "source": "originals/pool-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      627,
+      627,
+      1254
+    ],
+    "contentBounds": [
+      35,
+      20,
+      591,
+      558
+    ],
+    "transparentFraction": 0.3148
+  },
+  {
+    "id": "piscina-livello-4",
+    "family": "piscina",
+    "level": 4,
+    "entrances": [
+      "top",
+      "left",
+      "right"
+    ],
+    "path": "/care/grid-v2/piscina-livello-4.webp",
+    "source": "originals/pool-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      627,
+      1254,
+      1254
+    ],
+    "contentBounds": [
+      16,
+      0,
+      614,
+      558
+    ],
+    "transparentFraction": 0.1875
+  },
+  {
+    "id": "piscina-livello-5",
+    "family": "piscina",
+    "level": 5,
+    "entrances": [
+      "top",
+      "left",
+      "right"
+    ],
+    "path": "/care/grid-v2/piscina-livello-5.webp",
+    "source": "originals/pool-level-5.png",
+    "quadrantCrop": null,
+    "contentBounds": [
+      20,
+      13,
+      1234,
+      1212
+    ],
+    "transparentFraction": 0.1196
+  },
+  {
+    "id": "benessere-livello-1",
+    "family": "benessere",
+    "level": 1,
+    "entrances": [
+      "top",
+      "left"
+    ],
+    "path": "/care/grid-v2/benessere-livello-1.webp",
+    "source": "originals/wellbeing-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      0,
+      627,
+      627
+    ],
+    "contentBounds": [
+      105,
+      93,
+      573,
+      576
+    ],
+    "transparentFraction": 0.1547
+  },
+  {
+    "id": "benessere-livello-2",
+    "family": "benessere",
+    "level": 2,
+    "entrances": [
+      "top",
+      "left"
+    ],
+    "path": "/care/grid-v2/benessere-livello-2.webp",
+    "source": "originals/wellbeing-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      0,
+      1254,
+      627
+    ],
+    "contentBounds": [
+      43,
+      92,
+      524,
+      578
+    ],
+    "transparentFraction": 0.1324
+  },
+  {
+    "id": "benessere-livello-3",
+    "family": "benessere",
+    "level": 3,
+    "entrances": [
+      "top",
+      "left"
+    ],
+    "path": "/care/grid-v2/benessere-livello-3.webp",
+    "source": "originals/wellbeing-levels-1-4.png",
+    "quadrantCrop": [
+      0,
+      627,
+      627,
+      1254
+    ],
+    "contentBounds": [
+      76,
+      15,
+      601,
+      572
+    ],
+    "transparentFraction": 0.1733
+  },
+  {
+    "id": "benessere-livello-4",
+    "family": "benessere",
+    "level": 4,
+    "entrances": [
+      "top",
+      "left"
+    ],
+    "path": "/care/grid-v2/benessere-livello-4.webp",
+    "source": "originals/wellbeing-levels-1-4.png",
+    "quadrantCrop": [
+      627,
+      627,
+      1254,
+      1254
+    ],
+    "contentBounds": [
+      26,
+      13,
+      561,
+      573
+    ],
+    "transparentFraction": 0.1574
+  },
+  {
+    "id": "benessere-livello-5",
+    "family": "benessere",
+    "level": 5,
+    "entrances": [
+      "top",
+      "left"
+    ],
+    "path": "/care/grid-v2/benessere-livello-5.webp",
+    "source": "originals/wellbeing-level-5.png",
+    "quadrantCrop": null,
+    "contentBounds": [
+      73,
+      84,
+      1190,
+      1133
+    ],
+    "transparentFraction": 0.1539
+  }
+]

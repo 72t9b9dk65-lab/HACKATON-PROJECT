@@ -1,5 +1,6 @@
 import { env } from 'cloudflare:workers';
 import { seedWorkspace } from './seed.ts';
+import { importUpdatedWorkbook } from './workbook-import.ts';
 import type { Workspace } from './types.ts';
 type Bindings = { CARE_DB: D1Database; CARE_FILES: R2Bucket };
 export function bindings() {
@@ -25,7 +26,16 @@ export async function readWorkspace(): Promise<Workspace> {
       .first<{ snapshot: string }>();
   }
   if (!row) throw new Error('Could not open the care workspace.');
-  return JSON.parse(row.snapshot);
+  const current = JSON.parse(row.snapshot) as Workspace;
+  const updated = await importUpdatedWorkbook(current);
+  if (updated === current) return current;
+  try {
+    return await saveWorkspace(updated, current.revision);
+  } catch (error) {
+    if (error instanceof Error && error.message === 'CONFLICT')
+      return readWorkspace();
+    throw error;
+  }
 }
 export async function saveWorkspace(
   state: Workspace,

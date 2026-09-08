@@ -81,8 +81,8 @@ test('Workbook replaces the old starter example; previous user gifts stay pendin
   const before = JSON.stringify(gifts);
   const ledger = readGivingLedger(null, JSON.stringify(gifts));
   const summary = assertReconciled(ledger);
-  assert.equal(summary.totalOre, 578300);
-  assert.equal(summary.usedOre, 478300);
+  assert.equal(summary.totalOre, 579500);
+  assert.equal(summary.usedOre, 479500);
   assert.equal(summary.pendingOre, 100000);
   assert.deepEqual([...summary.residentIds].sort(), ['ake', 'koby', 'ove']);
   assert.ok(
@@ -160,7 +160,7 @@ test('Invalid, duplicate, misattributed, or over-budget expenses cannot increase
       JSON.stringify({ gifts: [gift], expenses: invalid }),
       null,
     );
-    assert.equal(spendingSummary(restored).usedOre, 478300);
+    assert.equal(spendingSummary(restored).usedOre, 479500);
     assert.equal(spendingSummary(restored).pendingOre, gift.amountOre);
   }
 });

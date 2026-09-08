@@ -246,7 +246,7 @@
 .gs-paths polyline {
   fill: none;
   stroke: #ddc994;
-  stroke-width: 28;
+  stroke-width: 22;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
@@ -1505,8 +1505,7 @@
   }
 }
 
-/* A dedicated label lane stays clear of every area, including level 5.
-   Row centres are 500px apart; images are at most 375px high. */
+/* Label sizing is finalized beside the compact map layout below. */
 .gs-zone-label {
   top: calc(100% + 14px);
   width: 280px;
@@ -1695,4 +1694,130 @@
   width: 100%;
   margin: 12px 0 8px;
   gap: 8px;
+}
+
+/* Show every companion; match the transaction rail to the complete right column. */
+.gs-roster > div:last-child {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 26px 18px;
+  overflow: visible;
+  padding: 18px 8px 8px;
+}
+.gs-roster button {
+  min-width: 0;
+  width: 100%;
+}
+.gs-roster button strong {
+  overflow-wrap: anywhere;
+}
+.gs-roster > div:last-child > p {
+  grid-column: 1 / -1;
+}
+.gs-sidebar-transactions {
+  flex: 1;
+  min-height: 0;
+}
+.gs-sidebar-transactions > .gs-transaction-list {
+  position: relative;
+}
+.gs-rail-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  visibility: hidden;
+  pointer-events: none;
+}
+@media (min-width: 761px) {
+  .gs-wallet-column > .gs-donate,
+  .gs-wallet-column > .gs-wallet {
+    flex-shrink: 0;
+  }
+  .gs-main-column {
+    min-height: 720px;
+  }
+}
+@media (max-width: 760px) {
+  .gs-wallet-column {
+    height: auto !important;
+  }
+  .gs-roster > div:last-child {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 26px 12px;
+  }
+}
+
+.gs-sidebar-transactions {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.gs-sidebar-transactions > header {
+  flex-shrink: 0;
+}
+.gs-rail-measurements {
+  position: absolute;
+  top: 0;
+  left: 18px;
+  right: 18px;
+  visibility: hidden;
+  pointer-events: none;
+}
+.gs-rail-measurements > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+@media (min-width: 761px) {
+  .gs-sidebar-transactions > .gs-transaction-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .gs-rail-visible-row {
+    flex: 1;
+    display: flex;
+  }
+  .gs-rail-visible-row > .gs-transaction {
+    width: 100%;
+    box-sizing: border-box;
+    align-content: space-between;
+  }
+  .gs-rail-visible-row:last-child > .gs-transaction {
+    padding-bottom: 0;
+  }
+}
+.gs-sidebar-transactions .gs-transaction {
+  padding: 10px 0;
+  gap: 8px;
+}
+
+/* Fixed badge lanes keep all five upgrade levels compact without covering art. */
+.gs-zone-label,
+.gs-zone-garden .gs-zone-label {
+  top: calc(100% + 8px);
+  bottom: auto;
+  height: 84px;
+  padding: 6px 10px;
+  gap: 2px;
+  justify-content: center;
+}
+.gs-zone .gs-label-beside-road {
+  left: calc(50% - 110px);
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
+}
+
+.gs-zone-label strong {
+  font-size: 22px;
+  line-height: 26px;
+  white-space: nowrap;
+}
+.gs-zone-label span {
+  font-size: 18px;
+  line-height: 21px;
 }

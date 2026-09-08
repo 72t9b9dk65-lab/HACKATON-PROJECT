@@ -70,7 +70,7 @@ const post = (changes = {}) => ({
   ...changes,
 });
 
-test('the new shared workspace preserves all 100 workbook rows, precision and total', async () => {
+test('the new shared workspace preserves all 102 workbook rows, precision and total', async () => {
   const s = await seed();
   const source = JSON.parse(
     fs.readFileSync(
@@ -81,13 +81,14 @@ test('the new shared workspace preserves all 100 workbook rows, precision and to
     ),
   );
   const rows = s.receipts.filter((r) => r.source === 'workbook');
-  assert.equal(rows.length, 100);
+  assert.equal(rows.length, 102);
   assert.equal(
     rows.reduce((n, r) => n + r.totalOre, 0),
-    478300,
+    479500,
   );
-  for (const row of source.transactions) {
-    const r = rows.find((r) => r.sourceRow === row.row);
+  for (const [index, row] of source.transactions.entries()) {
+    const r = rows[index];
+    assert.equal(r.sourceRow, row.row);
     assert.equal(r.purchasedAt, row.date);
     assert.equal(r.totalOre, row.amountOre);
     assert.equal(r.file, null);
@@ -96,7 +97,7 @@ test('the new shared workspace preserves all 100 workbook rows, precision and to
   assertBalanced(s);
   assert.equal(
     balances(s).reduce((n, d) => n + d.donated, 0),
-    928300,
+    929500,
   );
 });
 test('a gift increases available funds, never creates a dog or an automatic future payment', async () => {

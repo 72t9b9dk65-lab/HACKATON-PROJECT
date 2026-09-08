@@ -1,15 +1,18 @@
 'use client';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Plus, Minus, Maximize, Moon, Sun, LockKeyhole } from 'lucide-react';
 import { CareImage } from './care-image';
 import { profileDogs } from '@/lib/donation-shell';
 import { money } from '@/lib/platform/model';
 import { shelterMoment, dogIsSleeping } from '@/lib/platform/shelter-routine';
 import {
+  areaAsset,
   hashSeed,
   pointOnRoute,
-  travelRoute,
-  routeToGarden,
+  buildShelterNetwork,
+  WORLD_WIDTH,
+  WORLD_HEIGHT,
+  type ShelterNetwork,
   zoneSize,
   type ShelterProgress,
 } from '@/lib/platform/shelter-growth';
@@ -58,12 +61,19 @@ export function GrowingShelter({
   }, []);
   const moment = shelterMoment(clock);
   const poseMoment = shelterMoment(clock);
-  const scale =
-    Math.max(0.5, Math.min(dimensions.width / 1280, dimensions.height / 1600)) *
-    zoom;
+  const network = useMemo(
+    () => buildShelterNetwork(progress.zones, preview),
+    [progress.zones, preview],
+  );
+  const fitScale = Math.min(
+    dimensions.width / (WORLD_WIDTH + 80),
+    dimensions.height / (WORLD_HEIGHT + 80),
+  );
+  const baseScale = Math.max(dimensions.width < 600 ? 0.5 : 0, fitScale);
+  const scale = baseScale * zoom;
   const offset = {
-    x: (dimensions.width - 1200 * scale) / 2 + pan.x,
-    y: (dimensions.height - 1560 * scale) / 2 + pan.y,
+    x: (dimensions.width - WORLD_WIDTH * scale) / 2 + pan.x,
+    y: (dimensions.height - WORLD_HEIGHT * scale) / 2 + pan.y,
   };
   const formatted = new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Europe/Stockholm',
@@ -83,6 +93,7 @@ export function GrowingShelter({
       index={index}
       ghost={ghost}
       progress={progress}
+      network={network}
       poseMoment={poseMoment}
       reduced={reduced}
       onDog={onDog}
@@ -156,6 +167,8 @@ export function GrowingShelter({
         <div
           className="gs-world"
           style={{
+            width: WORLD_WIDTH,
+            height: WORLD_HEIGHT,
             transform:
               'translate(' +
               offset.x +
@@ -166,18 +179,21 @@ export function GrowingShelter({
               ')',
           }}
         >
-          <svg className="gs-paths" viewBox="0 0 1200 1560" aria-hidden="true">
-            {progress.zones
-              .filter((z) => z.id !== 'garden')
-              .map((z) => (
-                <polyline
-                  key={z.id}
-                  points={routeToGarden(z)
-                    .map((p) => p.x + ',' + p.y)
-                    .join(' ')}
-                  className={z.level ? '' : 'is-locked'}
-                />
-              ))}
+          <svg
+            className="gs-paths"
+            viewBox={`0 0 ${WORLD_WIDTH} ${WORLD_HEIGHT}`}
+            style={{ width: WORLD_WIDTH, height: WORLD_HEIGHT }}
+            aria-hidden="true"
+          >
+            {network.paths.map((path) => (
+              <polyline
+                key={path.id}
+                points={path.points.map((p) => `${p.x},${p.y}`).join(' ')}
+                data-zone={path.zoneId}
+                data-entrance={path.entrance}
+                className={path.locked ? 'is-locked' : ''}
+              />
+            ))}
           </svg>
           {progress.zones.map((z) => {
             const shown = preview
@@ -195,9 +211,7 @@ export function GrowingShelter({
                 style={{ left: z.x, top: z.y, width: size, height: size }}
               >
                 <CareImage
-                  src={
-                    '/care/upgrades/' + z.family + '-livello-' + shown + '.webp'
-                  }
+                  src={areaAsset(z, shown)}
                   alt={z.name + ' level ' + shown}
                   width={480}
                   height={480}
@@ -205,8 +219,18 @@ export function GrowingShelter({
                   loading="eager"
                 />
                 <button
-                  className="gs-zone-label"
+                  className={
+                    'gs-zone-label' +
+                    ((z.entrances as readonly string[]).includes('bottom')
+                      ? ' gs-label-beside-road'
+                      : '')
+                  }
                   onClick={onDonate}
+                  title={
+                    z.nextThresholdOre !== null
+                      ? money(z.remainingOre) + ' SEK more donated to upgrade'
+                      : 'Fully upgraded'
+                  }
                   aria-label={
                     z.name +
                     (z.level ? ' level ' + z.level : ' locked') +
@@ -230,11 +254,6 @@ export function GrowingShelter({
                           : money(z.donationGapOre) + ' SEK to unlock'
                         : 'Unlocked'}
                   </span>
-                  {z.level > 0 && z.nextThresholdOre !== null && (
-                    <small>
-                      {money(z.remainingOre)} SEK more donated to upgrade
-                    </small>
-                  )}
                 </button>
               </div>
             );
@@ -268,13 +287,7 @@ export function GrowingShelter({
             title="Fit whole shelter · arrow keys move the map"
             onKeyDown={panWithKeys}
             onClick={() => {
-              setZoom(
-                Math.min(dimensions.width / 1280, dimensions.height / 1600) /
-                  Math.max(
-                    0.5,
-                    Math.min(dimensions.width / 1280, dimensions.height / 1600),
-                  ),
-              );
+              setZoom(fitScale / baseScale);
               setPan({ x: 0, y: 0 });
             }}
           >
@@ -310,6 +323,7 @@ function ShelterDog({
   index,
   ghost,
   progress,
+  network,
   poseMoment,
   reduced,
   onDog,
@@ -318,6 +332,7 @@ function ShelterDog({
   index: number;
   ghost: boolean;
   progress: ShelterProgress;
+  network: ShelterNetwork;
   poseMoment: ReturnType<typeof shelterMoment>;
   reduced: boolean;
   onDog: (id: string) => void;
@@ -344,6 +359,7 @@ function ShelterDog({
       x: ((seed % 5) - 2) * 16,
       y: ((seed % 3) - 1) * 18,
     };
+    const routes = new Map<string, ReturnType<ShelterNetwork['route']>>();
     const draw = () => {
       let moving = false;
       let point = {
@@ -366,7 +382,9 @@ function ShelterDog({
           const from = active[(cycle + seed) % active.length];
           const to = active[(cycle + seed + 1) % active.length];
           moving = local < 15 && from.id !== to.id;
-          const route = travelRoute(from, to);
+          const key = `${from.id}:${to.id}`;
+          if (!routes.has(key)) routes.set(key, network.route(from.id, to.id));
+          const route = routes.get(key)!;
           // Connect the exact dwell positions to the route: no snap on arrival or departure.
           const start = {
             x: from.x + restingOffset.x,
@@ -394,7 +412,7 @@ function ShelterDog({
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [id, index, ghost, progress.zones, sleeping, reduced, columns]);
+  }, [id, index, ghost, progress.zones, network, sleeping, reduced, columns]);
   return (
     <button
       ref={element}

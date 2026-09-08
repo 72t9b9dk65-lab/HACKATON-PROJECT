@@ -1,0 +1,576 @@
+{
+  "zones": [
+    {
+      "id": "garden",
+      "name": "The garden",
+      "family": "giardino",
+      "first": 0,
+      "x": 820,
+      "y": 780,
+      "entrance": "all",
+      "entrances": [
+        "top",
+        "right",
+        "bottom",
+        "left"
+      ],
+      "level": 5,
+      "projectedLevel": 5,
+      "nextThresholdOre": null,
+      "remainingOre": 0,
+      "donationGapOre": 0,
+      "size": 375,
+      "asset": "/care/upgrades/giardino-livello-5.webp"
+    },
+    {
+      "id": "kennel",
+      "name": "A cosy home",
+      "family": "cuccia",
+      "first": 1,
+      "x": 260,
+      "y": 780,
+      "entrance": "right",
+      "entrances": [
+        "top",
+        "right",
+        "bottom"
+      ],
+      "level": 5,
+      "projectedLevel": 5,
+      "nextThresholdOre": null,
+      "remainingOre": 0,
+      "donationGapOre": 0,
+      "size": 367,
+      "asset": "/care/grid-v2/cuccia-livello-5.webp"
+    },
+    {
+      "id": "food",
+      "name": "The kitchen",
+      "family": "cibo",
+      "first": 2,
+      "x": 260,
+      "y": 220,
+      "entrance": "right",
+      "entrances": [
+        "right",
+        "bottom"
+      ],
+      "level": 5,
+      "projectedLevel": 5,
+      "nextThresholdOre": null,
+      "remainingOre": 0,
+      "donationGapOre": 0,
+      "size": 320,
+      "asset": "/care/grid-v2/cibo-livello-5.webp"
+    },
+    {
+      "id": "water",
+      "name": "Fresh water",
+      "family": "abbeveraggio",
+      "first": 3,
+      "x": 260,
+      "y": 1340,
+      "entrance": "right",
+      "entrances": [
+        "top",
+        "right"
+      ],
+      "level": 5,
+      "projectedLevel": 5,
+      "nextThresholdOre": null,
+      "remainingOre": 0,
+      "donationGapOre": 0,
+      "size": 320,
+      "asset": "/care/grid-v2/abbeveraggio-livello-5.webp"
+    },
+    {
+      "id": "play",
+      "name": "Playground",
+      "family": "gioco",
+      "first": 4,
+      "x": 820,
+      "y": 220,
+      "entrance": "left",
+      "entrances": [
+        "left",
+        "right",
+        "bottom"
+      ],
+      "level": 5,
+      "projectedLevel": 5,
+      "nextThresholdOre": null,
+      "remainingOre": 0,
+      "donationGapOre": 0,
+      "size": 320,
+      "asset": "/care/grid-v2/gioco-livello-5.webp"
+    },
+    {
+      "id": "wellbeing",
+      "name": "Wellbeing",
+      "family": "benessere",
+      "first": 6,
+      "x": 1380,
+      "y": 1340,
+      "entrance": "top",
+      "entrances": [
+        "top",
+        "left"
+      ],
+      "level": 5,
+      "projectedLevel": 5,
+      "nextThresholdOre": null,
+      "remainingOre": 0,
+      "donationGapOre": 0,
+      "size": 320,
+      "asset": "/care/grid-v2/benessere-livello-5.webp"
+    },
+    {
+      "id": "medical",
+      "name": "Care studio",
+      "family": "cura",
+      "first": 8,
+      "x": 1380,
+      "y": 780,
+      "entrance": "left",
+      "entrances": [
+        "top",
+        "left",
+        "bottom"
+      ],
+      "level": 5,
+      "projectedLevel": 5,
+      "nextThresholdOre": null,
+      "remainingOre": 0,
+      "donationGapOre": 0,
+      "size": 320,
+      "asset": "/care/grid-v2/cura-livello-5.webp"
+    },
+    {
+      "id": "pool",
+      "name": "Pool",
+      "family": "piscina",
+      "first": 5,
+      "x": 820,
+      "y": 1340,
+      "entrance": "top",
+      "entrances": [
+        "top",
+        "left",
+        "right"
+      ],
+      "level": 5,
+      "projectedLevel": 5,
+      "nextThresholdOre": null,
+      "remainingOre": 0,
+      "donationGapOre": 0,
+      "size": 320,
+      "asset": "/care/grid-v2/piscina-livello-5.webp"
+    },
+    {
+      "id": "sport",
+      "name": "Sports",
+      "family": "sport",
+      "first": 10,
+      "x": 1380,
+      "y": 220,
+      "entrance": "left",
+      "entrances": [
+        "left",
+        "bottom"
+      ],
+      "level": 5,
+      "projectedLevel": 5,
+      "nextThresholdOre": null,
+      "remainingOre": 0,
+      "donationGapOre": 0,
+      "size": 320,
+      "asset": "/care/grid-v2/sport-livello-5.webp"
+    }
+  ],
+  "paths": [
+    {
+      "id": "garden-medical:a",
+      "points": [
+        {
+          "x": 820,
+          "y": 780
+        },
+        {
+          "x": 1100,
+          "y": 780
+        }
+      ],
+      "locked": false,
+      "zoneId": "garden",
+      "entrance": "right"
+    },
+    {
+      "id": "garden-medical:b",
+      "points": [
+        {
+          "x": 1100,
+          "y": 780
+        },
+        {
+          "x": 1380,
+          "y": 780
+        }
+      ],
+      "locked": false,
+      "zoneId": "medical",
+      "entrance": "left"
+    },
+    {
+      "id": "garden-pool:a",
+      "points": [
+        {
+          "x": 820,
+          "y": 780
+        },
+        {
+          "x": 820,
+          "y": 1060
+        }
+      ],
+      "locked": false,
+      "zoneId": "garden",
+      "entrance": "bottom"
+    },
+    {
+      "id": "garden-pool:b",
+      "points": [
+        {
+          "x": 820,
+          "y": 1060
+        },
+        {
+          "x": 820,
+          "y": 1340
+        }
+      ],
+      "locked": false,
+      "zoneId": "pool",
+      "entrance": "top"
+    },
+    {
+      "id": "kennel-garden:a",
+      "points": [
+        {
+          "x": 260,
+          "y": 780
+        },
+        {
+          "x": 540,
+          "y": 780
+        }
+      ],
+      "locked": false,
+      "zoneId": "kennel",
+      "entrance": "right"
+    },
+    {
+      "id": "kennel-garden:b",
+      "points": [
+        {
+          "x": 540,
+          "y": 780
+        },
+        {
+          "x": 820,
+          "y": 780
+        }
+      ],
+      "locked": false,
+      "zoneId": "garden",
+      "entrance": "left"
+    },
+    {
+      "id": "kennel-water:a",
+      "points": [
+        {
+          "x": 260,
+          "y": 780
+        },
+        {
+          "x": 260,
+          "y": 1060
+        }
+      ],
+      "locked": false,
+      "zoneId": "kennel",
+      "entrance": "bottom"
+    },
+    {
+      "id": "kennel-water:b",
+      "points": [
+        {
+          "x": 260,
+          "y": 1060
+        },
+        {
+          "x": 260,
+          "y": 1340
+        }
+      ],
+      "locked": false,
+      "zoneId": "water",
+      "entrance": "top"
+    },
+    {
+      "id": "food-play:a",
+      "points": [
+        {
+          "x": 260,
+          "y": 220
+        },
+        {
+          "x": 540,
+          "y": 220
+        }
+      ],
+      "locked": false,
+      "zoneId": "food",
+      "entrance": "right"
+    },
+    {
+      "id": "food-play:b",
+      "points": [
+        {
+          "x": 540,
+          "y": 220
+        },
+        {
+          "x": 820,
+          "y": 220
+        }
+      ],
+      "locked": false,
+      "zoneId": "play",
+      "entrance": "left"
+    },
+    {
+      "id": "food-kennel:a",
+      "points": [
+        {
+          "x": 260,
+          "y": 220
+        },
+        {
+          "x": 260,
+          "y": 500
+        }
+      ],
+      "locked": false,
+      "zoneId": "food",
+      "entrance": "bottom"
+    },
+    {
+      "id": "food-kennel:b",
+      "points": [
+        {
+          "x": 260,
+          "y": 500
+        },
+        {
+          "x": 260,
+          "y": 780
+        }
+      ],
+      "locked": false,
+      "zoneId": "kennel",
+      "entrance": "top"
+    },
+    {
+      "id": "water-pool:a",
+      "points": [
+        {
+          "x": 260,
+          "y": 1340
+        },
+        {
+          "x": 540,
+          "y": 1340
+        }
+      ],
+      "locked": false,
+      "zoneId": "water",
+      "entrance": "right"
+    },
+    {
+      "id": "water-pool:b",
+      "points": [
+        {
+          "x": 540,
+          "y": 1340
+        },
+        {
+          "x": 820,
+          "y": 1340
+        }
+      ],
+      "locked": false,
+      "zoneId": "pool",
+      "entrance": "left"
+    },
+    {
+      "id": "play-sport:a",
+      "points": [
+        {
+          "x": 820,
+          "y": 220
+        },
+        {
+          "x": 1100,
+          "y": 220
+        }
+      ],
+      "locked": false,
+      "zoneId": "play",
+      "entrance": "right"
+    },
+    {
+      "id": "play-sport:b",
+      "points": [
+        {
+          "x": 1100,
+          "y": 220
+        },
+        {
+          "x": 1380,
+          "y": 220
+        }
+      ],
+      "locked": false,
+      "zoneId": "sport",
+      "entrance": "left"
+    },
+    {
+      "id": "play-garden:a",
+      "points": [
+        {
+          "x": 820,
+          "y": 220
+        },
+        {
+          "x": 820,
+          "y": 500
+        }
+      ],
+      "locked": false,
+      "zoneId": "play",
+      "entrance": "bottom"
+    },
+    {
+      "id": "play-garden:b",
+      "points": [
+        {
+          "x": 820,
+          "y": 500
+        },
+        {
+          "x": 820,
+          "y": 780
+        }
+      ],
+      "locked": false,
+      "zoneId": "garden",
+      "entrance": "top"
+    },
+    {
+      "id": "medical-wellbeing:a",
+      "points": [
+        {
+          "x": 1380,
+          "y": 780
+        },
+        {
+          "x": 1380,
+          "y": 1060
+        }
+      ],
+      "locked": false,
+      "zoneId": "medical",
+      "entrance": "bottom"
+    },
+    {
+      "id": "medical-wellbeing:b",
+      "points": [
+        {
+          "x": 1380,
+          "y": 1060
+        },
+        {
+          "x": 1380,
+          "y": 1340
+        }
+      ],
+      "locked": false,
+      "zoneId": "wellbeing",
+      "entrance": "top"
+    },
+    {
+      "id": "pool-wellbeing:a",
+      "points": [
+        {
+          "x": 820,
+          "y": 1340
+        },
+        {
+          "x": 1100,
+          "y": 1340
+        }
+      ],
+      "locked": false,
+      "zoneId": "pool",
+      "entrance": "right"
+    },
+    {
+      "id": "pool-wellbeing:b",
+      "points": [
+        {
+          "x": 1100,
+          "y": 1340
+        },
+        {
+          "x": 1380,
+          "y": 1340
+        }
+      ],
+      "locked": false,
+      "zoneId": "wellbeing",
+      "entrance": "left"
+    },
+    {
+      "id": "sport-medical:a",
+      "points": [
+        {
+          "x": 1380,
+          "y": 220
+        },
+        {
+          "x": 1380,
+          "y": 500
+        }
+      ],
+      "locked": false,
+      "zoneId": "sport",
+      "entrance": "bottom"
+    },
+    {
+      "id": "sport-medical:b",
+      "points": [
+        {
+          "x": 1380,
+          "y": 500
+        },
+        {
+          "x": 1380,
+          "y": 780
+        }
+      ],
+      "locked": false,
+      "zoneId": "medical",
+      "entrance": "top"
+    }
+  ]
+}

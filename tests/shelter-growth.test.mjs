@@ -7,11 +7,13 @@ import {
   companionThresholdOre,
   companionCount,
   companionOrder,
-  travelRoute,
-  routeToGarden,
+  buildShelterNetwork,
   pointOnRoute,
   tileSize,
   zoneSize,
+  areaAsset,
+  WORLD_WIDTH,
+  WORLD_HEIGHT,
 } from '../lib/platform/shelter-growth.ts';
 import { seedWorkspace } from '../lib/platform/seed.ts';
 import {
@@ -77,32 +79,25 @@ test('random companion prefixes are stable on reload, catalog reordering and rev
 test('garden stays in the centre, every level has an asset, and all areas connect through approved entrances', () => {
   const p = shelterProgress('a', 1e8, 0, 0, profileDogs);
   const garden = p.zones.find((z) => z.id === 'garden');
-  assert.deepEqual([garden.x, garden.y], [600, 720]);
+  assert.deepEqual([garden.x, garden.y], [672, 632]);
+  const network = buildShelterNetwork(p.zones);
   for (const z of p.zones) {
     assert.equal(z.level, 5);
     for (let level = 1; level <= 5; level++)
       assert.ok(
         fs.existsSync(
-          new URL(
-            '../public/care/upgrades/' +
-              z.family +
-              '-livello-' +
-              level +
-              '.webp',
-            import.meta.url,
-          ),
+          new URL('../public' + areaAsset(z, level), import.meta.url),
         ),
       );
-    const path = routeToGarden(z);
-    assert.deepEqual(path.at(-1), { x: 600, y: 720 });
-    if (z.id !== 'garden') {
-      const [a, b] = path;
-      if (z.entrance === 'right') assert.ok(b.x > a.x && b.y === a.y);
-      if (z.entrance === 'left') assert.ok(b.x < a.x && b.y === a.y);
-      if (z.entrance === 'top') assert.ok(b.y < a.y && b.x === a.x);
+    for (const direction of z.entrances) {
+      assert.ok(
+        network.paths.some(
+          (path) => path.zoneId === z.id && path.entrance === direction,
+        ),
+      );
     }
     for (const to of p.zones) {
-      const path = travelRoute(z, to);
+      const path = network.route(z.id, to.id);
       assert.deepEqual(pointOnRoute(path, 0), { x: z.x, y: z.y });
       assert.deepEqual(pointOnRoute(path, 1), { x: to.x, y: to.y });
       for (let i = 1; i < path.length; i++)
@@ -399,19 +394,21 @@ test('label lanes clear all area images at every upgrade level', () => {
   for (const z of zones)
     for (let level = 1; level <= 5; level++) {
       const half = zoneSize(z.id, level) / 2;
-      // Include the expanded hover/focus funding text in the reserved height.
+      // Fixed-height badges keep funding details in their accessible tooltip.
       const label = {
-        left: z.x - 140,
-        right: z.x + 140,
-        top: z.id === 'garden' ? z.y - half - 14 - 140 : z.y + half + 14,
+        left: z.x - (z.entrances.includes('bottom') ? 200 : 140),
+        right: z.x + (z.entrances.includes('bottom') ? -20 : 140),
+        top: z.y + half + 8,
       };
+      assert.ok(label.left >= 0 && label.right <= WORLD_WIDTH);
+      assert.ok(label.top + 84 <= WORLD_HEIGHT);
       for (const other of zones) {
         const maxHalf = zoneSize(other.id, other.id === z.id ? level : 5) / 2;
         const overlaps =
           label.left < other.x + maxHalf &&
           label.right > other.x - maxHalf &&
           label.top < other.y + maxHalf &&
-          label.top + 140 > other.y - maxHalf;
+          label.top + 84 > other.y - maxHalf;
         assert.equal(
           overlaps,
           false,
@@ -419,4 +416,131 @@ test('label lanes clear all area images at every upgrade level', () => {
         );
       }
     }
+});
+
+test('every entrance connects at each level and outdoor roads never cross area art', () => {
+  const manifest = ['upgrades', 'grid-v2'].flatMap((folder) =>
+    JSON.parse(
+      fs.readFileSync(
+        new URL(`../public/care/${folder}/manifest.json`, import.meta.url),
+      ),
+    ),
+  );
+  for (let level = 1; level <= 5; level++) {
+    const states = shelterProgress('a', 1e8, 0, 0, profileDogs).zones.map(
+      (z) => ({ ...z, level, projectedLevel: level }),
+    );
+    const network = buildShelterNetwork(states);
+    for (const port of network.ports) {
+      assert.ok(
+        network.paths.some(
+          (path) =>
+            path.zoneId !== port.zoneId &&
+            [path.points[0], path.points.at(-1)].some(
+              (p) => p.x === port.outside.x && p.y === port.outside.y,
+            ),
+        ),
+        `${port.zoneId} ${port.direction} must continue into an outdoor road at level ${level}`,
+      );
+    }
+    for (const z of states) {
+      const asset = manifest.find((a) => a.path === areaAsset(z, level));
+      assert.deepEqual([...z.entrances].sort(), [...asset.entrances].sort());
+    }
+    for (const path of network.paths) {
+      for (let i = 1; i < path.points.length; i++) {
+        const a = path.points[i - 1],
+          b = path.points[i];
+        assert.ok(a.x === b.x || a.y === b.y);
+        for (const z of states.filter((z) => z.id !== path.zoneId)) {
+          const half = zoneSize(z.id, level) / 2 + 14; // include road half-width
+          const crosses =
+            a.x === b.x
+              ? a.x > z.x - half &&
+                a.x < z.x + half &&
+                Math.max(a.y, b.y) > z.y - half &&
+                Math.min(a.y, b.y) < z.y + half
+              : a.y > z.y - half &&
+                a.y < z.y + half &&
+                Math.max(a.x, b.x) > z.x - half &&
+                Math.min(a.x, b.x) < z.x + half;
+          assert.equal(
+            crosses,
+            false,
+            `Road crosses ${z.id} at level ${level}`,
+          );
+        }
+      }
+    }
+    for (const from of states)
+      for (const to of states) {
+        const route = network.route(from.id, to.id);
+        assert.deepEqual(route[0], { x: from.x, y: from.y });
+        assert.deepEqual(route.at(-1), { x: to.x, y: to.y });
+      }
+    const direct = network.route('water', 'pool');
+    assert.ok(
+      network.route('garden', 'pool').every((point) => point.x === 672),
+      'Garden connects straight to the north entrance of Pool',
+    );
+    assert.ok(
+      !direct.some((p) => p.x === 672 && p.y === 632),
+      'Adjacent areas do not detour through garden',
+    );
+  }
+});
+test('nine areas and twelve direct connections form exactly four squares', () => {
+  const states = shelterProgress('a', 1e8, 0, 0, profileDogs).zones;
+  const network = buildShelterNetwork(states);
+  assert.equal(states.length, 9);
+  assert.equal(network.connections.length, 12);
+  assert.equal(network.ports.length, 24);
+  assert.ok(
+    network.connections.every((edge) => edge.length === 448),
+    'All square sides have equal length',
+  );
+  const rows = [184, 632, 1080].map((y) =>
+    states
+      .filter((z) => z.y === y)
+      .sort((a, b) => a.x - b.x)
+      .map((z) => z.id),
+  );
+  assert.deepEqual(rows, [
+    ['food', 'play', 'sport'],
+    ['kennel', 'garden', 'medical'],
+    ['water', 'pool', 'wellbeing'],
+  ]);
+  for (let y = 0; y < 2; y++)
+    for (let x = 0; x < 2; x++) {
+      const square = [
+        rows[y][x],
+        rows[y][x + 1],
+        rows[y + 1][x + 1],
+        rows[y + 1][x],
+      ];
+      for (let i = 0; i < 4; i++)
+        assert.ok(
+          network.connections.some(
+            (c) =>
+              [c.from, c.to].includes(square[i]) &&
+              [c.from, c.to].includes(square[(i + 1) % 4]),
+          ),
+        );
+    }
+  for (const edge of network.connections)
+    assert.equal(network.route(edge.from, edge.to).length, 2);
+});
+test('locked areas cannot be used as shortcuts, including in a donation preview', () => {
+  for (const amount of [5000, 10000, 20000, 100000]) {
+    const p = shelterProgress('a', amount, 0, 1000000, profileDogs);
+    for (const preview of [false, true]) {
+      const network = buildShelterNetwork(p.zones, preview);
+      for (const from of p.zones.filter((z) => z.level))
+        for (const to of p.zones.filter((z) => z.level)) {
+          assert.ok(network.route(from.id, to.id).length);
+        }
+      for (const locked of p.zones.filter((z) => !z.level))
+        assert.deepEqual(network.route('garden', locked.id), []);
+    }
+  }
 });

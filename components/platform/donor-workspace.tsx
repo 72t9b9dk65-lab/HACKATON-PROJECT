@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Heart,
   ArrowUpRight,
@@ -22,7 +22,7 @@ import {
   parseMoney,
   publishedPosts,
 } from '@/lib/platform/model';
-import { shelterProgress } from '@/lib/platform/shelter-growth';
+import { shelterProgress, areaAsset } from '@/lib/platform/shelter-growth';
 import { CareImage } from './care-image';
 import { DogPortrait } from '@/components/dog-portrait';
 import { GrowingShelter } from './growing-shelter';
@@ -42,6 +42,11 @@ export default function DonorWorkspace() {
   const store = useCareWorkspace(),
     now = useClock();
   const [donorId, setDonorId] = useState('personal');
+  const dashboardRef = useRef<HTMLDivElement>(null);
+  const [railLayout, setRailLayout] = useState<{
+    height?: number;
+    count: number;
+  }>({ count: 3 });
   const [view, setView] = useState<'shelter' | 'statistics'>('shelter');
   const [donating, setDonating] = useState(false),
     [amount, setAmount] = useState('500'),
@@ -60,6 +65,60 @@ export default function DonorWorkspace() {
     return () => clearTimeout(timer);
   }, []);
   const state = store.state;
+  useLayoutEffect(() => {
+    const dashboard = dashboardRef.current;
+    if (!dashboard) return;
+    const right = dashboard.querySelector<HTMLElement>('.gs-main-column')!;
+    const aside = dashboard.querySelector<HTMLElement>('.gs-wallet-column')!;
+    const section = dashboard.querySelector<HTMLElement>(
+      '.gs-sidebar-transactions',
+    )!;
+    const list = section.querySelector<HTMLElement>('.gs-transaction-list')!;
+    const header = section.querySelector('header')!;
+    const measure = () => {
+      if (matchMedia('(max-width: 760px)').matches) {
+        setRailLayout((old) =>
+          old.height === undefined && old.count === 3 ? old : { count: 3 },
+        );
+        return;
+      }
+      const height = right.getBoundingClientRect().height;
+      const available =
+        aside.getBoundingClientRect().top +
+        height -
+        list.getBoundingClientRect().top -
+        parseFloat(getComputedStyle(section).paddingBottom) -
+        1;
+      let used = 0,
+        count = 0;
+      for (const row of section.querySelectorAll<HTMLElement>(
+        '.gs-rail-measurements [data-rail-row]',
+      )) {
+        const rowHeight = row.getBoundingClientRect().height;
+        if (used + rowHeight > available) break;
+        used += rowHeight;
+        count++;
+      }
+      setRailLayout((old) =>
+        old.height === height && old.count === count ? old : { height, count },
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    for (const node of [
+      right,
+      header,
+      aside.querySelector('.gs-wallet')!,
+      aside.querySelector('.gs-donate')!,
+      ...section.querySelectorAll('.gs-rail-measurements [data-rail-row]'),
+    ])
+      observer.observe(node);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [state, query, limit, view, preview]);
   if (!state) return <LoadingWorkspace store={store} />;
   const donor =
     balances(state).find((d) => d.id === donorId) ?? balances(state)[0];
@@ -144,10 +203,7 @@ export default function DonorWorkspace() {
       </div>
       {nextZone && (
         <div className="gs-next-preview">
-          <CareImage
-            src={`/care/upgrades/${nextZone.family}-livello-${nextZone.level + 1}.webp`}
-            alt=""
-          />
+          <CareImage src={areaAsset(nextZone, nextZone.level + 1)} alt="" />
           <div>
             <strong>Next: {nextZone.name}</strong>
             <small>
@@ -232,10 +288,12 @@ export default function DonorWorkspace() {
           onClick={() => setProofReceiptId(r.id)}
         >
           <span>
-            <ShieldCheck size={16} /> Verified by blockchain
+            <ShieldCheck size={16} />{' '}
+            {proof?.anchors.length
+              ? 'Verified by blockchain'
+              : 'Blockchain verification'}
           </span>
           <small>Click for more info</small>
-          {!proof?.anchors.length && <small>Demo · not yet anchored</small>}
         </Button>
       </article>
     );
@@ -264,8 +322,11 @@ export default function DonorWorkspace() {
             </Button>
           </div>
         )}
-        <div className="gs-dashboard">
-          <aside className="gs-wallet-column">
+        <div className="gs-dashboard" ref={dashboardRef}>
+          <aside
+            className="gs-wallet-column"
+            style={{ height: railLayout.height }}
+          >
             <Primary className="gs-donate" onClick={() => setDonating(true)}>
               <Heart fill="currentColor" size={23} /> Donate{' '}
               <ArrowUpRight size={24} />
@@ -342,7 +403,18 @@ export default function DonorWorkspace() {
                 </label>
               </header>
               <div className="gs-transaction-list">
-                {filtered.slice(0, 3).map(renderTransaction)}
+                {filtered.slice(0, railLayout.count).map((receipt) => (
+                  <div key={receipt.id} className="gs-rail-visible-row">
+                    {renderTransaction(receipt)}
+                  </div>
+                ))}
+              </div>
+              <div className="gs-rail-measurements" aria-hidden="true" inert>
+                {filtered.slice(0, limit).map((receipt) => (
+                  <div key={receipt.id} data-rail-row>
+                    {renderTransaction(receipt)}
+                  </div>
+                ))}
               </div>
               {!filtered.length && (
                 <p className="gs-empty-list">No transactions found.</p>
@@ -432,13 +504,13 @@ export default function DonorWorkspace() {
             </div>
           </div>
         </div>
-        {filtered.length > 3 && (
+        {filtered.length > railLayout.count && (
           <section className="gs-transactions gs-transaction-continuation">
             <header>
               <h2>More care transactions</h2>
             </header>
             <div className="gs-transaction-list">
-              {filtered.slice(3, limit).map(renderTransaction)}
+              {filtered.slice(railLayout.count, limit).map(renderTransaction)}
             </div>
             {!filtered.length && (
               <p className="gs-empty-list">

@@ -1,0 +1,89 @@
+{
+  "shared": "Use case: stylized-concept. Asset type: production pixel-art tile for a dog shelter game.\nStyle: beautiful handcrafted pixel art, crisp small square pixels, dark brown 1–2 pixel outlines, rich detailed wood grain, cozy polished game sprite. Elevated near-overhead camera, around 75 degrees above ground with slight visible front faces for depth. Axis-aligned rectangular footprint: TOP and BOTTOM edges horizontal, LEFT and RIGHT edges vertical. NOT diamond isometric, no diagonal footprint. Same camera and consistent soft light from upper left for all.\nAll props INSIDE the fenced/walled square. All doors are actual wide open gaps exactly at the MIDPOINT of required edges, with a flat visible floor walkway reaching the very edge. Use low perimeter walls/fences with obvious missing sections for the gates. Gate width 20 percent of side. Internal broad walking aisle connects all gates through the middle; put props in quadrants, never blocking gates or aisles.\nNo dogs, no people, no letters, no text, no captions, no labels, no UI, no perspective background, no drop shadow outside tile. True transparent background alpha, no checkerboard drawn. Leave clear transparent margins around each isolated complete tile.",
+  "areas": [
+    {
+      "id": "kitchen",
+      "name": "The kitchen",
+      "gates": [
+        "right",
+        "bottom"
+      ],
+      "subject": "dog feeding kitchen, wooden preparation counters, clearly visible paired food and water bowls at dog height, kibble storage; warm oak with cream tile floor",
+      "luxury": "spacious premium dining hall with six oak bowl stations, beautifully tiled floor, back preparation kitchen with copper taps, ingredient jars, hanging utensils, stacked kibble sacks and neat shelves"
+    },
+    {
+      "id": "home",
+      "name": "A cosy home",
+      "gates": [
+        "top",
+        "right",
+        "bottom"
+      ],
+      "subject": "cozy dog sleeping lodge, oak wood construction, dog beds with cream cushions, blue blankets; a clear central walking hall",
+      "luxury": "large cozy lodge with eight individual plush sleeping nooks, elaborate oak beams, brass corner trim, folded blankets, bedside storage, bone and paw cushions"
+    },
+    {
+      "id": "playground",
+      "name": "Playground",
+      "gates": [
+        "left",
+        "right",
+        "bottom"
+      ],
+      "subject": "dog play yard, emerald grass, colorful toy balls, dog tunnels, sensory play equipment, wooden low fencing",
+      "luxury": "expansive joyful play yard with three toy tunnels, giant rope toys, low timber bridges, sand dig box, ball pit, decorative bushes in corners"
+    },
+    {
+      "id": "sports",
+      "name": "Sports",
+      "gates": [
+        "left",
+        "bottom"
+      ],
+      "subject": "dog agility sports arena, emerald grass, orange and blue sporting obstacles, hurdles, weave poles, hoops, low ramps; no pool or water",
+      "luxury": "grand dog agility arena with organized obstacle circuits, six weave poles, two hoops, adjustable hurdle pairs, A-frame, seesaw, small corner equipment storage; large clear crossing paths"
+    },
+    {
+      "id": "care",
+      "name": "Care studio",
+      "gates": [
+        "top",
+        "left",
+        "bottom"
+      ],
+      "subject": "dog veterinary care studio, light blue clinical tiles, veterinary exam table, cabinets of bandages and medicine, stethoscope, small dog recovery bed",
+      "luxury": "beautiful spacious veterinary pavilion, two premium exam tables with instruments, diagnostic equipment, polished cabinets, neatly arranged medicine bottles and bandages, two recovery beds, immaculate blue and white tiled interior"
+    },
+    {
+      "id": "water",
+      "name": "Fresh water",
+      "gates": [
+        "top",
+        "right"
+      ],
+      "subject": "dog drinking water courtyard, pale stone paving, low dog drinking fountains and bowls, blue water, wood edging",
+      "luxury": "luxurious hydration courtyard with tiered low flowing drinking fountain, six accessible water bowls, elegant copper water supply taps, stone channels and lush corner planting; no swimming pool"
+    },
+    {
+      "id": "pool",
+      "name": "Pool",
+      "gates": [
+        "top",
+        "left",
+        "right"
+      ],
+      "subject": "dog swimming pool, aqua blue water, shallow ramp and easy wide steps, timber deck, towels and life jackets; no sports obstacles",
+      "luxury": "large luxurious dog swimming pool with sparkling turquoise tiled basin, wide shallow entry ramp, shallow splash bay, safety rails along water edge, poolside towel shelves, blue life jackets, shaded lounge deck; no human characters"
+    },
+    {
+      "id": "wellbeing",
+      "name": "Wellbeing",
+      "gates": [
+        "top",
+        "left"
+      ],
+      "subject": "dog wellness spa and grooming studio, warm wood deck, calming greenery, dog massage cushions, dog-sized washing tub, grooming bench and brushes",
+      "luxury": "serene premium wellness spa with two ceramic dog bathtubs, three plush massage loungers, elegant oak grooming stations, folded towels, brushes, lush herb planters, warm cream and sage accents"
+    }
+  ]
+}

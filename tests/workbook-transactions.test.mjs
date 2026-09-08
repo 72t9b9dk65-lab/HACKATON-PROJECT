@@ -24,22 +24,29 @@ import {
   readDemoGifts,
 } from '../lib/donation-shell.ts';
 
-test('All 100 source rows retain their amounts, date-only precision, categories, and row identity', () => {
+test('All 102 source rows retain their amounts, date-only precision, categories, and row identity', () => {
   const ledger = workbookLedger();
   assert.equal(fixture.source.sheet, 'Blad1');
   assert.equal(fixture.source.range, 'A1:C101');
-  assert.equal(ledger.expenses.length, 100);
-  assert.equal(new Set(ledger.expenses.map((expense) => expense.id)).size, 100);
+  assert.equal(ledger.expenses.length, 102);
+  assert.equal(new Set(ledger.expenses.map((expense) => expense.id)).size, 102);
   const sourceTotals = {
-    Food: 133800,
+    Food: 132800,
     Medicine: 123300,
     Shelter: 110800,
     Toys: 110400,
+    Rehabilitation: 2200,
   };
-  const totals = { Food: 0, Medicine: 0, Shelter: 0, Toys: 0 };
+  const totals = {
+    Food: 0,
+    Medicine: 0,
+    Shelter: 0,
+    Toys: 0,
+    Rehabilitation: 0,
+  };
   for (const [index, expense] of ledger.expenses.entries()) {
     const row = fixture.transactions[index];
-    assert.equal(expense.sourceRow, index + 2);
+    assert.equal(expense.sourceRow, row.row);
     assert.deepEqual(workbookTransaction(expense), row);
     assert.equal(expense.recordedAt, row.date);
     assert.equal(expense.amountOre, row.amountOre);
@@ -48,13 +55,13 @@ test('All 100 source rows retain their amounts, date-only precision, categories,
   }
   assert.deepEqual(totals, sourceTotals);
   const summary = spendingSummary(ledger);
-  assert.equal(summary.usedOre, 478300);
-  assert.equal(summary.totalOre, 478300);
+  assert.equal(summary.usedOre, 479500);
+  assert.equal(summary.totalOre, 479500);
   assert.equal(summary.pendingOre, 0);
   assert.deepEqual(summary.byCategory, {
-    food: 133800,
+    food: 132800,
     medicine: 123300,
-    rehabilitation: 0,
+    rehabilitation: 2200,
     vaccination: 0,
     walk: 0,
     play: 110400,
@@ -65,7 +72,7 @@ test('All 100 source rows retain their amounts, date-only precision, categories,
       (sum, dog) => sum + dog.amountOre,
       0,
     ),
-    478300,
+    479500,
   );
   assert.deepEqual([...summary.residentIds].sort(), ['ake', 'koby', 'ove']);
 });
@@ -77,6 +84,7 @@ test('Imported dates never acquire invented source times and all categories have
     Medicine: 'rehabilitation',
     Shelter: 'sleep',
     Toys: 'play',
+    Rehabilitation: 'rehabilitation',
   };
   for (const expense of ledger.expenses) {
     assert.equal(expenseActivity(expense), expected[expenseLabel(expense)]);
@@ -123,12 +131,12 @@ test('Existing v2 sessions replace only the starter sample, retain user spending
     loaded.expenses.filter((item) => item.giftId !== WORKBOOK_GIFT_ID),
     userExpenses,
   );
-  assert.equal(loaded.expenses.length, 101);
+  assert.equal(loaded.expenses.length, 103);
   assert.equal(
     loaded.gifts.some((item) => item.id === 'example'),
     false,
   );
-  assert.equal(spendingSummary(loaded).usedOre, 483300);
+  assert.equal(spendingSummary(loaded).usedOre, 484500);
   assert.equal(spendingSummary(loaded).pendingOre, 5000);
   let restored = loaded;
   for (let i = 0; i < 3; i++)
@@ -140,8 +148,8 @@ test('Existing v2 sessions replace only the starter sample, retain user spending
 test('Opening funding uses exact source category totals, persists, and rejects malformed allocation budgets', () => {
   const { gifts, expenses } = workbookLedger();
   assert.deepEqual(giftAllocation(gifts[0]), {
-    food: 133800,
-    health: 123300,
+    food: 132800,
+    health: 125500,
     comfort: 221200,
   });
   assert.deepEqual(readDemoGifts(JSON.stringify(gifts)), gifts);
@@ -150,10 +158,10 @@ test('Opening funding uses exact source category totals, persists, and rejects m
   tampered[0].amountOre += 1;
   assert.equal(validExpenses(tampered, gifts), false);
   for (const allocation of [
-    { food: 133801, health: 123300, comfort: 221200 },
-    { food: -1, health: 1, comfort: 478300 },
-    { food: 133800.5, health: 123299.5, comfort: 221200 },
-    { food: 478300 },
+    { food: 133801, health: 125500, comfort: 221200 },
+    { food: -1, health: 1, comfort: 479500 },
+    { food: 132800.5, health: 123299.5, comfort: 221200 },
+    { food: 479500 },
     null,
   ]) {
     const invalid = [{ ...gifts[0], allocation }];

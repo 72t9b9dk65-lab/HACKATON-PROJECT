@@ -1,4 +1,5 @@
 import fixture from '../public/data/hundstallet/fake-transactions.json' with { type: 'json' };
+import { workbookRows } from './workbook-source.ts';
 import {
   SHARED_CARE_ID,
   type CareKind,
@@ -22,15 +23,16 @@ const categoryMapping: Record<string, { id: ExpenseCategory; kind: CareKind }> =
     medicine: { id: 'medicine', kind: 'health' },
     shelter: { id: 'comfort', kind: 'comfort' },
     toys: { id: 'play', kind: 'comfort' },
+    rehabilitation: { id: 'rehabilitation', kind: 'health' },
   };
 
 export function workbookLedger(): GivingLedger {
   const allocation = { food: 0, health: 0, comfort: 0 };
-  const expenses: DemoExpense[] = fixture.transactions.map((row, index) => {
+  const expenses: DemoExpense[] = workbookRows.map((row, index) => {
     const category = categoryMapping[row.category];
     allocation[category.kind] += row.amountOre;
     return {
-      id: `fake-transactions:Blad1:${row.row}`,
+      id: `fake-transactions:Blad1:${row.key}`,
       giftId: WORKBOOK_GIFT_ID,
       dogId: demoRecipients[index % demoRecipients.length],
       category: category.id,
@@ -54,7 +56,10 @@ export function workbookLedger(): GivingLedger {
 
 export function workbookTransaction(expense: DemoExpense) {
   if (expense.giftId !== WORKBOOK_GIFT_ID) return undefined;
-  return fixture.transactions.find((row) => row.row === expense.sourceRow);
+  const index = workbookRows.findIndex(
+    (row) => expense.id === `fake-transactions:Blad1:${row.key}`,
+  );
+  return fixture.transactions[index];
 }
 
 export function importWorkbookTransactions(ledger: GivingLedger): GivingLedger {

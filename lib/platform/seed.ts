@@ -1,4 +1,5 @@
 import workbook from '../../public/data/hundstallet/fake-transactions.json' with { type: 'json' };
+import { workbookRows, WORKBOOK_IMPORT_ID } from '../workbook-source.ts';
 import type { Category, Workspace, CarePost, Receipt } from './types.ts';
 import { assertBalanced } from './model.ts';
 import { makeProof } from './proofs.ts';
@@ -50,7 +51,7 @@ export async function seedWorkspace(
     posts: [],
     proofs: [],
     audit: [],
-    commands: [],
+    commands: [WORKBOOK_IMPORT_ID],
   };
   const total = workbook.transactions.reduce((n, r) => n + r.amountOre, 0);
   state.gifts.push({
@@ -65,10 +66,11 @@ export async function seedWorkspace(
     medicine: 'medicine',
     shelter: 'comfort',
     toys: 'play',
+    rehabilitation: 'rehabilitation',
   };
-  for (const row of workbook.transactions) {
+  for (const row of workbookRows) {
     const receipt: Receipt = {
-      id: `workbook-${row.row}`,
+      id: `workbook-${row.key}`,
       supplier: 'Imported workbook',
       reference: `Blad1 · row ${row.row}`,
       purchasedAt: row.date,
@@ -76,7 +78,7 @@ export async function seedWorkspace(
       totalOre: row.amountOre,
       products: [
         {
-          id: `workbook-${row.row}:unitemized`,
+          id: `workbook-${row.key}:unitemized`,
           description: `${row.category[0].toUpperCase() + row.category.slice(1)} · item details not supplied`,
           category: categoryMap[row.category],
           amountOre: row.amountOre,

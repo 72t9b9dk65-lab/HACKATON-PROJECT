@@ -134,10 +134,10 @@ test('recording a receipt updates every portfolio once with no premature dog ass
     (d) => d.id === 'personal',
   );
   assert.equal(wallet.pendingOre, 90000);
-  assert.equal(wallet.usedOre, 478300 + 10000);
+  assert.equal(wallet.usedOre, 479500 + 10000);
   const view = projectDonor(saved, withPending);
-  assert.equal(view.spending.totalOre, 578300);
-  assert.equal(view.spending.byCategory.food, 133800 + 10000);
+  assert.equal(view.spending.totalOre, 579500);
+  assert.equal(view.spending.byCategory.food, 132800 + 10000);
   assert.equal(
     view.transactions.find((t) => t.id === 'line-1').expenses.length,
     0,
@@ -343,7 +343,7 @@ test('itemizing and redistributing assigns whole products without charging twice
   const donors = donorPortfolios(distributed, base);
   assert.equal(
     donors.reduce((sum, d) => sum + d.usedOre, 0),
-    478300,
+    479500,
   );
   assert.equal(
     donors.reduce((sum, d) => sum + d.pendingOre, 0),
@@ -432,7 +432,7 @@ test('distribution includes receipts, preserves evidence and still permits later
       (sum, d) => sum + d.usedOre,
       0,
     ),
-    518300,
+    519500,
   );
   for (const donor of donorPortfolios(distributed, withPending)) {
     const tx = projectDonor(
@@ -463,7 +463,7 @@ test('distribution includes receipts, preserves evidence and still permits later
   });
   assert.equal(
     donorPortfolios(next, withPending).reduce((sum, d) => sum + d.usedOre, 0),
-    528300,
+    529500,
   );
   assert.ok(donorPortfolios(next, withPending).every((d) => d.pendingOre >= 0));
 });

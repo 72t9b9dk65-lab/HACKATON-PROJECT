@@ -27,7 +27,7 @@
       "row": 4,
       "date": "2024-08-16",
       "category": "food",
-      "amountOre": 9900
+      "amountOre": 8900
     },
     {
       "row": 5,
@@ -610,6 +610,18 @@
       "date": "2026-09-07",
       "category": "toys",
       "amountOre": 2400
+    },
+    {
+      "row": 5,
+      "date": "2024-04-14",
+      "category": "rehabilitation",
+      "amountOre": 1200
+    },
+    {
+      "row": 5,
+      "date": "2024-04-14",
+      "category": "rehabilitation",
+      "amountOre": 1000
     }
   ]
 }

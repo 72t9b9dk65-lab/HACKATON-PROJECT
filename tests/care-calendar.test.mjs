@@ -256,7 +256,7 @@ test('every care basket reconciles to recorded spending without adding forecast 
     );
     total += sum;
   }
-  assert.equal(total, 478300);
+  assert.equal(total, 479500);
   assert.deepEqual(dogCareBasket([], 'ake'), []);
   assert.equal(JSON.stringify(ledger), original);
 });
