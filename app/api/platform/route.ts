@@ -5,7 +5,7 @@ import {
   bindings,
 } from '@/lib/platform/storage';
 import { applyAction } from '@/lib/platform/model';
-import { appendProofs } from '@/lib/platform/proofs';
+import { appendProofs, verifyReceipt } from '@/lib/platform/proofs';
 import { profileDogs } from '@/lib/donation-shell';
 import type { Command, FileRecord } from '@/lib/platform/types';
 export async function GET(request: Request) {
@@ -78,6 +78,14 @@ export async function POST(request: Request) {
         { error: 'Use the confirmed testnet verification endpoint.' },
         { status: 400 },
       );
+    if (command.action.type === 'seal-record') {
+      const receipt = current.receipts.find(
+        (r) => r.id === (command.action as { receiptId: string }).receiptId,
+      );
+      const proof = current.proofs.find((p) => p.id === receipt?.proofId);
+      if (receipt && proof && (await verifyReceipt(proof, receipt)) === 'match')
+        return Response.json(current);
+    }
     const now = new Date().toISOString();
     const next = applyAction(
       current,

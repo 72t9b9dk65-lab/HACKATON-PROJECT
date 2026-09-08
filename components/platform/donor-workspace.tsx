@@ -1,951 +1,704 @@
 'use client';
-import { CareImage } from './care-image';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import {
-  ArrowUpRight,
-  Camera,
   Heart,
-  Home,
-  ImageIcon,
-  Search,
+  ArrowUpRight,
+  BarChart3,
+  Trees,
   ShieldCheck,
-  Users,
-  Wallet,
+  Image as ImageIcon,
+  Search,
   X,
+  Eye,
+  ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DogName } from '@/components/dog-name';
-import { DogPortrait } from '@/components/dog-portrait';
-import { profileDogs } from '@/lib/donation-shell';
 import { useCareWorkspace } from '@/hooks/use-care-workspace';
+import { profileDogs } from '@/lib/donation-shell';
 import {
   balances,
   categories,
-  categoryFor,
-  contributionToDog,
   donorProducts,
-  dogStage,
   money,
+  parseMoney,
   publishedPosts,
-  supportedDogs,
 } from '@/lib/platform/model';
-import type { CarePost, Receipt } from '@/lib/platform/types';
-import { DonationDialog, type Preview } from './donation-dialog';
-import { DogDialog } from './dog-dialog';
+import { shelterProgress } from '@/lib/platform/shelter-growth';
+import { CareImage } from './care-image';
+import { DogPortrait } from '@/components/dog-portrait';
+import { GrowingShelter } from './growing-shelter';
 import { ProofDialog } from './proof-dialog';
-import { ShelterScene } from './shelter-scene';
-import { ForecastPanel } from './forecast-panel';
 import {
-  Footer,
-  GoalSummary,
   Header,
+  Footer,
   LoadingWorkspace,
   Modal,
   Notice,
-  Photo,
   Primary,
-  dateLabel,
   CategoryIcon,
+  dateLabel,
+  useClock,
 } from './shared';
-
 export default function DonorWorkspace() {
-  const store = useCareWorkspace();
-  const [view, setView] = useState<'shelter' | 'impact' | 'community'>(
-    'shelter',
-  );
+  const store = useCareWorkspace(),
+    now = useClock();
   const [donorId, setDonorId] = useState('personal');
-  const [donateOpen, setDonateOpen] = useState(false);
-  const [selectedDog, setSelectedDog] = useState<string | null>(null);
-  const [photo, setPhoto] = useState<CarePost | null>(null);
-  const [receiptSelection, setReceipt] = useState<Receipt | null>(null);
-  const [proofId, setProofId] = useState<string | null>(null);
-  const [preview, setPreview] = useState<Preview | null>(null);
-  const [message, setMessage] = useState('');
-  const [allTransactions, setAllTransactions] = useState(false);
-  const [search, setSearch] = useState('');
-  const [directorySearch, setDirectorySearch] = useState('');
-  const [spendingBy, setSpendingBy] = useState<'categories' | 'dogs'>(
-    'categories',
-  );
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [shelterName, setShelterName] = useState('');
+  const [view, setView] = useState<'shelter' | 'statistics'>('shelter');
+  const [donating, setDonating] = useState(false),
+    [amount, setAmount] = useState('500'),
+    [preview, setPreview] = useState<number | null>(null);
+  const [dogId, setDogId] = useState<string | null>(null),
+    [receiptId, setReceiptId] = useState<string | null>(null),
+    [proofReceiptId, setProofReceiptId] = useState<string | null>(null);
+  const [query, setQuery] = useState(''),
+    [limit, setLimit] = useState(10),
+    [message, setMessage] = useState('');
   useEffect(() => {
     const timer = setTimeout(() => {
-      const query = new URLSearchParams(window.location.search);
-      if (query.get('goal') === 'shared-care') setView('community');
-      if (query.get('donate') === '1') setDonateOpen(true);
-      const id = query.get('donor');
-      if (id && ['personal', 'alex', 'maja', 'noah'].includes(id))
-        setDonorId(id);
+      const id = new URLSearchParams(window.location.search).get('donor');
+      if (id) setDonorId(id);
     }, 0);
     return () => clearTimeout(timer);
   }, []);
   const state = store.state;
   if (!state) return <LoadingWorkspace store={store} />;
-  const receipt =
-    state.receipts.find((r) => r.id === receiptSelection?.id) ?? null;
-  const donor = balances(state).find((d) => d.id === donorId)!;
-  const products = donorProducts(state, donorId);
-  const dogIds = supportedDogs(state, donorId);
-  const followed = donor.following;
-  const allPosts = publishedPosts(state);
-  const posts = allPosts.filter((p) =>
-    p.dogIds.some((id) => dogIds.includes(id) || followed.includes(id)),
-  );
-  const latest = posts[0];
-  const unseen = posts.filter((p) => !donor.seenUpdates.includes(p.id));
-  const transactions = state.receipts
+  const donor =
+    balances(state).find((d) => d.id === donorId) ?? balances(state)[0];
+  const clock = now ?? Date.parse(state.createdAt),
+    progress = shelterProgress(
+      donor.id,
+      donor.used,
+      donor.pending,
+      preview ?? 0,
+      profileDogs,
+    );
+  const rows = donorProducts(state, donor.id),
+    posts = publishedPosts(state, clock);
+  const receipts = state.receipts
     .filter(
       (r) =>
-        r.state !== 'draft' &&
-        r.products.some((p) => p.shares.some((s) => s.donorId === donorId)),
+        (r.state === 'funded' || r.state === 'voided') &&
+        r.products.some((p) => p.shares.some((s) => s.donorId === donor.id)),
     )
-    .sort((a, b) => b.purchasedAt.localeCompare(a.purchasedAt))
-    .filter((r) =>
-      `${r.supplier} ${r.reference} ${r.products.map((p) => p.description).join(' ')}`
-        .toLowerCase()
-        .includes(search.toLowerCase()),
-    );
-  const previewIds = preview
-    ? profileDogs
-        .filter((d) => !d.group && !dogIds.includes(d.id))
-        .slice(0, Math.min(preview.dogCount, 18))
-        .map((d) => d.id)
-    : [];
-  function openPhoto(post: CarePost) {
-    setPhoto(post);
-    void store.send({ type: 'seen', donorId, postId: post.id });
-  }
-  function donation() {
-    store.clearError();
-    setDonateOpen(true);
-  }
-  async function share() {
-    const url = new URL(window.location.href);
-    url.searchParams.set('goal', 'shared-care');
-    try {
-      await navigator.clipboard.writeText(url.toString());
+    .sort((a, b) => b.purchasedAt.localeCompare(a.purchasedAt));
+  const filtered = receipts.filter((r) =>
+    (
+      r.supplier +
+      ' ' +
+      r.reference +
+      ' ' +
+      r.products.map((p) => p.description).join(' ')
+    )
+      .toLowerCase()
+      .includes(query.toLowerCase()),
+  );
+  const selected = state.receipts.find((r) => r.id === receiptId),
+    proofReceipt = state.receipts.find((r) => r.id === proofReceiptId);
+  const dog = profileDogs.find((d) => d.id === dogId);
+  const categoryTotals = categories.map((c) => ({
+    ...c,
+    total: rows
+      .filter((r) => r.product.category === c.id)
+      .reduce((n, r) => n + r.contribution, 0),
+  }));
+  const maxCategory = Math.max(1, ...categoryTotals.map((c) => c.total));
+  const nextZone = progress.zones
+    .filter((z) => z.nextThresholdOre !== null)
+    .sort((a, b) => a.remainingOre - b.remainingOre)[0];
+  const parsed = parseMoney(amount),
+    valid = parsed !== null && parsed >= 100 && parsed <= 1_000_000;
+  async function recordGift() {
+    if (!valid) return;
+    if (
+      await store.send({
+        type: 'donate',
+        donorId: donor.id,
+        amountOre: parsed!,
+        monthly: false,
+        category: 'comfort',
+      })
+    ) {
+      setDonating(false);
+      setPreview(null);
       setMessage(
-        'Community link copied. Invite someone to share the next chapter.',
+        money(parsed!) +
+          ' SEK added to pending. Your virtual shelter has grown; funds remain pending until assigned to care products.',
       );
-    } catch {
-      setMessage(`Share this page: ${url.toString()}`);
     }
   }
-  const rewards = [
-    {
-      label: 'First little step',
-      detail: 'Made a contribution',
-      earned: donor.donated > 0,
-      icon: Heart,
-    },
-    {
-      label: 'Part of the story',
-      detail: 'Opened a care update',
-      earned: donor.seenUpdates.length > 0,
-      icon: Camera,
-    },
-    {
-      label: 'Better together',
-      detail: 'Contributed to shared care',
-      earned: state.gifts.some((g) => g.donorId === donorId && g.goalId),
-      icon: Users,
-    },
-    {
-      label: 'Home at last',
-      detail: 'A supported dog found a home',
-      earned: dogIds.some((id) => dogStage(state, id) === 'home'),
-      icon: Home,
-    },
-  ];
-  const impactRows =
-    spendingBy === 'categories'
-      ? categories.map((c) => ({
-          id: c.id,
-          label: c.label,
-          asset: c.asset,
-          amount: products
-            .filter((p) => p.product.category === c.id)
-            .reduce((n, p) => n + p.contribution, 0),
-        }))
-      : dogIds.map((id) => {
-          const d = profileDogs.find((d) => d.id === id)!;
-          return {
-            id,
-            label: d.name,
-            asset: d.photos[0].src,
-            amount: contributionToDog(state, donorId, id),
-          };
-        });
-  const max = Math.max(1, ...impactRows.map((r) => r.amount));
-  const dogAttributed = dogIds.reduce(
-    (n, id) => n + contributionToDog(state, donorId, id),
-    0,
-  );
-  return (
-    <div className="care-platform">
-      <Header online={store.online}>
-        <button
-          className="cp-avatar"
-          aria-label="Edit your profile"
-          onClick={() => {
-            setName(donor.name);
-            setShelterName(donor.shelterName);
-            setProfileOpen(true);
-          }}
-        >
-          {donor.name.slice(0, 1)}
-        </button>
-      </Header>
-      <main className="cp-donor-main">
-        <div className="cp-page-intro">
+  const shareTotal = (r: (typeof receipts)[number]) =>
+    r.products.reduce(
+      (n, p) =>
+        n + (p.shares.find((s) => s.donorId === donor.id)?.amountOre ?? 0),
+      0,
+    );
+  const growthSummary = (
+    <section className="gs-next gs-next-horizontal">
+      <div>
+        <span className="gs-eyebrow">Growing together</span>
+        <h2>{progress.residentIds.length} visual companions</h2>
+        <p>
+          {progress.nextDogOre === null
+            ? 'All companions unlocked'
+            : `${money(progress.nextDogOre)} SEK more donated for your next companion`}
+        </p>
+      </div>
+      {nextZone && (
+        <div className="gs-next-preview">
+          <CareImage
+            src={`/care/upgrades/${nextZone.family}-livello-${nextZone.level + 1}.webp`}
+            alt=""
+          />
           <div>
-            <span className="cp-eyebrow">YOUR LITTLE CORNER OF KINDNESS</span>
-            <h1>
-              {donor.shelterName}
-              <em>, connected to real dogs</em>
-            </h1>
+            <strong>Next: {nextZone.name}</strong>
+            <small>
+              Level {nextZone.level + 1} · {money(nextZone.remainingOre)} SEK to
+              unlock
+            </small>
           </div>
-          <span className="cp-new-count">
-            <Camera size={15} />
-            {unseen.length} new {unseen.length === 1 ? 'moment' : 'moments'}
-          </span>
         </div>
+      )}
+      <Button
+        variant="outline"
+        onClick={() => {
+          setDonating(true);
+          setView('shelter');
+        }}
+      >
+        <Eye size={16} /> Preview growth
+      </Button>
+    </section>
+  );
+  const renderTransaction = (r: (typeof receipts)[number]) => {
+    const photo = posts.find((p) =>
+      p.productIds.some((id) =>
+        r.products.some((product) => product.id === id),
+      ),
+    );
+    const proof = state.proofs.find((p) => p.id === r.proofId);
+    return (
+      <article
+        key={r.id}
+        className={
+          'gs-transaction ' + (r.state === 'voided' ? 'is-reversed' : '')
+        }
+      >
+        <button
+          className="gs-transaction-main"
+          onClick={() => setReceiptId(r.id)}
+        >
+          <CategoryIcon category={r.products[0].category} />
+          <span>
+            <strong>
+              {r.source === 'workbook' ? r.products[0].description : r.supplier}
+            </strong>
+            <small>
+              {dateLabel(r.purchasedAt, false)} ·{' '}
+              {r.source === 'workbook' ? 'Imported record' : r.reference}
+            </small>
+          </span>
+        </button>
+        <span className="gs-transaction-amount">
+          <strong>
+            {r.state === 'voided' ? '↩ ' : ''}
+            {money(shareTotal(r))} SEK
+          </strong>
+          <small>
+            {r.state === 'voided' ? 'Returned to pending' : 'Your contribution'}
+          </small>
+        </span>
+        <button
+          className="gs-photo-slot"
+          aria-label={
+            photo
+              ? 'View transaction photo'
+              : 'Open transaction — photo unavailable'
+          }
+          onClick={() => setReceiptId(r.id)}
+        >
+          {photo ? (
+            <CareImage
+              src={photo.photo?.url ?? photo.demoPhoto}
+              alt="Care photo"
+              width={120}
+              height={120}
+            />
+          ) : (
+            <ImageIcon size={22} />
+          )}
+        </button>
+        <Button
+          className="gs-blockchain-status"
+          variant="outline"
+          onClick={() => setProofReceiptId(r.id)}
+        >
+          <span>
+            <ShieldCheck size={16} /> Verified by blockchain
+          </span>
+          <small>Click for more info</small>
+          {!proof?.anchors.length && <small>Demo · not yet anchored</small>}
+        </Button>
+      </article>
+    );
+  };
+  return (
+    <div className="care-platform gs-platform">
+      <Header
+        online={store.online}
+        heading={
+          <h1 className="gs-header-title">
+            My little shelter<span>, connected to real dogs</span>
+          </h1>
+        }
+      />
+      <main className="gs-main">
+        {store.error && <Notice kind="error">{store.error}</Notice>}
         {message && (
-          <div className="cp-dismissable">
+          <div className="gs-notice-row">
             <Notice kind="success">{message}</Notice>
-            <button aria-label="Dismiss message" onClick={() => setMessage('')}>
+            <Button
+              variant="ghost"
+              aria-label="Dismiss message"
+              onClick={() => setMessage('')}
+            >
               <X size={16} />
-            </button>
+            </Button>
           </div>
         )}
-        {store.error && !donateOpen && (
-          <Notice kind="error">{store.error}</Notice>
-        )}
-        <div className="cp-donor-grid">
-          <aside className="cp-giving-column">
-            <Primary className="cp-donate-main" onClick={donation}>
-              <Heart size={23} fill="currentColor" />
-              Donate
-              <ArrowUpRight size={22} />
+        <div className="gs-dashboard">
+          <aside className="gs-wallet-column">
+            <Primary className="gs-donate" onClick={() => setDonating(true)}>
+              <Heart fill="currentColor" size={23} /> Donate{' '}
+              <ArrowUpRight size={24} />
             </Primary>
             <button
-              className="cp-balance-card"
-              onClick={() => setView(view === 'impact' ? 'shelter' : 'impact')}
-              aria-label="See your spending breakdown"
+              className="gs-wallet"
+              onClick={() =>
+                setView(view === 'statistics' ? 'shelter' : 'statistics')
+              }
             >
               <span>Your total donated</span>
-              <strong className="cp-total">
-                {money(donor.donated)}
-                <small>SEK</small>
+              <strong>
+                {money(donor.donated)} <small>SEK</small>
               </strong>
-              <div className="cp-balance-split">
+              <div className="gs-wallet-split">
                 <div>
-                  <small>
-                    <i />
-                    Available
-                  </small>
+                  <span>
+                    <i /> Pending
+                  </span>
                   <b>
                     {money(donor.pending)} <small>SEK</small>
                   </b>
                 </div>
                 <div>
-                  <small>
-                    <i />
-                    Used for care
-                  </small>
+                  <span>
+                    <i /> Used
+                  </span>
                   <b>
                     {money(donor.used)} <small>SEK</small>
                   </b>
                 </div>
               </div>
-              <div className="cp-progress">
-                <span
+              <div className="gs-balance-track">
+                <i
                   style={{
-                    width: `${donor.donated ? (donor.used / donor.donated) * 100 : 0}%`,
+                    width:
+                      (donor.donated ? (donor.used / donor.donated) * 100 : 0) +
+                      '%',
                   }}
                 />
               </div>
-              <span className="cp-balance-link">
-                See where your gift went <ArrowUpRight size={15} />
+              <span className="gs-wallet-link">
+                See where your money went <ArrowRight size={17} />
               </span>
             </button>
-            {donor.monthly && (
-              <div className="cp-monthly-card">
-                <span className="cp-tag">Monthly forecast</span>
-                <strong>{money(donor.monthly.amountOre)} SEK / month</strong>
-                <p>First demo gift recorded. Future months are estimates.</p>
-                <button
-                  onClick={() =>
-                    void store.send({ type: 'cancel-plan', donorId })
-                  }
-                >
-                  Remove forecast
-                </button>
-              </div>
-            )}
-            <section className="cp-transaction-list">
-              <div className="cp-section-title">
-                <h2>Your care records</h2>
-                <span>{transactions.length}</span>
-              </div>
-              <p className="cp-muted">A closer look at your contribution.</p>
-              {transactions.slice(0, 5).map((r) => {
-                const p = r.products.find((p) =>
-                  p.shares.some((s) => s.donorId === donorId),
-                )!;
-                const amount = r.products
-                  .flatMap((p) => p.shares)
-                  .filter((s) => s.donorId === donorId)
-                  .reduce((n, s) => n + s.amountOre, 0);
-                const post = allPosts.find((post) =>
-                  post.productIds.some((id) =>
-                    r.products.some((p) => p.id === id),
-                  ),
-                );
-                return (
-                  <button
-                    key={r.id}
-                    className={`cp-transaction ${r.state === 'voided' ? 'cp-voided' : ''}`}
-                    onClick={() => setReceipt(r)}
-                  >
-                    <CategoryIcon category={p.category} />
-                    <span>
-                      <strong>{categoryFor(p.category).label}</strong>
-                      <b>{money(amount)} SEK</b>
-                      <small>
-                        {dateLabel(r.purchasedAt, false)}
-                        {r.state === 'voided' ? ' · Corrected' : ''}
-                      </small>
-                    </span>
-                    <span className="cp-transaction-photo">
-                      {post ? (
-                        <CareImage
-                          src={post.photo?.url ?? post.demoPhoto}
-                          alt="Linked care moment"
-                        />
-                      ) : (
-                        <ImageIcon size={21} />
-                      )}
-                    </span>
-                  </button>
-                );
-              })}
-              <Button
-                variant="ghost"
-                className="cp-show-all"
-                onClick={() => setAllTransactions(true)}
-              >
-                View all care records <ArrowUpRight size={15} />
-              </Button>
-            </section>
-          </aside>
-          <div className="cp-main-column">
-            <nav className="cp-view-tabs" aria-label="Your shelter views">
-              {(['shelter', 'impact', 'community'] as const).map((tab) => (
-                <button
-                  aria-current={view === tab ? 'page' : undefined}
-                  className={view === tab ? 'active' : ''}
-                  key={tab}
-                  onClick={() => setView(tab)}
-                >
-                  {tab === 'shelter' ? (
-                    <Home size={16} />
-                  ) : tab === 'impact' ? (
-                    <Wallet size={16} />
-                  ) : (
-                    <Users size={16} />
-                  )}{' '}
-                  {tab === 'shelter'
-                    ? 'My shelter'
-                    : tab === 'impact'
-                      ? 'My impact'
-                      : 'Together'}
-                </button>
-              ))}
-            </nav>
-            {view === 'shelter' && (
-              <>
-                <ShelterScene
-                  state={state}
-                  donorId={donorId}
-                  onDog={setSelectedDog}
-                  onPhoto={openPhoto}
-                  previewIds={previewIds}
-                  previewCategory={preview?.careId}
-                  previewCount={preview?.dogCount ?? 0}
-                  onExitPreview={preview ? () => setPreview(null) : undefined}
-                />
-                {preview && (
-                  <ForecastPanel
-                    preview={preview}
-                    onChange={setPreview}
-                    onContinue={donation}
+
+            <section className="gs-transactions gs-sidebar-transactions">
+              <header>
+                <div>
+                  <h2>Your care transactions</h2>
+                  <p>Purchased products funded by your donations.</p>
+                </div>
+                <label className="gs-search">
+                  <Search size={17} />
+                  <input
+                    aria-label="Search transactions"
+                    placeholder="Search transactions"
+                    value={query}
+                    onChange={(e) => {
+                      setQuery(e.target.value);
+                      setLimit(10);
+                    }}
                   />
-                )}
-                {latest && (
-                  <section className="cp-latest">
-                    <Photo post={latest} onClick={() => openPhoto(latest)} />
-                    <div>
-                      <span className="cp-eyebrow">THE LATEST CHAPTER</span>
-                      <h2>{latest.title}</h2>
-                      <p>
-                        {latest.source === 'demo'
-                          ? 'Explore a sample care moment and see how a photo connects to a funded product.'
-                          : latest.note}
-                      </p>
-                      <span className="cp-muted">
-                        {latest.dogIds
-                          .map(
-                            (id) => profileDogs.find((d) => d.id === id)?.name,
-                          )
-                          .join(' & ')}{' '}
-                        · {dateLabel(latest.occurredAt)}
-                      </span>
-                      <Button variant="ghost" onClick={() => openPhoto(latest)}>
-                        Open this moment <ArrowUpRight size={16} />
-                      </Button>
-                    </div>
-                  </section>
-                )}
-                <section className="cp-discover">
-                  <div className="cp-section-title">
-                    <div>
-                      <span className="cp-eyebrow">
-                        MORE STORIES TO BE PART OF
-                      </span>
-                      <h2>Meet the dogs</h2>
-                    </div>
-                    <label className="cp-search">
-                      <Search size={16} />
-                      <input
-                        aria-label="Find a dog"
-                        placeholder="Find a friend"
-                        value={directorySearch}
-                        onChange={(e) => setDirectorySearch(e.target.value)}
-                      />
-                    </label>
-                  </div>
-                  <div className="cp-discover-grid">
-                    {profileDogs
-                      .filter(
-                        (d) =>
-                          !d.group &&
-                          `${d.name} ${d.breed}`
-                            .toLowerCase()
-                            .includes(directorySearch.toLowerCase()),
-                      )
-                      .slice(0, directorySearch ? 43 : 8)
-                      .map((d) => (
-                        <button key={d.id} onClick={() => setSelectedDog(d.id)}>
-                          <CareImage src={d.sprite} alt="" />
-                          <DogName name={d.name} />
-                          <small>{d.breed}</small>
-                          {followed.includes(d.id) && (
-                            <Heart size={12} fill="currentColor" />
-                          )}
-                        </button>
-                      ))}
-                  </div>
-                  <Link className="cp-text-link" href="/explore">
-                    Explore all shelters in Sweden <ArrowUpRight size={15} />
-                  </Link>
-                </section>
-              </>
-            )}
-            {view === 'impact' && (
-              <section className="cp-impact-panel">
-                <span className="cp-eyebrow">YOUR KINDNESS, ACCOUNTED FOR</span>
-                <h2>{money(donor.used)} SEK put to work</h2>
-                <p>
-                  Every amount links to a care record. Available funds stay
-                  available until a receipt is allocated.
-                </p>
-                <div className="cp-frequency">
-                  <button
-                    className={spendingBy === 'categories' ? 'active' : ''}
-                    onClick={() => setSpendingBy('categories')}
-                  >
-                    Goods & services
-                  </button>
-                  <button
-                    className={spendingBy === 'dogs' ? 'active' : ''}
-                    onClick={() => setSpendingBy('dogs')}
-                  >
-                    Dogs you support
-                  </button>
-                </div>
-                <div className="cp-impact-bars">
-                  {impactRows.map((row) => (
-                    <button
-                      key={row.id}
-                      onClick={() => {
-                        if (spendingBy === 'dogs') setSelectedDog(row.id);
-                        else {
-                          setSearch(
-                            row.id === 'comfort'
-                              ? 'shelter'
-                              : row.id === 'play'
-                                ? 'toy'
-                                : row.id,
-                          );
-                          setAllTransactions(true);
-                        }
-                      }}
-                    >
-                      <strong>
-                        {money(row.amount)}
-                        <small> SEK</small>
-                      </strong>
-                      <div className="cp-bar-space">
-                        <div
-                          style={{
-                            height: `${Math.max(1, (row.amount / max) * 100)}%`,
-                          }}
-                        />
-                      </div>
-                      {spendingBy === 'dogs' ? (
-                        <DogPortrait
-                          dog={profileDogs.find((d) => d.id === row.id)!}
-                        />
-                      ) : (
-                        <CareImage src={row.asset} alt="" />
-                      )}
-                      <span>{row.label}</span>
-                    </button>
-                  ))}
-                </div>
-                {spendingBy === 'dogs' && (
-                  <Notice>
-                    {money(donor.used - dogAttributed)} SEK of recorded spending
-                    is awaiting beneficiary details. No dog assignment is
-                    invented for the imported workbook.
-                  </Notice>
-                )}
-                <div className="cp-impact-totals">
-                  <span>
-                    <b>{products.length}</b> funded items & records
-                  </span>
-                  <span>
-                    <b>{dogIds.length}</b> supported dogs
-                  </span>
-                  <span>
-                    <b>{posts.length}</b> story moments
-                  </span>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSearch('');
-                    setAllTransactions(true);
-                  }}
-                >
-                  Explore the underlying records <ArrowUpRight size={16} />
-                </Button>
-              </section>
-            )}
-            {view === 'community' && (
-              <>
-                <GoalSummary
-                  state={state}
-                  onDonate={donation}
-                  onShare={() => void share()}
-                />
-                <section className="cp-rewards">
-                  <div className="cp-section-title">
-                    <div>
-                      <span className="cp-eyebrow">LITTLE MILESTONES</span>
-                      <h2>Moments worth keeping</h2>
-                    </div>
-                  </div>
-                  <div>
-                    {rewards.map((r) => (
-                      <article
-                        key={r.label}
-                        className={r.earned ? 'earned' : ''}
-                      >
-                        <r.icon size={25} />
-                        <strong>{r.label}</strong>
-                        <p>{r.detail}</p>
-                        <span>
-                          {r.earned ? 'Part of your story' : 'A chapter ahead'}
-                        </span>
-                      </article>
-                    ))}
-                  </div>
-                  <p className="cp-fine-print">
-                    These keepsakes celebrate participation. They have no
-                    financial value and are not traded.
-                  </p>
-                </section>
-                <section className="cp-help-grid">
-                  <a
-                    href="https://hundstallet.se/engagera-dig/jourhem/"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <Home size={22} />
-                    <h3>Open your home</h3>
-                    <p>Learn about becoming a foster family.</p>
-                    <ArrowUpRight size={18} />
-                  </a>
-                  <a
-                    href="https://hundstallet.se/insamlingar/"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <Users size={22} />
-                    <h3>Bring people together</h3>
-                    <p>Start a fundraiser through Hundstallet.</p>
-                    <ArrowUpRight size={18} />
-                  </a>
-                </section>
-              </>
-            )}
-          </div>
-          <aside className="cp-dogs-column">
-            <section className="cp-roster">
-              <div className="cp-section-title">
-                <h2>Shelter dogs</h2>
-                <span>{dogIds.length}</span>
+                </label>
+              </header>
+              <div className="gs-transaction-list">
+                {filtered.slice(0, 3).map(renderTransaction)}
               </div>
-              {dogIds.map((id) => {
-                const d = profileDogs.find((d) => d.id === id)!;
-                return (
-                  <button key={id} onClick={() => setSelectedDog(id)}>
-                    <DogPortrait dog={d} />
-                    <span>
-                      <DogName name={d.name} />
-                      <small>{d.breed}</small>
-                      <small>
-                        {dogStage(state, id) === 'home'
-                          ? 'Home at last'
-                          : d.location}
-                      </small>
-                    </span>
-                  </button>
-                );
-              })}
-              {!dogIds.length && (
-                <p>Companions appear when staff links funded care to a dog.</p>
+              {!filtered.length && (
+                <p className="gs-empty-list">No transactions found.</p>
               )}
             </section>
-            <section className="cp-following">
-              <span className="cp-eyebrow">STORIES YOU FOLLOW</span>
-              {followed
-                .filter((id) => !dogIds.includes(id))
-                .map((id) => {
-                  const d = profileDogs.find((d) => d.id === id);
-                  return d ? (
-                    <button key={id} onClick={() => setSelectedDog(id)}>
-                      <CareImage src={d.sprite} alt="" />
-                      {d.name}
-                      <Heart size={13} />
-                    </button>
-                  ) : null;
-                })}
-              <p>
-                Follow a dog to keep their next chapter close, whether or not
-                you have donated.
-              </p>
-            </section>
-            <div className="cp-small-community">
-              <Users size={22} />
-              <strong>Small gifts add up.</strong>
-              <p>Join the shared care goal.</p>
-              <button onClick={() => setView('community')}>
-                See what we can do together <ArrowUpRight size={14} />
-              </button>
-            </div>
           </aside>
+          <div className="gs-main-column">
+            <div className="gs-view-switch" aria-label="Shelter view">
+              <Button
+                variant={view === 'shelter' ? 'default' : 'ghost'}
+                onClick={() => setView('shelter')}
+              >
+                <Trees size={17} /> Live shelter
+              </Button>
+              <Button
+                variant={view === 'statistics' ? 'default' : 'ghost'}
+                onClick={() => setView('statistics')}
+              >
+                <BarChart3 size={17} /> Spending statistics
+              </Button>
+            </div>
+            {preview !== null && view === 'shelter' && (
+              <div className="gs-preview-banner">
+                <span>
+                  <Eye size={18} />
+                  <strong>Donation preview</strong> ·{' '}
+                  {progress.residentIds.length + progress.potentialIds.length}{' '}
+                  potential companions
+                  {preview > 0 ? ' with ' + money(preview) + ' SEK extra' : ''}
+                </span>
+                <Button variant="ghost" onClick={() => setPreview(null)}>
+                  <X size={17} /> Close preview
+                </Button>
+              </div>
+            )}
+            {view === 'shelter' ? (
+              <GrowingShelter
+                growthSummary={growthSummary}
+                progress={progress}
+                clock={clock}
+                preview={preview !== null}
+                onDog={setDogId}
+                onDonate={() => setDonating(true)}
+              />
+            ) : (
+              <section className="gs-statistics">
+                <div>
+                  <span className="gs-eyebrow">
+                    Your contributions, accounted for
+                  </span>
+                  <h2>{money(donor.used)} SEK put to work</h2>
+                  <p>Only allocated products count as used.</p>
+                </div>
+                <div className="gs-bars">
+                  {categoryTotals.map((c) => (
+                    <div key={c.id}>
+                      <CategoryIcon category={c.id} />
+                      <span>{c.label}</span>
+                      <div>
+                        <i
+                          style={{ width: (c.total / maxCategory) * 100 + '%' }}
+                        />
+                      </div>
+                      <strong>
+                        {money(c.total)} <small>SEK</small>
+                      </strong>
+                    </div>
+                  ))}
+                </div>
+                <div className="gs-stats-foot">
+                  <b>{rows.length} allocated items</b>
+                  <b>
+                    {receipts.filter((r) => r.state === 'funded').length} funded
+                    transactions
+                  </b>
+                  <span>{money(donor.pending)} SEK still available</span>
+                </div>
+              </section>
+            )}
+            <div className="gs-roster">
+              <div className="gs-roster-title">
+                <strong>Your visual companions</strong>
+                <small>
+                  Public Hundstallet profiles · illustrative selection
+                </small>
+              </div>
+              <div>
+                {progress.residentIds.map((id) => {
+                  const d = profileDogs.find((p) => p.id === id)!;
+                  return (
+                    <button key={id} onClick={() => setDogId(id)}>
+                      <DogPortrait dog={d} />
+                      <strong>{d.name}</strong>
+                    </button>
+                  );
+                })}
+                {!progress.residentIds.length && (
+                  <p>Your first companion arrives at 50 SEK donated.</p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
+        {filtered.length > 3 && (
+          <section className="gs-transactions gs-transaction-continuation">
+            <header>
+              <h2>More care transactions</h2>
+            </header>
+            <div className="gs-transaction-list">
+              {filtered.slice(3, limit).map(renderTransaction)}
+            </div>
+            {!filtered.length && (
+              <p className="gs-empty-list">
+                No transactions found. Pending donations stay available until
+                products are allocated.
+              </p>
+            )}
+            {filtered.length > limit && (
+              <Button variant="outline" onClick={() => setLimit((n) => n + 20)}>
+                Show more transactions ({filtered.length - limit} remaining)
+              </Button>
+            )}
+          </section>
+        )}
+        <p className="gs-prototype-note">
+          Visual companions and upgrades illustrate your support; they do not
+          assign your spending to those dogs. Real beneficiaries appear only on
+          linked care photos. Public dog profiles are a saved snapshot from 7
+          September 2026.
+        </p>
       </main>
       <Footer />
-      <DonationDialog
-        open={donateOpen}
-        onClose={() => setDonateOpen(false)}
-        store={store}
-        donorId={donorId}
-        onPreview={(p) => {
-          setPreview(p);
-          setView('shelter');
-        }}
-        onSuccess={(text) => {
-          setMessage(text);
-          setPreview(null);
-        }}
-      />
-      <DogDialog
-        dogId={selectedDog}
-        state={state}
-        donorId={donorId}
-        onClose={() => setSelectedDog(null)}
-        onFollow={(id) =>
-          void store.send({ type: 'follow', donorId, dogId: id })
-        }
-        onDonate={() => {
-          setSelectedDog(null);
-          donation();
-        }}
-        onPhoto={openPhoto}
-      />
-      <Modal
-        open={!!photo}
-        onClose={() => setPhoto(null)}
-        title={photo?.title ?? 'Care moment'}
-        description={
-          photo
-            ? `${dateLabel(photo.occurredAt)} · ${photo.source === 'demo' ? 'Demo story' : 'Care update'}`
-            : undefined
-        }
-      >
-        {photo && (
-          <>
-            <CareImage
-              className="cp-full-photo"
-              src={photo.photo?.url ?? photo.demoPhoto}
-              alt={photo.title}
-            />
-            <span className="cp-tag">{categoryFor(photo.category).label}</span>
-            <p>{photo.note}</p>
-            <div className="cp-photo-dogs">
-              {photo.dogIds.map((id) => {
-                const d = profileDogs.find((d) => d.id === id)!;
-                return (
-                  <button
-                    key={id}
-                    onClick={() => {
-                      setPhoto(null);
-                      setSelectedDog(id);
-                    }}
-                  >
-                    <CareImage src={d.sprite} alt="" />
-                    <DogName name={d.name} />
-                  </button>
-                );
-              })}
+      {donating && (
+        <Modal
+          open
+          onClose={() => setDonating(false)}
+          title="Help their world grow"
+          description="Your donation stays pending until staff assign it to purchased care products."
+        >
+          <div className="gs-amount-presets">
+            {[100, 500, 1000, 2500].map((n) => (
+              <Button
+                key={n}
+                variant={amount === String(n) ? 'default' : 'outline'}
+                onClick={() => setAmount(String(n))}
+              >
+                {n.toLocaleString('en-GB')} SEK
+              </Button>
+            ))}
+          </div>
+          <label className="cp-field">
+            Your amount
+            <div className="cp-money-input">
+              <input
+                aria-label="Donation amount in SEK"
+                inputMode="decimal"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+              <span>SEK</span>
             </div>
-            {photo.productIds.map((id) => {
-              const r = state.receipts.find((r) =>
-                r.products.some((p) => p.id === id),
-              );
-              const p = r?.products.find((p) => p.id === id);
-              return r && p ? (
-                <button
-                  className="cp-linked-product"
-                  key={id}
-                  onClick={() => {
-                    setPhoto(null);
-                    setReceipt(r);
-                  }}
-                >
-                  <CategoryIcon category={p.category} />
-                  <span>
-                    {p.description}
-                    <small>
-                      {money(p.amountOre)} SEK ·{' '}
-                      {r.state === 'voided'
-                        ? 'Corrected receipt'
-                        : 'Funded care'}
-                    </small>
-                  </span>
-                  <ArrowUpRight size={15} />
-                </button>
-              ) : null;
-            })}
-          </>
-        )}
-      </Modal>
-      <Modal
-        wide
-        open={allTransactions}
-        onClose={() => {
-          setAllTransactions(false);
-          setSearch('');
-        }}
-        title="Your care records"
-        description="Explore the purchases and shared care funded by your contributions."
-      >
-        <label className="cp-search">
-          <Search size={16} />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search supplier, receipt or product"
-            aria-label="Search care records"
-          />
-        </label>
-        <div className="cp-record-table">
-          {transactions.map((r) => (
-            <button
-              key={r.id}
+          </label>
+          {valid ? (
+            <div className="gs-gift-impact">
+              <CareImage src="/care/upgrades/giardino-livello-3.webp" alt="" />
+              <div>
+                <strong>
+                  {shelterProgress(
+                    donor.id,
+                    donor.used,
+                    donor.pending,
+                    parsed!,
+                    profileDogs,
+                  ).residentIds.length +
+                    shelterProgress(
+                      donor.id,
+                      donor.used,
+                      donor.pending,
+                      parsed!,
+                      profileDogs,
+                    ).potentialIds.length}{' '}
+                  potential companions
+                </strong>
+                <p>Based on your total donations, including this gift.</p>
+              </div>
+            </div>
+          ) : (
+            <Notice kind="error">
+              Enter 1–10,000 SEK, with up to two decimal places.
+            </Notice>
+          )}
+          {store.error && <Notice kind="error">{store.error}</Notice>}
+          <div className="cp-modal-actions">
+            <Button
+              variant="outline"
+              disabled={!valid}
               onClick={() => {
-                setAllTransactions(false);
-                setReceipt(r);
+                setPreview(parsed);
+                setDonating(false);
+                setView('shelter');
               }}
             >
-              <span>
-                <strong>
-                  {r.source === 'workbook'
-                    ? r.products[0].description
-                    : r.supplier}
-                </strong>
-                <small>
-                  {dateLabel(r.purchasedAt, false)} · {r.reference}
-                </small>
-              </span>
-              <span>
-                {money(
-                  r.products
-                    .flatMap((p) => p.shares)
-                    .filter((s) => s.donorId === donorId)
-                    .reduce((n, s) => n + s.amountOre, 0),
-                )}{' '}
-                SEK
-                <small>
-                  {r.state === 'voided'
-                    ? 'Corrected'
-                    : r.source === 'workbook'
-                      ? 'Workbook record'
-                      : 'Funded'}
-                </small>
-              </span>
-              <ArrowUpRight size={15} />
-            </button>
-          ))}
-          {!transactions.length && <p>No matching records.</p>}
-        </div>
-      </Modal>
-      <Modal
-        open={!!receipt}
-        onClose={() => setReceipt(null)}
-        title={receipt?.supplier ?? 'Care record'}
-        description={
-          receipt
-            ? `${receipt.reference} · ${dateLabel(receipt.purchasedAt, false)}`
-            : undefined
-        }
-      >
-        {receipt && (
-          <>
-            <div className="cp-receipt-total">
-              <span>Receipt total</span>
-              <strong>{money(receipt.totalOre)} SEK</strong>
-              <span className="cp-tag">
-                {receipt.state === 'voided'
-                  ? 'Corrected — funds returned'
-                  : receipt.source === 'workbook'
-                    ? 'Imported workbook'
-                    : 'Funded care'}
-              </span>
-            </div>
-            {receipt.state === 'voided' && <Notice>{receipt.reason}</Notice>}
-            {receipt.products.map((p) => {
-              const share = p.shares.find((s) => s.donorId === donorId);
-              return (
-                <div className="cp-product-detail" key={p.id}>
-                  <CategoryIcon category={p.category} />
-                  <span>
-                    <strong>{p.description}</strong>
-                    <small>
-                      {money(p.amountOre)} SEK total · {p.shares.length}{' '}
-                      {p.shares.length === 1 ? 'contributor' : 'contributors'}
-                    </small>
-                  </span>
-                  <b>
-                    {share ? `${money(share.amountOre)} SEK` : '—'}
-                    <small>{share ? 'your contribution' : ''}</small>
-                  </b>
-                </div>
-              );
-            })}
-            {receipt.file ? (
+              <Eye size={17} /> Preview shelter
+            </Button>
+            <Primary
+              disabled={!valid || store.busy}
+              onClick={() => void recordGift()}
+            >
+              <Heart size={17} />
+              {store.busy ? 'Saving…' : 'Record demo donation'}
+            </Primary>
+          </div>
+          <a
+            className="cp-real-gift"
+            href="https://hundstallet.se/stod-oss/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Make a real donation on Hundstallet’s website ↗
+          </a>
+          <small className="cp-demo-note">
+            Local prototype · no payment is taken.
+          </small>
+        </Modal>
+      )}
+      {dog && (
+        <Modal
+          open
+          onClose={() => setDogId(null)}
+          title={dog.name}
+          description="Virtual companion · public Hundstallet profile"
+        >
+          <div className="gs-dog-profile">
+            <DogPortrait dog={dog} large />
+            <div>
+              <h3>{dog.breed}</h3>
+              <p>
+                {dog.age} · {dog.location}
+              </p>
+              <p>{dog.description}</p>
               <a
-                className="cp-text-link"
-                href={receipt.file.url}
+                className="cp-real-gift"
+                href={dog.source}
                 target="_blank"
                 rel="noreferrer"
               >
-                Open receipt document <ArrowUpRight size={16} />
+                Meet {dog.name} on Hundstallet ↗
               </a>
-            ) : (
-              <p className="cp-fine-print">
-                {receipt.source === 'workbook'
-                  ? 'The supplied spreadsheet contains dates, categories and totals. No receipt or product breakdown was supplied.'
-                  : 'This is a sample purchase. No original receipt is attached.'}
-              </p>
-            )}
-            {receipt.proofId && (
-              <Primary onClick={() => setProofId(receipt.proofId!)}>
-                <ShieldCheck size={17} /> Follow the evidence
-              </Primary>
-            )}
-          </>
-        )}
-      </Modal>
-      <ProofDialog
-        key={proofId ?? 'closed'}
-        proof={state.proofs.find((p) => p.id === proofId) ?? null}
-        receipt={receipt ?? undefined}
-        onClose={() => setProofId(null)}
-        onRefresh={() => void store.refresh()}
-      />
-      <Modal
-        open={profileOpen}
-        onClose={() => setProfileOpen(false)}
-        title="Your little shelter"
-        description="Make this corner of care feel like yours."
-      >
-        <label className="cp-field">
-          Your name
-          <input
-            value={name}
-            maxLength={60}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </label>
-        <label className="cp-field">
-          Shelter name
-          <input
-            value={shelterName}
-            maxLength={60}
-            onChange={(e) => setShelterName(e.target.value)}
-          />
-        </label>
-        <Primary
-          disabled={store.busy}
-          onClick={async () => {
-            if (
-              await store.send({ type: 'profile', donorId, name, shelterName })
-            )
-              setProfileOpen(false);
-          }}
+            </div>
+          </div>
+          <p className="cp-fine-print">
+            This virtual companion was selected from the saved public directory.
+            Their presence does not mean your donation funded their individual
+            care.
+          </p>
+        </Modal>
+      )}
+      {selected && (
+        <Modal
+          wide
+          open
+          onClose={() => setReceiptId(null)}
+          title={selected.supplier}
+          description={
+            selected.reference + ' · ' + dateLabel(selected.purchasedAt, false)
+          }
         >
-          Save profile
-        </Primary>
-        {store.error && <Notice kind="error">{store.error}</Notice>}
-        <details className="cp-details">
-          <summary>Explore another sample supporter</summary>
-          <select
-            aria-label="Sample supporter"
-            value={donorId}
-            onChange={(e) => {
-              setDonorId(e.target.value);
-              setProfileOpen(false);
-              setPreview(null);
-            }}
-          >
-            {state.donors.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name}
-              </option>
+          <div className="gs-receipt-total">
+            <span>
+              Your contribution
+              <strong>{money(shareTotal(selected))} SEK</strong>
+            </span>
+            <span>
+              Receipt total<strong>{money(selected.totalOre)} SEK</strong>
+            </span>
+          </div>
+          {selected.state === 'voided' && (
+            <Notice>
+              Reversed on {dateLabel(selected.voidedAt!)}.{' '}
+              {money(shareTotal(selected))} SEK returned to pending.{' '}
+              {selected.reason}
+            </Notice>
+          )}
+          {selected.source === 'workbook' && (
+            <Notice>
+              Imported spreadsheet record. Product details and an original
+              receipt were not supplied.
+            </Notice>
+          )}
+          <div className="gs-product-list">
+            {selected.products.map((p) => (
+              <div key={p.id}>
+                <CategoryIcon category={p.category} />
+                <span>
+                  <strong>{p.description}</strong>
+                  <small>
+                    {p.shares.some((s) => s.donorId === donor.id)
+                      ? 'Funded by your donation'
+                      : 'Funded by another donor'}
+                  </small>
+                </span>
+                <strong>{money(p.amountOre)} SEK</strong>
+              </div>
             ))}
-          </select>
-          <p>Separate sample portfolios in this local demonstration.</p>
-        </details>
-      </Modal>
+          </div>
+          {posts
+            .filter((p) =>
+              p.productIds.some((id) =>
+                selected.products.some((product) => product.id === id),
+              ),
+            )
+            .map((p) => (
+              <figure className="gs-evidence-photo" key={p.id}>
+                <CareImage src={p.photo?.url ?? p.demoPhoto} alt={p.title} />
+                <figcaption>
+                  <strong>{p.title}</strong>
+                  <p>
+                    {p.dogIds
+                      .map(
+                        (id) =>
+                          profileDogs.find((d) => d.id === id)?.name ?? id,
+                      )
+                      .join(', ')}{' '}
+                    · {dateLabel(p.occurredAt)}
+                  </p>
+                  <p>{p.note}</p>
+                  {p.source === 'demo' && (
+                    <small>Demonstration photo link</small>
+                  )}
+                </figcaption>
+              </figure>
+            ))}
+          <div className="cp-modal-actions">
+            {selected.file && (
+              <a
+                className="cp-text-link"
+                href={selected.file.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Original receipt ↗
+              </a>
+            )}
+            <Primary
+              onClick={() => {
+                setProofReceiptId(selected.id);
+                setReceiptId(null);
+              }}
+            >
+              <ShieldCheck size={18} /> Verify this transaction
+            </Primary>
+          </div>
+        </Modal>
+      )}
+      {proofReceipt && (
+        <ProofDialog
+          key={proofReceipt.id + ':' + proofReceipt.proofId}
+          proof={
+            state.proofs.find((p) => p.id === proofReceipt.proofId) ?? null
+          }
+          receipt={proofReceipt}
+          onClose={() => setProofReceiptId(null)}
+          onRefresh={() => void store.refresh()}
+        />
+      )}
     </div>
   );
 }

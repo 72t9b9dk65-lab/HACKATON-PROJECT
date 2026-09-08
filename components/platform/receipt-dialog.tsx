@@ -505,8 +505,9 @@ export function ReceiptDialog({
           ) : (
             <>
               <p>
-                Whole products go to available portfolios. A costly service may
-                have several contributors, with one unchanged product price.
+                Each product or service is assigned whole to one available
+                portfolio. Items that cannot fit an individual balance remain
+                pending.
               </p>
               {donorTotals.map((d) => (
                 <div className="cp-summary-row" key={d.id}>

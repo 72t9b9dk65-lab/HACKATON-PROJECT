@@ -1,0 +1,1692 @@
+.gs-platform small {
+  font-size: 0.875rem;
+}
+.gs-main {
+  max-width: 1680px;
+  margin: auto;
+  padding: 26px 3.5% 40px;
+}
+.gs-page-heading {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.gs-page-heading h1 span {
+  font-style: italic;
+  font-weight: 400;
+}
+.gs-page-heading p,
+.gs-staff-heading p {
+  color: var(--cp-muted);
+  margin-top: 6px;
+}
+.gs-dashboard {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 26px;
+  align-items: start;
+}
+.gs-wallet-column {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 54px;
+}
+.gs-donate {
+  width: 100%;
+  height: 88px !important;
+  font-size: 1.5rem !important;
+  border-radius: 18px !important;
+  justify-content: center;
+  gap: 14px;
+}
+.gs-wallet {
+  text-align: left;
+  width: 100%;
+  padding: 26px 24px;
+  background: var(--cp-paper);
+  border: 1px solid var(--cp-line);
+  border-radius: 20px;
+}
+.gs-wallet > span:first-child {
+  color: var(--cp-muted);
+}
+.gs-wallet > strong {
+  display: block;
+  font-size: 2.7rem;
+  line-height: 1.3;
+  letter-spacing: -0.055em;
+  margin: 18px 0 26px;
+}
+.gs-wallet strong small {
+  font-size: 1rem;
+  letter-spacing: 0;
+  font-weight: 500;
+}
+.gs-wallet-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.gs-wallet-split > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gs-wallet-split span {
+  font-size: 0.875rem;
+  color: var(--cp-muted);
+}
+.gs-wallet-split i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d7bc8f;
+  margin-right: 4px;
+}
+.gs-wallet-split > div:last-child i {
+  background: var(--cp-accent);
+}
+.gs-wallet-split b {
+  font-size: 1.45rem;
+  letter-spacing: -0.04em;
+}
+.gs-wallet-split small {
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.gs-balance-track {
+  height: 7px;
+  background: var(--cp-sand);
+  border-radius: 20px;
+  margin: 24px 0 20px;
+  overflow: hidden;
+}
+.gs-balance-track i {
+  display: block;
+  height: 100%;
+  background: var(--cp-accent);
+}
+.gs-wallet-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--cp-accent);
+}
+.gs-next {
+  border: 1px solid var(--cp-line);
+  border-radius: 20px;
+  padding: 23px;
+  background: var(--cp-paper);
+}
+.gs-eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--cp-accent);
+}
+.gs-next h2 {
+  font-size: 1.25rem;
+  margin: 9px 0;
+}
+.gs-next p {
+  font-size: 0.875rem;
+  color: var(--cp-muted);
+  margin: 8px 0;
+}
+.gs-next > small {
+  display: block;
+}
+.gs-next > button {
+  margin-top: 20px;
+  width: 100%;
+}
+.gs-next-preview {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 20px 0 10px;
+}
+.gs-next-preview img {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.gs-next-preview strong,
+.gs-next-preview small {
+  display: block;
+}
+.gs-view-switch {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 40px;
+  margin-bottom: 14px;
+}
+.gs-view-switch button {
+  border-radius: 10px;
+}
+.gs-view-switch button[data-variant='default'] {
+  background: var(--cp-accent);
+  color: white;
+}
+.gs-scene {
+  border: 1px solid #c8d6c1;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #e0eddb;
+}
+.gs-clock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 25px;
+  background: #eff4e9;
+  border-bottom: 1px solid #c8d6c1;
+}
+.gs-date {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.gs-date strong {
+  display: block;
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+}
+.gs-date small {
+  display: block;
+  margin-top: 2px;
+}
+.gs-clock-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+.gs-viewport {
+  height: 690px;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    #c8dcae 0%,
+    #dce8ce 55%,
+    #e8eedb 100%
+  );
+}
+.gs-viewport:active {
+  cursor: grabbing;
+}
+.gs-world {
+  position: absolute;
+  width: 1200px;
+  height: 1560px;
+  transform-origin: 0 0;
+  isolation: isolate;
+}
+.gs-paths {
+  position: absolute;
+  inset: 0;
+  width: 1200px;
+  height: 1560px;
+  z-index: 0;
+  overflow: visible;
+}
+.gs-paths polyline {
+  fill: none;
+  stroke: #ddc994;
+  stroke-width: 28;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.gs-paths polyline.is-locked {
+  opacity: 0.32;
+  stroke-dasharray: 12 16;
+}
+.gs-zone {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.8s,
+    height 0.8s;
+  z-index: 1;
+}
+.gs-zone > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+.gs-zone.is-locked > img {
+  opacity: 0.27;
+  filter: saturate(0.45);
+}
+.gs-zone-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  width: max-content;
+  max-width: 340px;
+  border: 1px solid #b8bd9d;
+  border-radius: 14px;
+  background: #fffdf5f5;
+  padding: 6px 14px;
+  text-align: center;
+  box-shadow: 0 3px 9px #30402310;
+  line-height: 1.25;
+}
+.gs-zone-label strong {
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.gs-zone-label span {
+  font-size: 21px;
+  color: #5d654b;
+}
+.gs-zone-label small {
+  font-size: 19px;
+  color: #697054;
+}
+.gs-dog {
+  position: absolute;
+  width: 76px;
+  height: 90px;
+  transform: translate(-50%, -72%);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.gs-dog > img {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 1px #24352430);
+}
+.gs-dog-name {
+  position: absolute;
+  left: 50%;
+  top: 68px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 2px 7px;
+  background: #fffdf4;
+  border: 1.5px solid #43382e;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.2;
+}
+.gs-dog.is-moving > img {
+  animation: gs-hop 0.48s ease-in-out infinite;
+}
+.gs-dog.is-preview {
+  opacity: 0.4;
+}
+.gs-sleep {
+  position: absolute;
+  top: -13px;
+  left: 11px;
+  white-space: nowrap;
+  font-weight: bold;
+  font-size: 22px;
+  color: #fff9db;
+  text-shadow: 0 1px 3px #243b39;
+}
+@keyframes gs-hop {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(2deg);
+  }
+}
+.gs-map-tools {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  gap: 5px;
+  z-index: 10000;
+}
+.gs-map-tools button {
+  background: #fffdf5;
+  color: #43382e;
+  box-shadow: 0 2px 8px #23342212;
+}
+.gs-map-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid #c8d6c1;
+  font-size: 0.875rem;
+}
+.gs-scene.is-night {
+  border-color: #42595a;
+  background: #314c46;
+  color: #e7eddc;
+}
+.gs-scene.is-night .gs-clock {
+  background: #263e4c;
+  border-color: #52685d;
+}
+.gs-scene.is-night .gs-clock small,
+.gs-scene.is-night .gs-map-footer small {
+  color: #c2d0c3;
+}
+.gs-scene.is-night .gs-viewport {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    #385845 0%,
+    #2d4642 60%,
+    #263e4c 100%
+  );
+}
+.gs-scene.is-night .gs-paths {
+  opacity: 0.75;
+}
+.gs-scene.is-night .gs-zone > img {
+  filter: brightness(0.82) saturate(0.82);
+}
+.gs-scene.is-night .gs-zone-label,
+.gs-scene.is-night .gs-dog-name {
+  color: #43382e;
+}
+.gs-scene.is-night .gs-map-footer {
+  border-color: #52685d;
+}
+.gs-roster {
+  margin-top: 18px;
+  border: 1px solid var(--cp-line);
+  padding: 18px 22px;
+  border-radius: 20px;
+  background: var(--cp-paper);
+}
+.gs-roster-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 17px;
+}
+.gs-roster > div:last-child {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 16px 8px 8px;
+}
+.gs-roster button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  min-width: 70px;
+  background: none;
+  border: 0;
+  font-size: 0.875rem;
+}
+.gs-roster .dog-portrait {
+  width: 60px;
+  height: 60px;
+  flex: none;
+  overflow: visible;
+}
+.gs-roster .dog-portrait-photo {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+.gs-roster .dog-portrait-avatar {
+  width: 34px;
+  height: 34px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: auto;
+  transform: translate(40%, -40%);
+  background: none;
+  border: 0;
+}
+.gs-roster .dog-portrait {
+  position: relative;
+}
+.gs-transactions {
+  background: var(--cp-paper);
+  border: 1px solid var(--cp-line);
+  border-radius: 22px;
+  padding: 26px;
+  margin-top: 26px;
+  min-width: 0;
+}
+.gs-transactions > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+.gs-transactions > header p {
+  font-size: 0.875rem;
+  color: var(--cp-muted);
+  margin-top: 5px;
+}
+.gs-search {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--cp-line);
+  padding: 10px 14px;
+  border-radius: 12px;
+  min-width: 230px;
+  background: var(--cp-paper);
+}
+.gs-search input {
+  border: 0;
+  background: none;
+  width: 100%;
+  outline: none;
+  min-width: 0;
+  font-size: 0.875rem;
+}
+.gs-transaction {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 4px;
+  border-top: 1px solid var(--cp-line);
+}
+.gs-transaction-main {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  background: none;
+  border: 0;
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+}
+.gs-transaction-main .cp-category-icon {
+  width: 56px;
+  height: 56px;
+  flex: none;
+}
+.gs-transaction-main strong,
+.gs-transaction-main small,
+.gs-transaction-amount strong,
+.gs-transaction-amount small {
+  display: block;
+}
+.gs-transaction-main small {
+  margin-top: 4px;
+}
+.gs-transaction-amount {
+  text-align: right;
+  white-space: nowrap;
+}
+.gs-photo-slot {
+  width: 54px;
+  height: 54px;
+  border: 1px dashed #cabcaa;
+  border-radius: 10px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #f8f5ef;
+  color: var(--cp-muted);
+}
+.gs-photo-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.gs-transaction-list + .gs-empty-list {
+  margin: 20px 0;
+}
+.gs-transactions > button:last-child {
+  margin-top: 20px;
+}
+.gs-statistics {
+  min-height: 795px;
+  border: 1px solid var(--cp-line);
+  border-radius: 24px;
+  background: var(--cp-paper);
+  padding: 34px;
+  display: flex;
+  flex-direction: column;
+}
+.gs-statistics h2 {
+  font-size: 2rem;
+  margin: 10px 0;
+}
+.gs-statistics p {
+  color: var(--cp-muted);
+}
+.gs-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin: 45px 0;
+}
+.gs-bars > div {
+  display: grid;
+  grid-template-columns: 48px 165px 1fr 100px;
+  gap: 16px;
+  align-items: center;
+}
+.gs-bars .cp-category-icon {
+  width: 48px;
+  height: 48px;
+}
+.gs-bars > div > div {
+  height: 20px;
+  background: #f0ece4;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.gs-bars i {
+  display: block;
+  height: 100%;
+  background: var(--cp-accent);
+  border-radius: 6px;
+  min-width: 0;
+}
+.gs-bars > div > span {
+  font-size: 0.875rem;
+}
+.gs-bars strong {
+  text-align: right;
+}
+.gs-stats-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 25px;
+  border-top: 1px solid var(--cp-line);
+  margin-top: auto;
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+.gs-preview-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #eee4d1;
+  border: 1px solid #dccbb0;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  font-size: 0.875rem;
+}
+.gs-preview-banner > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.gs-notice-row {
+  display: flex;
+  align-items: center;
+}
+.gs-notice-row .cp-notice {
+  flex: 1;
+}
+.gs-empty {
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 16px 20px;
+  width: min(90%, 410px);
+  border-radius: 14px;
+  background: #fffdf5;
+  color: var(--cp-ink);
+  text-align: center;
+  font-size: 0.875rem;
+}
+.gs-empty strong {
+  font-weight: 500;
+  color: var(--cp-muted);
+}
+.gs-empty-list {
+  padding: 20px;
+  color: var(--cp-muted);
+}
+.gs-prototype-note {
+  font-size: 0.875rem;
+  color: var(--cp-muted);
+  margin-top: 23px !important;
+  max-width: 1000px;
+}
+.gs-amount-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+}
+.gs-gift-impact {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 18px 0;
+  padding: 16px;
+  background: var(--cp-soft);
+  border-radius: 18px;
+}
+.gs-gift-impact img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.gs-gift-impact p {
+  font-size: 0.875rem;
+  color: var(--cp-muted);
+  margin-top: 6px;
+}
+.gs-dog-profile {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 26px;
+  align-items: start;
+}
+.gs-dog-profile .dog-portrait {
+  display: block;
+  position: relative;
+  width: 200px;
+  height: 220px;
+}
+.gs-dog-profile .dog-portrait-photo {
+  width: 200px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 18px;
+}
+.gs-dog-profile .dog-portrait-avatar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: auto;
+  width: 60px;
+  height: 60px;
+  background: none;
+  border: 0;
+  transform: translate(30%, -30%);
+}
+.gs-dog-profile p {
+  margin-top: 12px;
+}
+.gs-receipt-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px;
+  background: var(--cp-soft);
+  border-radius: 15px;
+}
+.gs-receipt-total strong {
+  display: block;
+  font-size: 1.8rem;
+}
+.gs-product-list > div {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 17px 0;
+  border-bottom: 1px solid var(--cp-line);
+}
+.gs-product-list > div > span {
+  flex: 1;
+}
+.gs-product-list strong,
+.gs-product-list small {
+  display: block;
+}
+.gs-product-list .cp-category-icon {
+  width: 45px;
+  height: 45px;
+}
+.gs-evidence-photo {
+  margin: 22px 0;
+  background: var(--cp-soft);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.gs-evidence-photo > img {
+  width: 100%;
+  max-height: 430px;
+  object-fit: contain;
+}
+.gs-evidence-photo figcaption {
+  padding: 18px;
+}
+.gs-anchor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.gs-anchor a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.gs-staff-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 22px;
+  margin: 10px 0 28px;
+}
+.gs-staff-totals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--cp-line);
+  border-radius: 20px;
+  background: var(--cp-paper);
+  margin: 24px 0;
+}
+.gs-staff-totals > div {
+  padding: 25px 30px;
+  border-right: 1px solid var(--cp-line);
+}
+.gs-staff-totals > div:last-child {
+  border: 0;
+}
+.gs-staff-totals span {
+  display: block;
+  color: var(--cp-muted);
+}
+.gs-staff-totals strong {
+  font-size: 2.5rem;
+  display: block;
+  letter-spacing: -0.045em;
+  margin-top: 8px;
+}
+.gs-staff-totals small {
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+.gs-staff-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+.gs-staff-toolbar .gs-view-switch {
+  margin: 0;
+}
+.gs-filter-row {
+  display: flex;
+  gap: 15px;
+  margin: 20px 0;
+}
+.gs-filter-row .gs-search {
+  flex: 1;
+}
+.gs-filter-row select {
+  border: 1px solid var(--cp-line);
+  border-radius: 12px;
+  padding: 8px 12px;
+  background: var(--cp-paper);
+}
+.gs-staff-receipt {
+  padding: 23px 0;
+  border-top: 1px solid var(--cp-line);
+}
+.gs-staff-receipt-top {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+.gs-staff-receipt-top > .cp-category-icon {
+  width: 62px;
+  height: 62px;
+}
+.gs-staff-receipt-top > div {
+  flex: 1;
+}
+.gs-staff-receipt-top > strong {
+  font-size: 1.3rem;
+  white-space: nowrap;
+}
+.gs-receipt-tags {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 7px;
+}
+.gs-staff-products {
+  margin: 20px 0 12px 80px;
+}
+.gs-staff-products summary {
+  font-size: 0.875rem;
+  color: var(--cp-accent);
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+.gs-staff-product {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee7dc;
+}
+.gs-staff-product .cp-category-icon {
+  width: 40px;
+  height: 40px;
+}
+.gs-staff-product > span {
+  flex: 1;
+}
+.gs-staff-product strong,
+.gs-staff-product small {
+  display: block;
+}
+.gs-staff-receipt-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 17px;
+}
+.gs-staff-receipt-actions > div {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.gs-staff-receipt-actions > a {
+  font-size: 0.875rem;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.gs-donor-portfolios {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  gap: 25px;
+  margin-top: 25px;
+}
+.gs-donor-portfolios > .gs-transactions {
+  margin: 0;
+}
+.gs-donor-portfolios > aside {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.gs-donor-portfolios > aside > button {
+  padding: 19px;
+  border: 1px solid var(--cp-line);
+  border-radius: 15px;
+  text-align: left;
+  background: var(--cp-paper);
+}
+.gs-donor-portfolios > aside > button.active {
+  border-color: var(--cp-accent);
+  background: var(--cp-soft);
+}
+.gs-donor-portfolios > aside span,
+.gs-donor-portfolios > aside small {
+  display: block;
+  margin-top: 4px;
+}
+.gs-photo-upload {
+  display: flex;
+  min-height: 180px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px dashed #baad99;
+  border-radius: 15px;
+  padding: 18px;
+  cursor: pointer;
+}
+.gs-photo-upload input {
+  max-width: 100%;
+  font-size: 0.875rem;
+}
+.gs-photo-upload img {
+  max-height: 230px;
+  object-fit: contain;
+}
+.gs-dog-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-height: 270px;
+  overflow: auto;
+  margin: 15px 0;
+}
+.gs-dog-picker label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--cp-line);
+  border-radius: 10px;
+  padding: 8px;
+  font-size: 0.875rem;
+}
+.gs-dog-picker img {
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+@media (min-width: 1600px) {
+  .gs-viewport {
+    height: 790px;
+  }
+  .gs-dashboard {
+    grid-template-columns: 320px minmax(0, 1fr);
+  }
+}
+@media (max-width: 1050px) {
+  .gs-dashboard {
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 18px;
+  }
+  .gs-wallet {
+    padding: 20px;
+  }
+  .gs-wallet > strong {
+    font-size: 2.3rem;
+  }
+  .gs-date strong {
+    font-size: 1.05rem;
+  }
+  .gs-clock {
+    padding: 17px;
+  }
+  .gs-clock-actions > span {
+    display: none;
+  }
+  .gs-viewport {
+    height: 620px;
+  }
+  .gs-roster-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .gs-bars > div {
+    grid-template-columns: 40px 125px 1fr 80px;
+    gap: 9px;
+  }
+  .gs-statistics {
+    padding: 24px;
+  }
+  .gs-map-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (max-width: 760px) {
+  .gs-main {
+    padding: 20px 16px 30px;
+  }
+  .gs-page-heading h1 {
+    font-size: 1.55rem;
+  }
+  .gs-page-heading h1 span {
+    display: block;
+    font-size: 1.15rem;
+    margin-top: 5px;
+  }
+  .gs-dashboard {
+    display: flex;
+    flex-direction: column;
+  }
+  .gs-wallet-column {
+    width: 100%;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .gs-donate {
+    height: 58px !important;
+    font-size: 1.25rem !important;
+  }
+  .gs-wallet {
+    padding: 18px;
+  }
+  .gs-wallet > strong {
+    margin: 7px 0 14px;
+    font-size: 2.3rem;
+  }
+  .gs-wallet-split b {
+    font-size: 1.3rem;
+  }
+  .gs-balance-track {
+    margin: 16px 0 12px;
+  }
+  .gs-next {
+    display: none;
+  }
+  .gs-main-column {
+    width: 100%;
+    min-width: 0;
+  }
+  .gs-view-switch {
+    margin-top: 6px;
+  }
+  .gs-clock {
+    padding: 14px;
+  }
+  .gs-date {
+    gap: 9px;
+  }
+  .gs-date strong {
+    font-size: 1rem;
+  }
+  .gs-date small {
+    font-size: 0.8rem;
+  }
+  .gs-clock-actions {
+    gap: 0;
+  }
+  .gs-viewport {
+    height: 510px;
+  }
+  .gs-zone-label {
+    min-width: 205px;
+  }
+  .gs-roster {
+    padding: 16px;
+  }
+  .gs-roster > div:last-child {
+    gap: 15px;
+  }
+  .gs-transactions {
+    padding: 18px;
+    margin-top: 20px;
+  }
+  .gs-transactions > header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .gs-search {
+    min-width: 0;
+  }
+  .gs-transaction {
+    display: grid;
+    grid-template-columns: 1fr 55px;
+    gap: 10px;
+    padding: 17px 0;
+  }
+  .gs-transaction-main {
+    grid-column: 1/2;
+  }
+  .gs-transaction-main .cp-category-icon {
+    width: 43px;
+    height: 43px;
+  }
+  .gs-transaction-main {
+    gap: 10px;
+  }
+  .gs-transaction-main small {
+    font-size: 0.8rem;
+  }
+  .gs-transaction-amount {
+    grid-column: 1;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    padding-left: 53px;
+  }
+  .gs-transaction-amount small {
+    font-size: 0.75rem;
+  }
+  .gs-photo-slot {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .gs-transaction > button:last-child {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 6px;
+    font-size: 0.75rem;
+  }
+  .gs-transaction > button:last-child svg {
+    display: none;
+  }
+  .gs-statistics {
+    min-height: 550px;
+    padding: 20px;
+  }
+  .gs-statistics h2 {
+    font-size: 1.5rem;
+  }
+  .gs-bars {
+    gap: 19px;
+    margin: 25px 0;
+  }
+  .gs-bars > div {
+    grid-template-columns: 35px 1fr 95px;
+  }
+  .gs-bars > div > div {
+    grid-column: 2/4;
+    grid-row: 2;
+    height: 11px;
+  }
+  .gs-bars > div > strong {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .gs-bars .cp-category-icon {
+    width: 35px;
+    height: 35px;
+  }
+  .gs-preview-banner {
+    align-items: flex-start;
+  }
+  .gs-preview-banner > button {
+    font-size: 0;
+    min-width: 28px;
+    padding: 5px;
+  }
+  .gs-preview-banner > button svg {
+    width: 18px;
+    height: 18px;
+  }
+  .gs-amount-presets {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .gs-gift-impact img {
+    width: 75px;
+    height: 75px;
+  }
+  .gs-dog-profile {
+    grid-template-columns: 1fr;
+  }
+  .gs-dog-profile .dog-portrait {
+    margin: 10px auto;
+  }
+  .gs-staff-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .gs-staff-totals > div {
+    padding: 15px;
+  }
+  .gs-staff-totals strong {
+    font-size: 1.6rem;
+  }
+  .gs-staff-totals span {
+    font-size: 0.8rem;
+  }
+  .gs-staff-totals small {
+    display: block;
+    font-size: 0.8rem;
+  }
+  .gs-staff-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .gs-filter-row {
+    flex-direction: column;
+  }
+  .gs-staff-receipt-top {
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .gs-staff-receipt-top > .cp-category-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .gs-staff-receipt-top > strong {
+    font-size: 1rem;
+  }
+  .gs-staff-receipt-top small {
+    font-size: 0.8rem;
+  }
+  .gs-staff-products {
+    margin-left: 0;
+  }
+  .gs-staff-product {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .gs-staff-product > span {
+    min-width: 120px;
+  }
+  .gs-staff-product > b {
+    font-size: 0.875rem;
+  }
+  .gs-staff-receipt-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .gs-staff-receipt-actions > div {
+    justify-content: flex-start;
+  }
+  .gs-donor-portfolios {
+    grid-template-columns: 1fr;
+  }
+  .gs-donor-portfolios > aside {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .gs-dog-picker {
+    grid-template-columns: 1fr 1fr;
+  }
+  .gs-receipt-total strong {
+    font-size: 1.4rem;
+  }
+  .gs-product-list > div {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .gs-product-list > div > span {
+    min-width: 120px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gs-dog.is-moving > img {
+    animation: none;
+  }
+  .gs-zone {
+    transition: none;
+  }
+}
+
+/* Scope above the inherited plain-button reset. */
+.care-platform .gs-zone-label {
+  background: #fffdf5;
+  border-color: #b8bd9d;
+}
+.care-platform .gs-wallet {
+  background: var(--cp-paper);
+}
+.care-platform .gs-photo-slot {
+  background: #f8f5ef;
+}
+.care-platform .gs-donor-portfolios > aside > button {
+  background: var(--cp-paper);
+}
+.care-platform .gs-donor-portfolios > aside > button.active {
+  background: var(--cp-soft);
+}
+.gs-dog-name {
+  opacity: 0;
+  pointer-events: none;
+  top: 100%;
+}
+.gs-dog:hover .gs-dog-name,
+.gs-dog:focus-visible .gs-dog-name {
+  opacity: 1;
+}
+.gs-dog:hover,
+.gs-dog:focus-visible {
+  z-index: 10000 !important;
+}
+.gs-sleep {
+  left: 50%;
+  top: -15px;
+  font-size: 18px;
+}
+
+.gs-scene.is-paused .gs-sleep {
+  animation-play-state: paused;
+}
+
+.gs-transaction.is-reversed .gs-transaction-amount {
+  color: #8a522d;
+}
+
+.gs-zone-label {
+  padding: 6px 12px;
+  min-width: 205px;
+}
+.gs-zone-label strong {
+  font-size: 23px;
+}
+.gs-zone-label span {
+  font-size: 20px;
+}
+.gs-zone-label small {
+  display: none;
+}
+.gs-zone-label:hover small,
+.gs-zone-label:focus-visible small {
+  display: block;
+}
+.gs-zone-garden .gs-zone-label {
+  top: auto;
+  bottom: calc(100% + 12px);
+}
+
+.gs-import-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--cp-soft);
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 0.875rem;
+  margin: 18px 0;
+}
+@media (max-width: 760px) {
+  .gs-import-banner {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+/* Header growth summary and continuous donor transaction history. */
+.gs-page-heading {
+  gap: 24px;
+}
+.gs-page-heading > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.gs-page-heading h1 {
+  font-size: clamp(1.5rem, 2.3vw, 2.5rem);
+}
+.gs-next-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 20px;
+  max-width: 680px;
+}
+.gs-next-horizontal h2 {
+  margin: 5px 0;
+}
+.gs-next-horizontal p {
+  margin: 0;
+  max-width: 230px;
+}
+.gs-next-horizontal .gs-next-preview {
+  margin: 0;
+  max-width: 230px;
+}
+.gs-next-horizontal .gs-next-preview img {
+  width: 62px;
+  height: 62px;
+}
+.gs-next-horizontal > button {
+  width: auto;
+  margin: 0;
+  white-space: normal;
+}
+.gs-sidebar-transactions {
+  margin-top: 0;
+  padding: 18px;
+}
+.gs-sidebar-transactions > header {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+.gs-sidebar-transactions h2 {
+  font-size: 1.15rem;
+}
+.gs-sidebar-transactions .gs-search {
+  min-width: 0;
+}
+.gs-sidebar-transactions .gs-transaction {
+  display: grid;
+  grid-template-columns: 1fr 48px;
+  gap: 10px;
+}
+.gs-sidebar-transactions .gs-transaction-main {
+  grid-column: 1 / -1;
+  gap: 10px;
+}
+.gs-sidebar-transactions .gs-transaction-main .cp-category-icon {
+  width: 42px;
+  height: 42px;
+}
+.gs-sidebar-transactions .gs-transaction-amount {
+  text-align: left;
+  white-space: normal;
+}
+.gs-sidebar-transactions .gs-photo-slot {
+  width: 44px;
+  height: 44px;
+}
+.gs-sidebar-transactions .gs-transaction > button:last-child {
+  grid-column: 1 / -1;
+}
+@media (max-width: 1200px) {
+  .gs-next-horizontal {
+    max-width: 500px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+@media (max-width: 800px) {
+  .gs-page-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .gs-next-horizontal {
+    display: flex;
+    max-width: none;
+  }
+  .gs-sidebar-transactions {
+    margin-top: 0;
+  }
+}
+
+/* A dedicated label lane stays clear of every area, including level 5.
+   Row centres are 500px apart; images are at most 375px high. */
+.gs-zone-label {
+  top: calc(100% + 14px);
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+}
+.gs-zone-label small {
+  font-size: 18px;
+  line-height: 1.25;
+}
+.gs-zone-garden .gs-zone-label {
+  top: auto;
+  bottom: calc(100% + 14px);
+}
+
+/* Sprite travel is updated every animation frame without layout updates. */
+.gs-dog {
+  will-change: transform;
+}
+.gs-sleep {
+  width: 48px;
+  height: 40px;
+  pointer-events: none;
+}
+.gs-sleep > span {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  opacity: 0;
+  animation: gs-sleep-rise 2.4s linear infinite;
+}
+.gs-sleep > span:nth-child(2) {
+  animation-delay: -0.8s;
+}
+.gs-sleep > span:nth-child(3) {
+  animation-delay: -1.6s;
+}
+@keyframes gs-sleep-rise {
+  0% {
+    transform: translate(0, 9px) scale(0.65);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(25px, -28px) scale(1.15);
+    opacity: 0;
+  }
+}
+.gs-scene.is-paused .gs-dog.is-moving > img,
+.gs-scene.is-paused .gs-sleep > span {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gs-sleep > span {
+    animation: none;
+  }
+  .gs-sleep > span:first-child {
+    opacity: 1;
+  }
+}
+
+.gs-blockchain-status {
+  height: auto;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 12px;
+  white-space: normal;
+}
+.gs-blockchain-status > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.gs-blockchain-status > span svg {
+  flex-shrink: 0;
+}
+.gs-blockchain-status > small {
+  font-size: 0.7rem;
+  color: var(--cp-muted);
+  font-weight: 400;
+}
+
+/* Growth shares the shelter's date bar instead of adding a page-heading row. */
+.gs-clock {
+  gap: 24px;
+}
+.gs-clock .gs-date {
+  flex: 0 1 270px;
+}
+.gs-clock .gs-date strong {
+  font-size: 1.35rem;
+}
+.gs-clock .gs-next-horizontal {
+  flex: 1;
+  display: flex;
+  max-width: none;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  gap: 18px;
+}
+.gs-clock .gs-next-horizontal > div:first-child {
+  flex: 1;
+}
+.gs-clock .gs-next-horizontal h2 {
+  font-size: 1.1rem;
+}
+.gs-clock .gs-next-horizontal .gs-next-preview {
+  flex: 1;
+}
+.gs-clock .gs-next-horizontal .gs-next-preview img {
+  width: 56px;
+  height: 56px;
+}
+.gs-scene.is-night .gs-next-horizontal p {
+  color: #c2d0c3;
+}
+.gs-scene.is-night .gs-next-horizontal .gs-eyebrow {
+  color: #d6e7c6;
+}
+@media (max-width: 1100px) {
+  .gs-clock {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .gs-clock .gs-date {
+    flex-basis: 100%;
+  }
+}
+@media (max-width: 600px) {
+  .gs-clock .gs-next-horizontal {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .gs-clock .gs-next-horizontal > div {
+    min-width: 130px;
+  }
+  .gs-clock .gs-next-horizontal > button {
+    width: 100%;
+  }
+}
+
+.gs-header-title {
+  flex: 1;
+  min-width: 0;
+  font-size: clamp(1.25rem, 1.8vw, 2rem);
+  line-height: 1.25;
+  letter-spacing: -0.035em;
+}
+.gs-header-title span {
+  font-weight: 400;
+  font-style: italic;
+}
+.gs-platform > .cp-header {
+  column-gap: 30px;
+}
+.gs-platform > .cp-header .cp-header-actions {
+  flex-shrink: 0;
+}
+@media (max-width: 1000px) {
+  .gs-platform > .cp-header {
+    flex-wrap: wrap;
+    gap: 12px 20px;
+  }
+  .gs-header-title {
+    flex-basis: 50%;
+  }
+}
+@media (max-width: 600px) {
+  .gs-header-title {
+    font-size: 1.1rem;
+  }
+}

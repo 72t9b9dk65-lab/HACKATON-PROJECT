@@ -8,7 +8,12 @@ import {
   ShieldCheck,
   UploadCloud,
 } from 'lucide-react';
-import { verifyChain, verifyProof, sha256 } from '@/lib/platform/proofs';
+import {
+  verifyChain,
+  verifyProof,
+  sha256,
+  documentHashOf,
+} from '@/lib/platform/proofs';
 import type { Proof } from '@/lib/platform/types';
 import { Header, Footer, Notice, dateLabel } from './shared';
 export default function VerifyWorkspace() {
@@ -79,7 +84,7 @@ export default function VerifyWorkspace() {
       return;
     }
     const hash = await sha256(await file.arrayBuffer());
-    const match = proofs.find((p) => p.payload.documentHash === hash);
+    const match = proofs.find((p) => documentHashOf(p) === hash);
     if (match) setDocumentResult(`Document matches care record #${match.seq}.`);
     else
       setError(

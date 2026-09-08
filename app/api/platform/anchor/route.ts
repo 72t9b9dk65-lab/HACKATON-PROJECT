@@ -3,73 +3,77 @@ import {
   saveWorkspace,
   localOnly,
 } from '@/lib/platform/storage';
-import { anchorData } from '@/lib/platform/proofs';
+import { verifyProof } from '@/lib/platform/proofs';
+import { validateAnchorResponse } from '@/lib/platform/anchor-validation';
 import { applyAction } from '@/lib/platform/model';
-async function rpc(method: string, params: unknown[]) {
+async function rpc(method: string, params: unknown[]): Promise<unknown> {
   const response = await fetch('https://ethereum-sepolia-rpc.publicnode.com', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
-    signal: AbortSignal.timeout(15_000),
+    signal: AbortSignal.timeout(15000),
   });
-  const data = (await response.json()) as {
-    result?: Record<string, string>;
-    error?: unknown;
-  };
+  const data = (await response.json()) as { result?: unknown; error?: unknown };
   if (!response.ok || data.error)
     throw new Error(
-      'The testnet could not be reached. Your local record is safe.',
+      'The testnet is unavailable. No confirmation was recorded.',
     );
   return data.result;
 }
 export async function POST(request: Request) {
   try {
     localOnly(request);
-    const { proofId, txHash } = (await request.json()) as {
+    const { proofId, txHash: input } = (await request.json()) as {
       proofId: string;
       txHash: string;
     };
-    if (!/^0x[0-9a-fA-F]{64}$/.test(txHash))
+    if (typeof input !== 'string' || !/^0x[0-9a-fA-F]{64}$/.test(input))
       throw new Error('Enter a valid testnet transaction hash.');
-    const current = await readWorkspace();
-    const proof = current.proofs.find((p) => p.id === proofId);
-    if (!proof) throw new Error('Record not found.');
-    const [tx, receipt] = await Promise.all([
+    const txHash = input.toLowerCase(),
+      current = await readWorkspace(),
+      proof = current.proofs.find((p) => p.id === proofId);
+    if (!proof || !(await verifyProof(proof)))
+      throw new Error('The local proof is missing or invalid.');
+    const [chain, tx, receipt] = await Promise.all([
+      rpc('eth_chainId', []),
       rpc('eth_getTransactionByHash', [txHash]),
       rpc('eth_getTransactionReceipt', [txHash]),
     ]);
+    const blockNumber = validateAnchorResponse(
+      proof.hash,
+      txHash,
+      String(chain),
+      tx as Record<string, string> | null,
+      receipt as Record<string, string> | null,
+    );
+    const latest = await readWorkspace(),
+      latestProof = latest.proofs.find((p) => p.id === proofId);
     if (
-      !tx ||
-      !receipt ||
-      receipt.status !== '0x1' ||
-      tx.input?.toLowerCase() !== anchorData(proof.hash) ||
-      !receipt.blockNumber
+      !latestProof ||
+      latestProof.hash !== proof.hash ||
+      !(await verifyProof(latestProof))
     )
-      throw new Error(
-        'The transaction is not confirmed or does not contain this record’s fingerprint.',
-      );
+      throw new Error('The local proof changed during verification.');
+    if (latestProof.anchors.some((a) => a.txHash.toLowerCase() === txHash))
+      return Response.json(latest);
     const next = applyAction(
-      current,
-      {
-        type: 'anchor',
-        proofId,
-        txHash,
-        chainId: '0xaa36a7',
-        blockNumber: parseInt(receipt.blockNumber, 16),
-      },
+      latest,
+      { type: 'anchor', proofId, txHash, chainId: '0xaa36a7', blockNumber },
       new Date().toISOString(),
       [],
     );
-    return Response.json(await saveWorkspace(next, current.revision));
-  } catch (error) {
+    return Response.json(await saveWorkspace(next, latest.revision));
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : 'Could not verify the network record.';
     return Response.json(
       {
         error:
-          error instanceof Error
-            ? error.message
-            : 'Could not verify the testnet record.',
+          message === 'CONFLICT'
+            ? 'The workspace changed. Retry confirmation.'
+            : message,
       },
-      { status: 400 },
+      { status: message === 'CONFLICT' ? 409 : 400 },
     );
   }
 }

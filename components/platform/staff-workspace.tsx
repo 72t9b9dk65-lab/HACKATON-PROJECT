@@ -1,126 +1,254 @@
 'use client';
-import { CareImage } from './care-image';
 import { useState } from 'react';
 import {
-  ArrowDownToLine,
-  ArrowUpRight,
-  CalendarDays,
-  Camera,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  FileText,
-  ImagePlus,
-  ListChecks,
   Plus,
   Search,
   ShieldCheck,
+  ArrowRight,
+  FileText,
+  Download,
+  ImagePlus,
   Users,
-  Wallet,
+  ReceiptText,
+  Upload,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DogPortrait } from '@/components/dog-portrait';
-import { profileDogs } from '@/lib/donation-shell';
-import { useCareWorkspace } from '@/hooks/use-care-workspace';
+import {
+  useCareWorkspace,
+  uploadCareFile,
+  type CareStore,
+} from '@/hooks/use-care-workspace';
 import {
   balances,
-  categoryFor,
   donorProducts,
   money,
-  publishedPosts,
-  stages,
-  supportedDogs,
+  categoryFor,
 } from '@/lib/platform/model';
-import type { Receipt } from '@/lib/platform/types';
-import { AllocationDialog } from './allocation-dialog';
-import { PhotoComposer } from './photo-composer';
+import { profileDogs } from '@/lib/donation-shell';
+import type { Receipt, Product, FileRecord } from '@/lib/platform/types';
 import { ReceiptDialog } from './receipt-dialog';
+import { AllocationDialog } from './allocation-dialog';
 import { ProofDialog } from './proof-dialog';
+import { prepareCarePhoto } from '@/lib/platform/photo-preview';
+import { CareImage } from './care-image';
 import {
-  CategoryIcon,
   Header,
   LoadingWorkspace,
   Modal,
   Notice,
-  Photo,
   Primary,
+  CategoryIcon,
   dateLabel,
-  useClock,
 } from './shared';
-
-type Tab = 'today' | 'receipts' | 'supporters' | 'stories';
-const stockDay = (time: number | string) =>
-  new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm' }).format(
-    new Date(time),
+function ProductPhotoDialog({
+  store,
+  product,
+  onClose,
+  onSaved,
+}: {
+  store: CareStore;
+  product: Product;
+  onClose: () => void;
+  onSaved: (message: string) => void;
+}) {
+  const [photo, setPhoto] = useState<FileRecord | null>(null),
+    [dogs, setDogs] = useState<string[]>([]),
+    [query, setQuery] = useState(''),
+    [note, setNote] = useState(''),
+    [uploading, setUploading] = useState(false),
+    [error, setError] = useState('');
+  async function upload(file: File) {
+    setUploading(true);
+    setError('');
+    try {
+      setPhoto(await uploadCareFile(await prepareCarePhoto(file)));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Upload failed.');
+    } finally {
+      setUploading(false);
+    }
+  }
+  async function save() {
+    if (!photo || !dogs.length) return;
+    const now = new Date().toISOString();
+    if (
+      await store.send({
+        type: 'publish',
+        post: {
+          title: product.description,
+          note,
+          dogIds: dogs,
+          productIds: [product.id],
+          category: product.category,
+          stage: null,
+          photo,
+          occurredAt: now,
+          publishAt: now,
+          liveHours: 2,
+        },
+      })
+    ) {
+      onSaved('Care photo attached to the product and its donor transactions.');
+      onClose();
+    }
+  }
+  return (
+    <Modal
+      open
+      wide
+      onClose={onClose}
+      title="Attach a care photo"
+      description={
+        product.description + ' · ' + categoryFor(product.category).label
+      }
+    >
+      <label className="gs-photo-upload">
+        {photo ? (
+          <CareImage src={photo.url} alt="Uploaded care photo" />
+        ) : (
+          <>
+            <Upload size={26} />
+            <strong>{uploading ? 'Uploading…' : 'Choose a photo'}</strong>
+          </>
+        )}
+        <input
+          aria-label="Upload care photo"
+          type="file"
+          accept="image/*"
+          disabled={uploading}
+          onChange={(e) => {
+            if (e.target.files?.[0]) void upload(e.target.files[0]);
+          }}
+        />
+      </label>
+      <p className="cp-fine-print">
+        Category and transaction are already linked. Select the dogs that used
+        this product.
+      </p>
+      <label className="gs-search">
+        <Search size={17} />
+        <input
+          aria-label="Find dogs"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Find dogs by name"
+        />
+      </label>
+      <div className="gs-dog-picker">
+        {profileDogs
+          .filter(
+            (d) =>
+              !d.group && d.name.toLowerCase().includes(query.toLowerCase()),
+          )
+          .map((d) => (
+            <label key={d.id}>
+              <input
+                type="checkbox"
+                checked={dogs.includes(d.id)}
+                onChange={(e) =>
+                  setDogs(
+                    e.target.checked
+                      ? [...dogs, d.id]
+                      : dogs.filter((id) => id !== d.id),
+                  )
+                }
+              />
+              <CareImage
+                src={d.photos[0].src}
+                alt=""
+                width={120}
+                height={120}
+              />
+              <strong>{d.name}</strong>
+            </label>
+          ))}
+      </div>
+      <label className="cp-field">
+        Note (optional)
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          maxLength={1600}
+        />
+      </label>
+      {(error || store.error) && (
+        <Notice kind="error">{error || store.error}</Notice>
+      )}
+      <div className="cp-modal-actions">
+        <Button variant="ghost" onClick={onClose}>
+          Cancel
+        </Button>
+        <Primary
+          disabled={
+            !photo ||
+            !dogs.length ||
+            dogs.length > 20 ||
+            store.busy ||
+            uploading
+          }
+          onClick={() => void save()}
+        >
+          Attach photo · {dogs.length} dogs
+        </Primary>
+      </div>
+    </Modal>
   );
+}
 export default function StaffWorkspace() {
   const store = useCareWorkspace();
-  const now = useClock();
-  const [tab, setTab] = useState<Tab>('today');
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('active');
-  const [limit, setLimit] = useState(12);
-  const [receiptEditor, setReceiptEditor] = useState<Receipt | true | null>(
-    null,
-  );
-  const [photoEditor, setPhotoEditor] = useState<{
-    productId?: string;
-    publishDay?: string;
-    milestone?: boolean;
-  } | null>(null);
-  const [allocation, setAllocation] = useState<string | null>(null);
-  const [selectedDonor, setSelectedDonor] = useState('personal');
-  const [proofId, setProofId] = useState<string | null>(null);
-  const [receiptDetailId, setReceiptDetailId] = useState<string | null>(null);
-  const [photoId, setPhotoId] = useState<string | null>(null);
-  const [correction, setCorrection] = useState<{
-    type: 'receipt' | 'post';
-    id: string;
-  } | null>(null);
-  const [reason, setReason] = useState('');
-  const [message, setMessage] = useState('');
-  const [calendarDay, setCalendarDay] = useState<string | null>(null);
+  const [tab, setTab] = useState<'receipts' | 'donors'>('receipts'),
+    [search, setSearch] = useState(''),
+    [filter, setFilter] = useState('all'),
+    [limit, setLimit] = useState(12);
+  const [editor, setEditor] = useState<Receipt | true | null>(null),
+    [allocation, setAllocation] = useState<string | null>(null),
+    [photoProduct, setPhotoProduct] = useState<Product | null>(null),
+    [proofId, setProofId] = useState<string | null>(null),
+    [selectedDonor, setSelectedDonor] = useState('personal'),
+    [correction, setCorrection] = useState<Receipt | null>(null),
+    [reason, setReason] = useState(''),
+    [message, setMessage] = useState('');
   const state = store.state;
   if (!state) return <LoadingWorkspace store={store} />;
-  const clock = now ?? Date.parse(state.createdAt);
-  const wallets = balances(state);
-  const donated = wallets.reduce((n, d) => n + d.donated, 0);
-  const available = wallets.reduce((n, d) => n + d.pending, 0);
-  const used = wallets.reduce((n, d) => n + d.used, 0);
-  const pending = state.receipts.filter((r) => r.state === 'draft');
-  const active = publishedPosts(state, clock);
-  const scheduled = state.posts
-    .filter((p) => !p.withdrawnAt && Date.parse(p.publishAt) > clock)
-    .sort((a, b) => a.publishAt.localeCompare(b.publishAt));
-  const photographed = new Set(
-    state.posts.filter((p) => !p.withdrawnAt).flatMap((p) => p.productIds),
+  const wallets = balances(state),
+    pending = state.receipts.filter((r) => r.state === 'draft');
+  const needsSnapshots = state.receipts.filter(
+    (r) =>
+      r.state !== 'draft' &&
+      state.proofs.find((p) => p.id === r.proofId)?.payload.evidenceVersion !==
+        2,
+  ).length;
+  async function prepareSnapshots() {
+    if (await store.send({ type: 'seal-records' }))
+      setMessage(
+        'Imported records now have local fingerprints. Missing original documents remain marked; nothing has been registered on-chain.',
+      );
+  }
+  const totals = wallets.reduce(
+    (a, d) => ({
+      donated: a.donated + d.donated,
+      pending: a.pending + d.pending,
+      used: a.used + d.used,
+    }),
+    { donated: 0, pending: 0, used: 0 },
   );
-  const unpictured = state.receipts
-    .filter((r) => r.state === 'funded')
-    .flatMap((receipt) =>
-      receipt.products
-        .filter((p) => !p.id.endsWith(':unitemized') && !photographed.has(p.id))
-        .map((product) => ({ receipt, product })),
-    );
-  const receiptDetail = state.receipts.find((r) => r.id === receiptDetailId);
-  const photoDetail = state.posts.find((p) => p.id === photoId);
-  const proof = state.proofs.find((p) => p.id === proofId) ?? null;
-  const proofReceipt = state.receipts.find(
-    (r) => r.id === proof?.payload.entityId,
-  );
-  const donor = wallets.find((d) => d.id === selectedDonor)!;
-  const donorItems = donorProducts(state, selectedDonor);
-  const dogIds = supportedDogs(state, selectedDonor, clock);
+  const donor = wallets.find((d) => d.id === selectedDonor) ?? wallets[0],
+    items = donorProducts(state, donor.id);
   const filtered = state.receipts
     .filter(
       (r) =>
         filter === 'all' ||
-        (filter === 'active' && r.source !== 'workbook') ||
-        (filter === 'workbook' && r.source === 'workbook') ||
-        r.state === filter,
+        r.state === filter ||
+        (filter === 'workbook' && r.source === 'workbook'),
     )
     .filter((r) =>
-      `${r.supplier} ${r.reference} ${r.products.map((p) => p.description).join(' ')}`
+      (
+        r.supplier +
+        ' ' +
+        r.reference +
+        ' ' +
+        r.products.map((p) => p.description).join(' ')
+      )
         .toLowerCase()
         .includes(search.toLowerCase()),
     )
@@ -129,126 +257,88 @@ export default function StaffWorkspace() {
         b.createdAt.localeCompare(a.createdAt) ||
         b.purchasedAt.localeCompare(a.purchasedAt),
     );
-  const days = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date(clock);
-    date.setDate(date.getDate() + i);
-    return stockDay(date.getTime());
-  });
-  const selectedDay = calendarDay ?? days[0];
-  const dailyPosts = state.posts
-    .filter((p) => !p.withdrawnAt && stockDay(p.publishAt) === selectedDay)
-    .sort((a, b) => a.publishAt.localeCompare(b.publishAt));
-  function changeTab(value: Tab) {
-    setTab(value);
-    setSearch('');
-    setLimit(12);
-    store.clearError();
-  }
-  function editReceipt(receipt?: Receipt) {
-    store.clearError();
-    setReceiptEditor(receipt ?? true);
-  }
-  function addPhoto(productId?: string, milestone = false) {
-    store.clearError();
-    setPhotoEditor({
-      productId,
-      milestone,
-      publishDay: tab === 'stories' ? (calendarDay ?? days[0]) : undefined,
-    });
-  }
-  function correct(type: 'receipt' | 'post', id: string) {
-    setReason('');
-    store.clearError();
-    setCorrection({ type, id });
-  }
-  async function confirmCorrection() {
-    if (!correction) return;
-    const action =
-      correction.type === 'receipt'
-        ? { type: 'void' as const, receiptId: correction.id, reason }
-        : { type: 'withdraw' as const, postId: correction.id, reason };
-    if (await store.send(action)) {
+  const proof = state.proofs.find((p) => p.id === proofId),
+    proofReceipt = state.receipts.find((r) => r.id === proof?.payload.entityId);
+  async function seal(r: Receipt) {
+    if (await store.send({ type: 'seal-record', receiptId: r.id }))
       setMessage(
-        correction.type === 'receipt'
-          ? 'Correction recorded. Contributions are available again; the original assignment remains in the history.'
-          : 'Update withdrawn. It no longer appears in public stories or the live shelter.',
+        'Current receipt snapshot registered. Open Verify & anchor to check or publish its fingerprint.',
       );
+  }
+  async function correct() {
+    if (!correction) return;
+    if (await store.send({ type: 'void', receiptId: correction.id, reason })) {
       setCorrection(null);
-      setReceiptDetailId(null);
-      setPhotoId(null);
+      setReason('');
+      setMessage(
+        'Correction recorded. The assigned funds are pending again; original records remain in the history.',
+      );
     }
   }
   function exportLedger() {
-    if (!state) return;
-    const data = {
-      exportedAt: new Date().toISOString(),
-      environment: 'local-demo',
-      donors: wallets.map(({ id, name, donated, pending, used }) => ({
-        id,
-        name,
-        donatedOre: donated,
-        availableOre: pending,
-        usedOre: used,
-      })),
-      receipts: state.receipts,
-      audit: state.audit,
-      proofs: state.proofs,
-    };
     const url = URL.createObjectURL(
-      new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
+      new Blob(
+        [
+          JSON.stringify(
+            {
+              exportedAt: new Date().toISOString(),
+              environment: 'local-demo',
+              wallets,
+              receipts: state!.receipts,
+              proofs: state!.proofs,
+              audit: state!.audit,
+            },
+            null,
+            2,
+          ),
+        ],
+        { type: 'application/json' },
+      ),
     );
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `hundstallet-care-records-${stockDay(clock)}.json`;
-    link.click();
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'hundstallet-ledger.json';
+    a.click();
     URL.revokeObjectURL(url);
   }
   const receiptCard = (r: Receipt) => {
-    const post = active.find((p) =>
-      p.productIds.some((id) => r.products.some((p) => p.id === id)),
-    );
-    const isUnitemized = r.products.some((p) => p.id.endsWith(':unitemized'));
+    const record = state.proofs.find((p) => p.id === r.proofId),
+      unitemized = r.products.some((p) => p.id.endsWith(':unitemized'));
     return (
-      <article className="cp-staff-receipt" key={r.id}>
-        <div className="cp-staff-receipt-summary">
+      <article className="gs-staff-receipt" key={r.id}>
+        <div className="gs-staff-receipt-top">
           <CategoryIcon category={r.products[0].category} />
           <div>
-            <div className="cp-receipt-badges">
-              <span className={`cp-status cp-status-${r.state}`}>
+            <div className="gs-receipt-tags">
+              <span className={'cp-status cp-status-' + r.state}>
                 {r.state === 'draft'
                   ? 'Pending allocation'
-                  : r.state === 'voided'
-                    ? 'Corrected'
-                    : 'Allocated'}
+                  : r.state === 'funded'
+                    ? 'Allocated'
+                    : 'Corrected'}
               </span>
               {r.source === 'workbook' && (
-                <span className="cp-tag">Workbook</span>
+                <span className="cp-tag">Spreadsheet import</span>
               )}
-              {r.source === 'demo' && <span className="cp-tag">Sample</span>}
             </div>
-            <button
-              className="cp-receipt-name"
-              onClick={() => setReceiptDetailId(r.id)}
-            >
-              {r.supplier}
-              <ChevronRight size={15} />
-            </button>
+            <h3>{r.supplier}</h3>
             <small>
               {r.reference} · {dateLabel(r.purchasedAt, false)} ·{' '}
-              {isUnitemized
-                ? 'Product details not supplied'
-                : `${r.products.length} purchased items`}
+              {r.products.length}{' '}
+              {unitemized ? 'unitemized record' : 'products'}
             </small>
           </div>
-          <strong>
-            {money(r.totalOre)} <small>SEK</small>
-          </strong>
+          <strong>{money(r.totalOre)} SEK</strong>
         </div>
-        <div className="cp-staff-receipt-bottom">
-          <details className="cp-product-disclosure">
-            <summary>Products & contributors</summary>
-            {r.products.map((p) => (
-              <div className="cp-staff-product" key={p.id}>
+        <details className="gs-staff-products" open={r.source !== 'workbook'}>
+          <summary>Products, donors & photos</summary>
+          {r.products.map((p) => {
+            const photos = state.posts.filter(
+              (post) => !post.withdrawnAt && post.productIds.includes(p.id),
+            );
+            return (
+              <div className="gs-staff-product" key={p.id}>
+                <CategoryIcon category={p.category} />
                 <span>
                   <strong>{p.description}</strong>
                   <small>
@@ -256,679 +346,299 @@ export default function StaffWorkspace() {
                       ? p.shares
                           .map(
                             (s) =>
-                              `${state.donors.find((d) => d.id === s.donorId)!.name} · ${money(s.amountOre)} SEK`,
+                              (wallets.find((d) => d.id === s.donorId)?.name ??
+                                s.donorId) +
+                              ' · ' +
+                              money(s.amountOre) +
+                              ' SEK',
                           )
                           .join(' / ')
-                      : 'Not allocated yet'}
+                      : 'Awaiting donor assignment'}
                   </small>
                 </span>
                 <b>{money(p.amountOre)} SEK</b>
-                {r.state === 'funded' && !isUnitemized && (
+                {r.state === 'funded' && !unitemized && (
                   <button
-                    className="cp-icon-button"
-                    aria-label={`Add photo for ${p.description}`}
-                    onClick={() => addPhoto(p.id)}
+                    className="gs-photo-slot"
+                    onClick={() => setPhotoProduct(p)}
+                    aria-label={'Add care photo for ' + p.description}
                   >
-                    <ImagePlus size={18} />
+                    {photos[0] ? (
+                      <CareImage
+                        src={photos[0].photo?.url ?? photos[0].demoPhoto}
+                        alt="Care photo"
+                        width={120}
+                        height={120}
+                      />
+                    ) : (
+                      <ImagePlus size={23} />
+                    )}
                   </button>
                 )}
               </div>
-            ))}
-          </details>
-          <div className="cp-receipt-card-actions">
+            );
+          })}
+        </details>
+        <footer className="gs-staff-receipt-actions">
+          {r.file ? (
+            <a href={r.file.url} target="_blank" rel="noreferrer">
+              <FileText size={16} /> Original receipt ↗
+            </a>
+          ) : (
+            <small>Original document unavailable</small>
+          )}
+          <div>
             {r.state === 'draft' ? (
               <>
-                <Button variant="outline" onClick={() => editReceipt(r)}>
-                  Edit details
+                <Button variant="outline" onClick={() => setEditor(r)}>
+                  Edit products
                 </Button>
-                <Primary
-                  onClick={() => {
-                    store.clearError();
-                    setAllocation(r.id);
-                  }}
-                >
-                  Allocate products <ArrowUpRight size={15} />
+                <Primary onClick={() => setAllocation(r.id)}>
+                  Allocate products <ArrowRight size={15} />
                 </Primary>
               </>
-            ) : r.state === 'funded' ? (
-              isUnitemized ? (
-                <Button variant="outline" onClick={() => editReceipt(r)}>
-                  Add original product details
-                </Button>
-              ) : (
-                <button
-                  className="cp-care-photo-slot"
-                  onClick={() =>
-                    post ? setPhotoId(post.id) : addPhoto(r.products[0].id)
-                  }
-                >
-                  {post ? (
-                    <>
-                      <CareImage
-                        src={post.photo?.url ?? post.demoPhoto}
-                        alt={post.title}
-                      />
-                      <span>View care photo</span>
-                    </>
-                  ) : (
-                    <>
-                      <ImagePlus size={24} />
-                      <span>Add care photo</span>
-                    </>
-                  )}
-                </button>
-              )
             ) : (
-              <span className="cp-muted">{r.reason}</span>
+              <>
+                {unitemized && r.state === 'funded' && (
+                  <Button variant="outline" onClick={() => setEditor(r)}>
+                    Add original product details
+                  </Button>
+                )}
+                {record?.payload.evidenceVersion === 2 ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setProofId(record.id)}
+                  >
+                    <ShieldCheck size={16} />
+                    {record.anchors.length
+                      ? 'Verify on-chain'
+                      : 'Verify & anchor'}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    disabled={store.busy}
+                    onClick={() => void seal(r)}
+                  >
+                    <ShieldCheck size={16} /> Register snapshot
+                  </Button>
+                )}
+                {r.state === 'funded' && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setCorrection(r);
+                      setReason('');
+                    }}
+                  >
+                    Correct
+                  </Button>
+                )}
+              </>
             )}
           </div>
-        </div>
+        </footer>
       </article>
     );
   };
   return (
-    <div className="care-platform cp-staff">
+    <div className="care-platform gs-platform">
       <Header staff online={store.online} />
-      <main className="cp-staff-main">
-        <div className="cp-staff-intro">
+      <main className="gs-main gs-staff-main">
+        <div className="gs-staff-heading">
           <div>
-            <span className="cp-eyebrow">LESS ADMIN. MORE TIME WITH DOGS.</span>
-            <h1>A little care, made visible.</h1>
-            <p>Receipts in. Moments out. Every contribution accounted for.</p>
+            <h1>Care, accounted for.</h1>
+            <p>Upload receipts. Check products. Allocate once.</p>
           </div>
-          <div className="cp-inline-actions">
-            <Button variant="outline" onClick={() => addPhoto()}>
-              <Camera size={17} /> Add care photo
-            </Button>
-            <Primary onClick={() => editReceipt()}>
-              <Plus size={19} /> Add receipts or invoices
-            </Primary>
-          </div>
+          <Primary
+            onClick={() => {
+              store.clearError();
+              setEditor(true);
+            }}
+          >
+            <Plus size={20} /> Add receipts or invoices
+          </Primary>
         </div>
-        {message && (
-          <div className="cp-dismissable">
-            <Notice kind="success">{message}</Notice>
-            <button onClick={() => setMessage('')} aria-label="Dismiss message">
-              ×
-            </button>
-          </div>
+        {(message || store.error) && (
+          <Notice kind={store.error ? 'error' : 'success'}>
+            {store.error || message}
+          </Notice>
         )}
-        {store.error &&
-          !receiptEditor &&
-          !photoEditor &&
-          !allocation &&
-          !correction && <Notice kind="error">{store.error}</Notice>}
-        <div className="cp-staff-stats">
-          <button onClick={() => changeTab('supporters')}>
-            <span>
-              <Users size={16} /> Total donated
-            </span>
-            <strong>
-              {money(donated)} <small>SEK</small>
-            </strong>
-            <small>{wallets.length} supporter portfolios</small>
-          </button>
-          <button
-            onClick={() => {
-              changeTab('receipts');
-              setFilter('draft');
-            }}
-          >
-            <span>
-              <Wallet size={16} /> Available to spend
-            </span>
-            <strong>
-              {money(available)} <small>SEK</small>
-            </strong>
-            <small>
-              {pending.length
-                ? `${pending.length} receipts ready for allocation`
-                : 'Ready for the next care purchase'}
-            </small>
-          </button>
-          <button
-            onClick={() => {
-              changeTab('receipts');
-              setFilter('funded');
-            }}
-          >
-            <span>
-              <CheckCircle2 size={16} /> Used for care
-            </span>
-            <strong>
-              {money(used)} <small>SEK</small>
-            </strong>
-            <small>Linked to recorded purchases</small>
-          </button>
-        </div>
-        <div className="cp-staff-nav-row">
-          <nav className="cp-staff-tabs" aria-label="Staff workspace">
-            {(
-              [
-                {
-                  id: 'today',
-                  label: 'Today',
-                  icon: ListChecks,
-                  count: pending.length + unpictured.length,
-                },
-                {
-                  id: 'receipts',
-                  label: 'Receipts & products',
-                  icon: FileText,
-                },
-                { id: 'supporters', label: 'Supporters', icon: Users },
-                {
-                  id: 'stories',
-                  label: 'Stories & calendar',
-                  icon: CalendarDays,
-                },
-              ] as const
-            ).map((t) => (
-              <button
-                key={t.id}
-                className={tab === t.id ? 'active' : ''}
-                aria-current={tab === t.id ? 'page' : undefined}
-                onClick={() => changeTab(t.id)}
-              >
-                <t.icon size={18} />
-                {t.label}
-                {'count' in t && t.count > 0 && <span>{t.count}</span>}
-              </button>
-            ))}
-          </nav>
-          <button className="cp-text-link" onClick={exportLedger}>
-            <ArrowDownToLine size={15} /> Export records
-          </button>
-        </div>
-        {tab === 'today' && (
-          <div className="cp-staff-today">
-            <div className="cp-todo-main">
-              <div className="cp-section-title">
-                <div>
-                  <span className="cp-eyebrow">THE NEXT SMALL STEPS</span>
-                  <h2>Your care inbox</h2>
-                </div>
-                <span>{pending.length + unpictured.length} to do</span>
-              </div>
-              {pending.length > 0 && (
-                <section className="cp-todo-group">
-                  <div className="cp-section-title">
-                    <h3>Ready to allocate</h3>
-                    <button
-                      className="cp-text-link"
-                      onClick={() => setAllocation('all')}
-                    >
-                      Review all <ArrowUpRight size={15} />
-                    </button>
-                  </div>
-                  {pending.slice(0, 3).map((r) => (
-                    <button
-                      className="cp-todo-row"
-                      key={r.id}
-                      onClick={() => setAllocation(r.id)}
-                    >
-                      <span className="cp-todo-icon">
-                        <FileText size={22} />
-                      </span>
-                      <span>
-                        <strong>{r.supplier}</strong>
-                        <small>
-                          {r.products.length} items · {r.reference}
-                        </small>
-                      </span>
-                      <b>{money(r.totalOre)} SEK</b>
-                      <ChevronRight size={18} />
-                    </button>
-                  ))}
-                </section>
-              )}
-              <section className="cp-todo-group">
-                <div className="cp-section-title">
-                  <h3>A photo makes the connection</h3>
-                  <span>{unpictured.length}</span>
-                </div>
-                <p>
-                  These funded products are waiting for a photo and the dogs who
-                  used them.
-                </p>
-                {unpictured.slice(0, 8).map(({ receipt, product }) => (
-                  <button
-                    className="cp-todo-row"
-                    key={product.id}
-                    onClick={() => addPhoto(product.id)}
-                  >
-                    <CategoryIcon category={product.category} />
-                    <span>
-                      <strong>{product.description}</strong>
-                      <small>
-                        {receipt.supplier} · {money(product.amountOre)} SEK
-                      </small>
-                    </span>
-                    <span className="cp-todo-camera">
-                      <ImagePlus size={21} />
-                      <small>Add photo</small>
-                    </span>
-                  </button>
-                ))}
-                {!unpictured.length && (
-                  <div className="cp-todo-clear">
-                    <CheckCircle2 size={31} />
-                    <h3>Every funded item has a moment.</h3>
-                    <p>
-                      Add your next receipt, or share another chapter in a dog’s
-                      story.
-                    </p>
-                  </div>
-                )}
-                {unpictured.length > 8 && (
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      changeTab('receipts');
-                      setFilter('funded');
-                    }}
-                  >
-                    See all funded products <ChevronRight size={16} />
-                  </Button>
-                )}
-              </section>
-              <div className="cp-staff-how">
-                <span>
-                  <b>1</b> Add a receipt
-                </span>
-                <ChevronRight size={15} />
-                <span>
-                  <b>2</b> Check & allocate
-                </span>
-                <ChevronRight size={15} />
-                <span>
-                  <b>3</b> Photo + dogs
-                </span>
-              </div>
+        <div className="gs-staff-totals">
+          {[
+            { label: 'Total donated', value: totals.donated },
+            { label: 'Available to spend', value: totals.pending },
+            { label: 'Used for care', value: totals.used },
+          ].map((t) => (
+            <div key={t.label}>
+              <span>{t.label}</span>
+              <strong>
+                {money(t.value)} <small>SEK</small>
+              </strong>
             </div>
-            <aside className="cp-staff-aside">
-              <section className="cp-staff-scheduled">
-                <div className="cp-section-title">
-                  <h2>Coming up</h2>
-                  <Clock size={19} />
-                </div>
-                {scheduled.slice(0, 4).map((p) => (
-                  <button
-                    key={p.id}
-                    aria-label={`Open ${p.title}`}
-                    onClick={() => setPhotoId(p.id)}
-                  >
-                    <CareImage src={p.photo?.url ?? p.demoPhoto} alt="" />
-                    <span>
-                      <strong>{p.title}</strong>
-                      <small>{dateLabel(p.publishAt)}</small>
-                    </span>
-                  </button>
-                ))}
-                {!scheduled.length && (
-                  <p>
-                    No scheduled updates. A photo can be published now or saved
-                    for a later moment.
-                  </p>
-                )}
-                <Button
-                  variant="outline"
-                  onClick={() => addPhoto(undefined, true)}
-                >
-                  <Plus size={16} /> Add a story milestone
-                </Button>
-              </section>
-              <section className="cp-staff-last">
-                <span className="cp-eyebrow">LATEST SHARED MOMENT</span>
-                {active[0] ? (
-                  <>
-                    <Photo
-                      post={active[0]}
-                      onClick={() => setPhotoId(active[0].id)}
-                    />
-                    <h3>{active[0].title}</h3>
-                    <p>{dateLabel(active[0].publishAt)}</p>
-                  </>
-                ) : (
-                  <p>Your next photo starts the story.</p>
-                )}
-              </section>
-              <Notice>
-                All accounts, contributions and care posts in this workspace are
-                local prototype data. No payment is taken.
-              </Notice>
-            </aside>
+          ))}
+        </div>
+        <div className="gs-staff-toolbar">
+          <div className="gs-view-switch" aria-label="Staff workspace view">
+            <Button
+              variant={tab === 'receipts' ? 'default' : 'ghost'}
+              onClick={() => setTab('receipts')}
+            >
+              <ReceiptText size={17} /> Receipts & products
+            </Button>
+            <Button
+              variant={tab === 'donors' ? 'default' : 'ghost'}
+              onClick={() => setTab('donors')}
+            >
+              <Users size={17} /> Donors
+            </Button>
           </div>
-        )}
-        {tab === 'receipts' && (
-          <section className="cp-staff-panel">
-            <div className="cp-section-title">
+          <Button variant="outline" onClick={exportLedger}>
+            <Download size={16} /> Export ledger
+          </Button>
+        </div>
+        {tab === 'receipts' ? (
+          <section className="gs-transactions">
+            <header>
               <div>
                 <h2>All care transactions</h2>
                 <p>
-                  Receipts contain products. Products connect supporters to
-                  care.
+                  {pending.length} receipts awaiting allocation · products keep
+                  their exact prices.
                 </p>
               </div>
               <Primary
-                disabled={!pending.length}
+                disabled={!pending.length || store.busy}
                 onClick={() => setAllocation('all')}
               >
-                Distribute products to supporters <ArrowUpRight size={16} />
+                Distribute products to donors <ArrowRight size={17} />
               </Primary>
-            </div>
-            <div className="cp-filter-row">
-              <div className="cp-filter-chips">
-                {[
-                  { id: 'active', label: 'Recent workspace' },
-                  { id: 'draft', label: `Pending (${pending.length})` },
-                  { id: 'funded', label: 'Allocated' },
-                  { id: 'workbook', label: 'Imported workbook' },
-                  { id: 'voided', label: 'Corrected' },
-                  { id: 'all', label: 'All' },
-                ].map((f) => (
-                  <button
-                    className={filter === f.id ? 'active' : ''}
-                    key={f.id}
-                    onClick={() => {
-                      setFilter(f.id);
-                      setLimit(12);
-                    }}
-                  >
-                    {f.label}
-                  </button>
-                ))}
+            </header>
+            {needsSnapshots > 0 && (
+              <div className="gs-import-banner">
+                <span>
+                  {needsSnapshots} older records have no complete fingerprint.
+                </span>
+                <Button
+                  variant="outline"
+                  disabled={store.busy}
+                  onClick={() => void prepareSnapshots()}
+                >
+                  <ShieldCheck size={16} /> Register imported records
+                </Button>
               </div>
-              <label className="cp-search">
-                <Search size={16} />
+            )}
+            <div className="gs-filter-row">
+              <label className="gs-search">
+                <Search size={18} />
                 <input
-                  aria-label="Search receipts and products"
-                  placeholder="Supplier, receipt, product…"
+                  aria-label="Search receipts"
                   value={search}
+                  placeholder="Supplier, receipt or product"
                   onChange={(e) => {
                     setSearch(e.target.value);
                     setLimit(12);
                   }}
                 />
               </label>
-            </div>
-            {filter === 'workbook' && (
-              <Notice>
-                100 original spreadsheet records. Dates, categories and amounts
-                are preserved. Add the original receipt to identify its
-                products; no extra donation is spent.
-              </Notice>
-            )}
-            <div>
-              {filtered.slice(0, limit).map(receiptCard)}
-              {!filtered.length && (
-                <div className="cp-todo-clear">
-                  <FileText size={30} />
-                  <h3>No matching receipts</h3>
-                  <p>New documents are reviewed before they use donations.</p>
-                  <Button variant="outline" onClick={() => editReceipt()}>
-                    Add a receipt
-                  </Button>
-                </div>
-              )}
-            </div>
-            {filtered.length > limit && (
-              <Button
-                variant="outline"
-                className="cp-load-more"
-                onClick={() => setLimit(limit + 24)}
+              <select
+                aria-label="Filter receipts"
+                value={filter}
+                onChange={(e) => {
+                  setFilter(e.target.value);
+                  setLimit(12);
+                }}
               >
-                Show more · {filtered.length - limit} remaining
+                <option value="all">All transactions</option>
+                <option value="draft">Pending allocation</option>
+                <option value="funded">Allocated</option>
+                <option value="voided">Corrected</option>
+                <option value="workbook">Spreadsheet imports</option>
+              </select>
+            </div>
+            {filtered.slice(0, limit).map(receiptCard)}
+            {!filtered.length && (
+              <p className="gs-empty-list">No receipts match this view.</p>
+            )}
+            {filtered.length > limit && (
+              <Button variant="outline" onClick={() => setLimit((n) => n + 20)}>
+                Show more ({filtered.length - limit} remaining)
               </Button>
             )}
           </section>
-        )}
-        {tab === 'supporters' && (
-          <div className="cp-supporters-layout">
-            <aside className="cp-supporter-picker">
-              <h2>Supporter portfolios</h2>
+        ) : (
+          <div className="gs-donor-portfolios">
+            <aside>
               {wallets.map((d) => (
                 <button
+                  className={d.id === donor.id ? 'active' : ''}
                   key={d.id}
-                  className={d.id === selectedDonor ? 'selected' : ''}
                   onClick={() => setSelectedDonor(d.id)}
                 >
-                  <span className="cp-person-avatar">
-                    {d.name
-                      .split(' ')
-                      .map((s) => s[0])
-                      .join('')
-                      .slice(0, 2)}
-                  </span>
-                  <span>
-                    <strong>{d.name}</strong>
-                    <small>{money(d.pending)} SEK available</small>
-                  </span>
-                  <ChevronRight size={15} />
+                  <strong>{d.name}</strong>
+                  <span>{money(d.pending)} SEK pending</span>
+                  <small>{money(d.used)} SEK used</small>
                 </button>
               ))}
             </aside>
-            <section className="cp-staff-panel">
-              <div className="cp-section-title">
+            <section className="gs-transactions">
+              <header>
                 <div>
-                  <span className="cp-eyebrow">SUPPORTER PORTFOLIO</span>
                   <h2>{donor.name}</h2>
-                  <p>{donor.shelterName}</p>
+                  <p>
+                    {money(donor.donated)} SEK donated · {money(donor.pending)}{' '}
+                    SEK pending · {money(donor.used)} SEK used
+                  </p>
                 </div>
                 <a
-                  className="cp-text-link"
-                  href={`/?donor=${encodeURIComponent(donor.id)}`}
+                  href={'/?donor=' + donor.id}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Open their shelter <ArrowUpRight size={15} />
+                  Open shelter ↗
                 </a>
-              </div>
-              <div className="cp-supporter-stats">
-                <span>
-                  Total donated
-                  <strong>
-                    {money(donor.donated)} <small>SEK</small>
-                  </strong>
-                </span>
-                <span>
-                  Available
-                  <strong>
-                    {money(donor.pending)} <small>SEK</small>
-                  </strong>
-                </span>
-                <span>
-                  Used for care
-                  <strong>
-                    {money(donor.used)} <small>SEK</small>
-                  </strong>
-                </span>
-              </div>
-              <h3>Dogs connected to funded care</h3>
-              <div className="cp-supporter-dogs">
-                {dogIds.map((id) => {
-                  const d = profileDogs.find((d) => d.id === id)!;
-                  return (
-                    <div key={id}>
-                      <DogPortrait dog={d} />
-                      <strong>{d.name}</strong>
-                    </div>
-                  );
-                })}
-                {!dogIds.length && (
-                  <p>
-                    Dogs appear when a published care photo identifies who
-                    benefited.
-                  </p>
-                )}
-              </div>
-              <h3>Precisely what their contribution funded</h3>
-              <div className="cp-record-table">
-                {donorItems.map(({ receipt, product, contribution }) => (
-                  <button
-                    key={product.id}
-                    onClick={() => setReceiptDetailId(receipt.id)}
-                  >
+              </header>
+              <div className="gs-product-list">
+                {items.map(({ product, receipt, contribution }) => (
+                  <div key={product.id}>
                     <CategoryIcon category={product.category} />
                     <span>
                       <strong>{product.description}</strong>
                       <small>
-                        {receipt.reference} ·{' '}
+                        {receipt.supplier} ·{' '}
                         {dateLabel(receipt.purchasedAt, false)}
                       </small>
                     </span>
-                    <span>
-                      <strong>{money(contribution)} SEK</strong>
-                      <small>of {money(product.amountOre)} SEK</small>
-                    </span>
-                    <ArrowUpRight size={15} />
-                  </button>
+                    <b>{money(contribution)} SEK</b>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setTab('receipts');
+                        setSearch(receipt.reference);
+                        setFilter('all');
+                      }}
+                    >
+                      Receipt
+                    </Button>
+                  </div>
                 ))}
               </div>
+              {!items.length && (
+                <p className="gs-empty-list">No products assigned yet.</p>
+              )}
             </section>
           </div>
         )}
-        {tab === 'stories' && (
-          <section className="cp-staff-panel">
-            <div className="cp-section-title">
-              <div>
-                <h2>A calendar of second chances</h2>
-                <p>
-                  Published photos guide the live shelter and stay in each dog’s
-                  journey.
-                </p>
-              </div>
-              <Primary onClick={() => addPhoto(undefined, true)}>
-                <Plus size={17} /> New milestone
-              </Primary>
-            </div>
-            <div className="cp-calendar-days">
-              {days.map((day) => {
-                const n = state.posts.filter(
-                  (p) => !p.withdrawnAt && stockDay(p.publishAt) === day,
-                ).length;
-                return (
-                  <button
-                    key={day}
-                    className={day === selectedDay ? 'selected' : ''}
-                    onClick={() => setCalendarDay(day)}
-                  >
-                    <span>
-                      {new Intl.DateTimeFormat('en-GB', {
-                        weekday: 'short',
-                        timeZone: 'Europe/Stockholm',
-                      }).format(new Date(`${day}T12:00:00Z`))}
-                    </span>
-                    <strong>{Number(day.slice(-2))}</strong>
-                    <small>{n ? `${n} updates` : '—'}</small>
-                  </button>
-                );
-              })}
-            </div>
-            <div className="cp-section-title">
-              <h3>{dateLabel(selectedDay, false)}</h3>
-              <label className="cp-field cp-calendar-date">
-                Choose a date
-                <input
-                  type="date"
-                  value={selectedDay}
-                  onChange={(e) => setCalendarDay(e.target.value || null)}
-                />
-              </label>
-            </div>
-            <div className="cp-story-grid">
-              {dailyPosts.map((p) => (
-                <article key={p.id}>
-                  <Photo post={p} onClick={() => setPhotoId(p.id)} />
-                  <div>
-                    <span
-                      className={`cp-status cp-status-${Date.parse(p.publishAt) > clock ? 'draft' : 'funded'}`}
-                    >
-                      {Date.parse(p.publishAt) > clock
-                        ? 'Scheduled'
-                        : 'Published'}{' '}
-                      ·{' '}
-                      {new Intl.DateTimeFormat('en-GB', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        timeZone: 'Europe/Stockholm',
-                      }).format(new Date(p.publishAt))}
-                    </span>
-                    <h3>{p.title}</h3>
-                    <p>
-                      {p.dogIds
-                        .map((id) => profileDogs.find((d) => d.id === id)?.name)
-                        .join(' & ')}
-                    </p>
-                    <small>
-                      {p.stage
-                        ? stages.find((s) => s.id === p.stage)?.label
-                        : categoryFor(p.category).label}
-                    </small>
-                  </div>
-                </article>
-              ))}
-            </div>
-            {!dailyPosts.length && (
-              <div className="cp-todo-clear">
-                <CalendarDays size={30} />
-                <h3>An open page in their story</h3>
-                <p>No updates scheduled or published for this date.</p>
-                <Button
-                  variant="outline"
-                  onClick={() => addPhoto(undefined, true)}
-                >
-                  Add a photo milestone
-                </Button>
-              </div>
-            )}
-            <details className="cp-details">
-              <summary>Recent changes & corrections</summary>
-              <div className="cp-audit-list">
-                {[...state.audit]
-                  .reverse()
-                  .slice(0, 30)
-                  .map((event) => (
-                    <div key={event.id}>
-                      <small>{dateLabel(event.at)}</small>
-                      <strong>{event.kind.replaceAll('.', ' · ')}</strong>
-                      <span>{event.note}</span>
-                    </div>
-                  ))}
-              </div>
-            </details>
-          </section>
-        )}
+        <p className="gs-prototype-note">
+          Local prototype with sample donor accounts. Blockchain registration
+          uses Sepolia testnet; a fingerprint is not proof that care occurred.
+        </p>
       </main>
-      <footer className="cp-staff-footer">
-        <ShieldCheck size={15} />
-        <span>
-          Shared local records · reviewed receipts · traceable corrections
-        </span>
-        <small>
-          Local prototype. No external staff connection or automatic payment
-          processing.
-        </small>
-      </footer>
-      {receiptEditor && (
+      {editor && (
         <ReceiptDialog
           store={store}
-          receipt={receiptEditor === true ? undefined : receiptEditor}
-          onClose={() => setReceiptEditor(null)}
-          onSaved={(text) => {
-            setMessage(text);
-            setTab('receipts');
-            setFilter('draft');
-          }}
-        />
-      )}
-      {photoEditor && (
-        <PhotoComposer
-          store={store}
-          initialProductId={photoEditor.productId}
-          initialPublishDay={photoEditor.publishDay}
-          milestone={photoEditor.milestone}
-          onClose={() => setPhotoEditor(null)}
+          receipt={editor === true ? undefined : editor}
+          onClose={() => setEditor(null)}
           onSaved={setMessage}
         />
       )}
@@ -937,181 +647,59 @@ export default function StaffWorkspace() {
           store={store}
           receiptId={allocation}
           onClose={() => setAllocation(null)}
-          onSaved={(text) => {
-            setMessage(text);
-            setTab('today');
-          }}
+          onSaved={setMessage}
         />
       )}
-      <Modal
-        wide
-        open={!!receiptDetail}
-        onClose={() => setReceiptDetailId(null)}
-        title={receiptDetail?.supplier ?? 'Care record'}
-        description={
-          receiptDetail
-            ? `${receiptDetail.reference} · ${dateLabel(receiptDetail.purchasedAt, false)}`
-            : undefined
-        }
-      >
-        {receiptDetail && (
-          <>
-            <div className="cp-receipt-total">
-              <span>Receipt total</span>
-              <strong>{money(receiptDetail.totalOre)} SEK</strong>
-              <span className={`cp-status cp-status-${receiptDetail.state}`}>
-                {receiptDetail.state === 'draft'
-                  ? 'Pending allocation'
-                  : receiptDetail.state === 'voided'
-                    ? 'Corrected — funds returned'
-                    : 'Allocated'}
-              </span>
-            </div>
-            {receiptDetail.products.map((p) => (
-              <div key={p.id} className="cp-product-detail">
-                <CategoryIcon category={p.category} />
-                <span>
-                  <strong>{p.description}</strong>
-                  <small>{categoryFor(p.category).label}</small>
-                  {p.shares.map((s) => (
-                    <small key={s.donorId}>
-                      {state.donors.find((d) => d.id === s.donorId)!.name} ·{' '}
-                      {money(s.amountOre)} SEK
-                    </small>
-                  ))}
-                </span>
-                <b>{money(p.amountOre)} SEK</b>
-              </div>
-            ))}
-            {receiptDetail.file && (
-              <a
-                className="cp-text-link"
-                href={receiptDetail.file.url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Open original document <ArrowUpRight size={15} />
-              </a>
-            )}
-            {receiptDetail.reason && <Notice>{receiptDetail.reason}</Notice>}
-            <div className="cp-inline-actions">
-              {receiptDetail.proofId && (
-                <Button
-                  variant="outline"
-                  onClick={() => setProofId(receiptDetail.proofId!)}
-                >
-                  <ShieldCheck size={16} /> Verify record
-                </Button>
-              )}
-              {receiptDetail.state === 'draft' ? (
-                <Primary
-                  onClick={() => {
-                    setReceiptDetailId(null);
-                    setAllocation(receiptDetail.id);
-                  }}
-                >
-                  Review allocation
-                </Primary>
-              ) : (
-                receiptDetail.state === 'funded' && (
-                  <Button
-                    variant="ghost"
-                    onClick={() => correct('receipt', receiptDetail.id)}
-                  >
-                    Record a correction
-                  </Button>
-                )
-              )}
-            </div>
-          </>
-        )}
-      </Modal>
-      <Modal
-        open={!!photoDetail}
-        onClose={() => setPhotoId(null)}
-        title={photoDetail?.title ?? 'Care photo'}
-        description={
-          photoDetail
-            ? `${Date.parse(photoDetail.publishAt) > clock ? 'Scheduled for' : 'Published'} ${dateLabel(photoDetail.publishAt)}`
-            : undefined
-        }
-      >
-        {photoDetail && (
-          <>
-            <CareImage
-              className="cp-full-photo"
-              src={photoDetail.photo?.url ?? photoDetail.demoPhoto}
-              alt={photoDetail.title}
+      {photoProduct && (
+        <ProductPhotoDialog
+          store={store}
+          product={photoProduct}
+          onClose={() => setPhotoProduct(null)}
+          onSaved={setMessage}
+        />
+      )}
+      {proof && (
+        <ProofDialog
+          key={proof.id}
+          proof={proof}
+          receipt={proofReceipt}
+          allowAnchor
+          onClose={() => setProofId(null)}
+          onRefresh={() => void store.refresh()}
+        />
+      )}
+      {correction && (
+        <Modal
+          open
+          onClose={() => setCorrection(null)}
+          title="Correct this transaction"
+          description="The original receipt and allocation stay in the history. Its funds become available again."
+        >
+          <p>
+            {correction.supplier} · {money(correction.totalOre)} SEK
+          </p>
+          <label className="cp-field">
+            Reason
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              maxLength={500}
             />
-            <span className="cp-tag">
-              {photoDetail.source === 'demo'
-                ? 'Demo story'
-                : categoryFor(photoDetail.category).label}
-            </span>
-            <p>{photoDetail.note}</p>
-            <p>
-              {photoDetail.dogIds
-                .map((id) => profileDogs.find((d) => d.id === id)?.name)
-                .join(' & ')}
-            </p>
-            <small>
-              Photo taken {dateLabel(photoDetail.occurredAt)} · Live for{' '}
-              {photoDetail.liveHours} hours
-            </small>
-            {photoDetail.withdrawnAt ? (
-              <Notice>Withdrawn: {photoDetail.withdrawalReason}</Notice>
-            ) : (
-              <Button
-                variant="ghost"
-                onClick={() => correct('post', photoDetail.id)}
-              >
-                Withdraw this update
-              </Button>
-            )}
-          </>
-        )}
-      </Modal>
-      <Modal
-        open={!!correction}
-        onClose={() => setCorrection(null)}
-        title="Record a correction"
-        description={
-          correction?.type === 'receipt'
-            ? 'The original record remains in the history. Its contributions become available again.'
-            : 'The update leaves the live shelter and public journey, while the correction stays in the history.'
-        }
-      >
-        <label className="cp-field">
-          Reason
-          <textarea
-            value={reason}
-            rows={4}
-            minLength={10}
-            maxLength={500}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Explain what needs correcting"
-          />
-        </label>
-        {store.error && <Notice kind="error">{store.error}</Notice>}
-        <div className="cp-modal-actions">
-          <Button variant="ghost" onClick={() => setCorrection(null)}>
-            Cancel
-          </Button>
-          <Primary
-            disabled={reason.trim().length < 10 || store.busy}
-            onClick={() => void confirmCorrection()}
-          >
-            Confirm correction
-          </Primary>
-        </div>
-      </Modal>
-      <ProofDialog
-        key={proofId ?? 'closed'}
-        proof={proof}
-        receipt={proofReceipt}
-        onClose={() => setProofId(null)}
-        onRefresh={() => void store.refresh()}
-      />
+          </label>
+          {store.error && <Notice kind="error">{store.error}</Notice>}
+          <div className="cp-modal-actions">
+            <Button variant="ghost" onClick={() => setCorrection(null)}>
+              Cancel
+            </Button>
+            <Primary
+              disabled={reason.trim().length < 10 || store.busy}
+              onClick={() => void correct()}
+            >
+              Record correction & return funds
+            </Primary>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

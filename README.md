@@ -1,16 +1,12 @@
-# Hundstallet — A second chance, together
+# Hundstallet — Your growing shelter
 
-An independent, local hackathon prototype connecting a personal virtual shelter to the everyday work behind a dog's second chance.
+Independent local hackathon prototype. The donor experience contains a growing virtual shelter, donation balances, spending statistics and verifiable transactions. Staff upload receipts, review purchased products, allocate them to donor portfolios and attach care photos.
 
-**Donor:** give → follow the funded care → meet the real dog → keep their story.
+Developed in an independent worktree and integrated into `main`. Publishing the repository does not configure a production deployment.
 
-**Staff:** read a receipt → check its products → allocate → photo + dogs → publish.
+## Run locally
 
-This branch is an independent worktree. Nothing is pushed or deployed. Payments and external staff connections are not enabled.
-
-## Open the local platform
-
-Requires Node.js 22.13 or later. The original project can keep running on port 3000; this copy uses **3001** and its own data directory.
+Requires Node.js 22.13+.
 
 ```sh
 npm ci
@@ -18,67 +14,71 @@ npm run db:local
 npm run dev:isolated
 ```
 
-- Donor shelter: http://127.0.0.1:3001/
-- Staff workspace: http://127.0.0.1:3001/staff
-- Shelter map: http://127.0.0.1:3001/explore
-- Independent record checker: http://127.0.0.1:3001/verify
+- Donor: http://127.0.0.1:3001/
+- Staff: http://127.0.0.1:3001/staff
+- Independent proof checker: http://127.0.0.1:3001/verify
 
-The macOS and Windows **Open in browser** launchers install missing dependencies, apply local migrations, and open the app. Keep the terminal open. Migration commands are explicitly local and safe to repeat.
+The original checkout can remain on port 3000. Financial state uses project-local D1/SQLite and uploads use local R2; preserve `.wrangler/state/` to retain this demo. There is no payment capture or production authentication.
 
-On macOS, receipt images are read by Apple Vision and PDFs by PDFKit, with no document sent to an external OCR service. The first image may take longer while the Swift helper compiles. To prepare it before a presentation:
+On macOS, `npm run ocr:build` prepares Apple Vision/PDFKit receipt reading. Images/PDFs stay local. Staff can also upload text, paste extracted text or enter product lines. OCR suggestions always require review.
 
-```sh
-npm run ocr:build
-```
+## Shelter progression
 
-On other operating systems, staff can upload the document and paste its text or enter its product lines. No external OCR key is required. The image/PDF reader is a local development middleware, not a deployed Worker feature.
+Visual companions unlock at cumulative **total donated** thresholds: **50, 100, 150, 200, 300, 400, 500, 700, 1,000, 1,250, 1,500, 1,750, 2,000 SEK**, then another 250 SEK per milestone, up to the 41 individual profiles in the saved public directory. Allocation alone moves money from pending to used; it does not change total donations or unlock companions again. Selection is deterministic per donor: reloads and additional donations preserve the existing prefix. Groups are excluded.
 
-## What is implemented
+These are game progression thresholds, not estimates of dog-care costs or claims about individual beneficiaries.
 
-### Personal shelter
+The garden remains at the map centre. First unlocks occur at these companion counts:
 
-- Real Stockholm date and clock, day/night styling, pause and reduced-motion support. The supplied cushion kennel sits on the lawn in the right half of the scene. Every virtual dog sleeps 21:00–07:00 and takes 3–4 hours of independent daily naps; this is an illustrated routine, not staff evidence. Only a published photo sends an awake dog to a care station; the photo stays live for one or two hours, then remains in the dog's journey.
-- Permanent companions require a positive contribution to a funded product and a published update identifying that dog. A donation alone never claims that a dog received care.
-- Real portraits, pixel avatars, official profile links, following without donating, a photo timeline, and the contributor's care basket. Homecoming milestones move dogs into a lasting **Home at last** section.
-- Custom gifts, three official care examples and one-time/monthly forecasts. Faded dogs appear only when a donor explicitly requests a preview. The collapsed daily forecast accumulates monthly care capacity, keeps unspent remainders and avoids presenting repeated care as new unique recipients.
-- Available/used balances, category and dog spending, receipt details, original documents, and photo evidence. Original workbook records without beneficiary details remain explicitly unattributed.
-- A shared care goal, a copyable local invitation link, participation keepsakes, and official routes for real giving, adoption, fostering and fundraising. These badges have no financial value.
-- All 43 public directory listings remain explorable on the existing Sweden map. Group listings do not masquerade as individual supported dogs.
+| Area | Companions | Door direction |
+|---|---:|---|
+| Kennel | 1 | Right |
+| Kitchen | 2 | Right |
+| Water | 3 | Top / right |
+| Playground | 4 | Left / right |
+| Wellbeing | 6 | Top / right |
+| Care studio | 8 | Left |
+| Sport & pool | 10 | Top / left / right |
 
-### Staff workspace
+All eight families, including the garden, have five generated upgrades: **40 transparent assets**. Each family's entrances stay in the same directions across upgrades. The garden has four exits. Original PNGs, prompts and provenance are in `output/imagegen/shelter-upgrades-v1/`; trimmed, lightweight WebP copies are in `public/care/upgrades/`.
 
-- **Today** prioritizes pending allocations and funded items missing a photo. **Receipts & products**, **Supporters**, and **Stories & calendar** expose the detail when needed.
-- Upload up to ten receipts in a queue; supported documents are JPEG, PNG, WebP, PDF and text, up to 12 MB each. OCR proposes fields; staff must check supplier, reference, date, categories, quantities and final unit prices.
-- Receipt rows expand into individually priced purchased units. Differently priced products stay different. Totals must reconcile exactly in integer öre. Saving a draft does not use donations.
-- A reviewed allocation assigns whole products to available portfolios, balancing the current batch. If no portfolio can cover a costly service alone, that one identifiable item may be co-funded. The service is not turned into fictional equal-priced products.
-- Confirmed allocations never redistribute when a new receipt or gift arrives. Insufficient funds leave the entire allocation pending. Corrections retain the original purchase and restore its funds through an audit entry.
-- Attach a photo, select the funded products and the dogs who used them. The activity category is inherited from those products. A photo never creates another expense.
-- Schedule a photo or journey milestone. Publishing and expiry follow wall time; withdrawal leaves a correction history. A milestone can exist without an expense, but it cannot manufacture financial support.
-- Itemize an imported workbook entry only when its original receipt is attached. The original amount and every existing donor contribution remain unchanged.
-- Export the ledger, product allocations, correction history and record proofs as JSON. Sample supporter shelters can be opened directly from their portfolio.
+Total donations, including pending funds, determine current upgrades. An optional hypothetical gift previews additional companions and upgrades. Locked areas disclose the additional donation needed. Preview funds never alter financial balances.
 
-### Shared records and evidence
+Dogs follow connected routes, hop while travelling and dwell in areas. Stockholm wall time controls day/night and independent 3–4-hour daytime naps. All dogs sleep 21:00–07:00. Sprite movement uses animation-frame transforms; floating Z letters animate during sleep. Reduced motion disables travel and keeps a static sleep indicator. The map supports drag, zoom, fit and arrow-key panning from its zoom controls.
 
-- Staff and donor views use the same local D1/SQLite database. Uploaded documents and photos are in local R2 storage. Financial state is not held in `localStorage`.
-- Polling refreshes visible tabs every three seconds. Optimistic revision checks prevent stale concurrent writes; command IDs make retrying an uncertain response safe.
-- Receipt, gift, photo and correction events append SHA-256 record fingerprints linked to the preceding fingerprint. Original receipt bytes also receive a fingerprint.
-- The verification page checks an exported record or complete chain and compares a receipt file, entirely on the reader's device.
-- An optional Ethereum wallet flow can anchor a fingerprint on **Sepolia**, using a zero-value transaction. The server checks the actual transaction receipt and its data before accepting a confirmed anchor. No wallet key is stored, and no blockchain transaction was sent during development.
-- A local hash checks internal consistency. A separately verified external anchor is needed to independently detect a rewritten local history. Neither hashes nor blockchain prove that an underlying care event was true.
+Random virtual companions are separate from care evidence. Staff photos identify real beneficiary dogs for their linked purchased products; virtual selection never allocates money to a dog.
 
-## Data and boundaries
+## Staff accounting and evidence
 
-The supplied **Fake Transactions.xlsx** is preserved unchanged: all 100 rows, date-only precision, categories and the **4,783 SEK** expense total. The spreadsheet contains no original receipts, product breakdowns, incoming donations or beneficiary identities. Its opening contribution is a balancing demo fixture, not a claimed payment.
+1. Upload up to ten receipts/invoices: JPEG, PNG, WebP, PDF or text, up to 12 MB each.
+2. Review supplier, reference, date, quantities, categories and final unit prices. Different prices stay on separate lines; totals reconcile exactly in integer öre.
+3. Save pending, then review and confirm allocation. Each purchased unit goes whole to one donor. The algorithm balances batch spending, tries alternative feasible assignments and never overdrafts. An item that cannot fit any donor balance stays pending.
+4. Attach a care photo directly to a product and select the dogs. Transaction and category are inherited. Photos never create additional spending.
+5. Verify the receipt, export its proof or anchor its fingerprint on Sepolia.
 
-A separate sample receipt and four sample portfolios make the first demonstration useful. Public profile pictures used in sample care stories are marked **Demo story** and are not represented as photos of a real purchase or treatment. Seeded live moments naturally expire; publish a new, explicitly labelled sample moment for a later demo.
+Previously allocated products never change owners because a later gift or receipt arrives. Duplicate supplier/reference or attached document fingerprints are rejected. Corrections return funds once and remain visible in donor history, with the original record and corrective proof preserved.
 
-Public profiles and sources are a 7 September 2026 snapshot. Photographs retain their original ownership. Lightweight WebP previews preserve the originals and their source manifest; the 106 derivatives total approximately 3.34 MB against 15.36 MB of source images. Uploaded care photos are resized on the client and stripped of embedded camera metadata; receipt documents retain their original bytes.
+Commands are idempotent and revision checks reject conflicting concurrent writes. Monetary state is shared across donor/staff tabs, which refresh every three seconds.
 
-Local state lives in `.wrangler/state/` (ignored by Git); keep that folder to retain demo changes. The `.local/` folder holds the OCR executable, its compiler cache and optional isolated test data. The original checkout's browser storage and data are untouched. No existing browser-only demo gifts are silently imported into this independent copy.
+## Verification boundaries
 
-The service is deliberately restricted to localhost, with sample accounts and no authentication. Before any real launch it needs authorized staff and donor identities, permission boundaries, payment-provider reconciliation, data protection and retention rules, backup/recovery, reviewed accounting attribution, accessible browser/device testing, and a security/dependency review. The current single-snapshot storage is suitable for a hackathon; production should use normalized records and tested operational controls. No production-readiness or fundraising uplift is claimed.
+Version 2 proofs cover supplier, receipt reference/date, provenance, document fingerprint, product descriptions/prices/categories and hashed donor allocations. The transaction details opened through **Verified by blockchain** compare the currently displayed receipt to this canonical snapshot. Exported proofs and documents can also be checked locally on `/verify`.
 
-## Verify the implementation
+Unanchored transaction buttons include **Demo · not yet anchored**; the label is not a claim of confirmed network inclusion.
+
+Imported spreadsheet rows can receive a baseline snapshot through **Register imported records**. Their missing originals and unitemized contents remain explicit. Re-registering unchanged snapshots preserves previous proofs and anchors.
+
+Staff can submit a zero-value wallet transaction containing only a fingerprint on the **Sepolia testnet**. Confirmation checks the network, successful receipt, matching transaction/block hashes and exact fingerprint; repeated confirmation is safe. Donors can recheck a saved network transaction. No wallet transaction was sent during development.
+
+A fingerprint establishes integrity; network inclusion supplies a separately checkable record. Neither proves a purchase occurred, and this local prototype does not authenticate a Hundstallet staff signer.
+
+## Source data
+
+`Fake Transactions.xlsx` remains unchanged: 100 rows, original date-only precision, categories and **4,783 SEK** of expenses. It contains no incoming donations, item breakdowns, receipt documents or beneficiary identities. Its balancing opening gift is explicitly a demo fixture.
+
+Public dog profiles are a **7 September 2026 snapshot**, with original photo ownership and official profile links retained. Images uploaded for care are resized and camera metadata is removed; original receipt bytes are preserved.
+
+## Validation
 
 ```sh
 npm test
@@ -87,27 +87,19 @@ npm run lint:platform
 npm run build
 ```
 
-The suite includes the retained reference models and new platform tests for money conservation, stable ownership, batch allocation, expensive services, duplicate receipts, corrections, itemization, photo/category links, scheduling, expiry, milestones and fingerprint tampering.
+The new growth tests cover exact thresholds, total-donation milestones and hypothetical previews, stable selection, reversals, all 40 assets, route entrances, whole-unit assignment including 10,000-unit batches, duplicate documents, current-receipt tampering, repeat-safe snapshots and invalid blockchain responses.
 
-The HTTP integration check must run against a **separate** QA database and port. Stop the development server first because Vinext runs one server per checkout.
+HTTP integration must use a separate database and port. Vinext permits one dev server per directory: stop the preview first, or run a temporary source copy with its own state.
 
 ```sh
 npx wrangler d1 migrations apply CARE_DB --local --config wrangler.local.jsonc --persist-to .local/qa-state
 CARE_STATE_DIR=.local/qa-state npx vinext dev --host 127.0.0.1 --port 3002
-# In a second terminal:
+# In another terminal:
 CARE_QA_URL=http://127.0.0.1:3002 npm run test:api
 ```
 
-It writes only to the QA instance. Checks include an actual 1.7 MB image upload, file round-trip hashes, idempotency, concurrent requests, product allocation, multiple dogs, corrections and the origin/anchor boundaries. Stop the QA server and restart `npm run dev:isolated` afterward.
+Development QA also exercised actual browser flows on desktop and a 390 px viewport: receipt review/allocation, photo upload with two dogs, donor verification, export/document comparison, correction history, donation previews, pause across a night boundary and reduced motion.
 
-The main implementation is in `components/platform/`, `lib/platform/`, `app/api/platform/`, `hooks/use-care-workspace.ts`, and `db/schema.ts`. The old browser-only components remain as reference, not as the active donor or staff application. Their former documentation is archived in `docs/legacy-prototype.md`.
+The main implementation is in `components/platform/`, `lib/platform/`, `app/api/platform/`, `app/shelter-growth.css` and `hooks/use-care-workspace.ts`. Legacy models remain for regression/reference; collaborative and photo-feed features are absent from the active interface.
 
-## Presentation and sources
-
-Use [the three-minute demo and next validation steps](docs/hackathon-demo.md). The challenge is to earn repeat participation through visible care while reducing staff effort; the prototype demonstrates that loop, not a prediction of increased revenue.
-
-- [Hundstallet's giving examples and official donation page](https://hundstallet.se/stod-oss/)
-- [Public dog directory](https://hundstallet.se/hundar/) and [directory import notes](docs/hundstallet-dog-directory.md)
-- [Foster homes](https://hundstallet.se/engagera-dig/jourhem/) and [fundraisers](https://hundstallet.se/insamlingar/)
-- [How donations are used](https://hundstallet.kb.kundo.se/guide/vad-anvands-mina-pengar-till?category=gavor-och-donationer)
-- [OpenStreetMap attribution](https://www.openstreetmap.org/copyright); local source manifests remain in `public/data/hundstallet/`.
+See [the focused demo](docs/hackathon-demo.md). Before production, Hundstallet must approve the accounting rules; the service needs authenticated roles, authorized payments/reconciliation, privacy/retention, backup/recovery and a reviewed deployment. No fundraising uplift or production readiness is claimed.

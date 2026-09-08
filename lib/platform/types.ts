@@ -139,6 +139,8 @@ export type Action =
   | { type: 'itemize'; receiptId: string; lines: LineDraft[]; file: FileRecord }
   | { type: 'fund'; receiptId: string }
   | { type: 'fund-pending' }
+  | { type: 'seal-record'; receiptId: string }
+  | { type: 'seal-records' }
   | { type: 'void'; receiptId: string; reason: string }
   | { type: 'publish'; post: Omit<CarePost, 'id' | 'source'> }
   | { type: 'withdraw'; postId: string; reason: string }

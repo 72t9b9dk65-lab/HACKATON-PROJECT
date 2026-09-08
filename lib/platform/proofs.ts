@@ -1,4 +1,4 @@
-import type { Proof, Workspace } from './types.ts';
+import type { Proof, Workspace, Receipt } from './types.ts';
 export function canonical(value: unknown): string {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
@@ -82,12 +82,18 @@ export async function appendProofs(
         'receipt.funded',
         'receipt.corrected',
         'receipt.itemized',
+        'receipt.snapshot',
         'care.published',
         'care.withdrawn',
       ].includes(event.kind)
     )
       continue;
     const receipt = next.receipts.find((r) => r.id === event.entityId);
+    if (receipt && event.kind === 'receipt.snapshot') {
+      const existing = next.proofs.find((p) => p.id === receipt.proofId);
+      if (existing && (await verifyReceipt(existing, receipt)) === 'match')
+        continue;
+    }
     const gift = next.gifts.find((g) => g.id === event.entityId);
     const post = next.posts.find((p) => p.id === event.entityId);
     const payload: Record<string, unknown> = {
@@ -98,23 +104,8 @@ export async function appendProofs(
     };
     if (receipt)
       Object.assign(payload, {
-        totalOre: receipt.totalOre,
-        state: receipt.state,
-        documentHash: receipt.file?.hash ?? null,
-        products: await Promise.all(
-          receipt.products.map(async (p) => ({
-            id: p.id,
-            category: p.category,
-            amountOre: p.amountOre,
-            contributions: await Promise.all(
-              p.shares.map(async (s) => ({
-                supporter: await sha256(`supporter:${s.donorId}`),
-                amountOre: s.amountOre,
-              })),
-            ),
-          })),
-        ),
-        ...(receipt.reason ? { correctionReason: receipt.reason } : {}),
+        evidenceVersion: 2,
+        receipt: await receiptEvidence(receipt),
       });
     if (gift)
       Object.assign(payload, {
@@ -136,11 +127,68 @@ export async function appendProofs(
     next.proofs.push(proof);
     if (
       receipt &&
-      ['receipt.funded', 'receipt.itemized', 'receipt.corrected'].includes(
-        event.kind,
-      )
+      [
+        'receipt.funded',
+        'receipt.itemized',
+        'receipt.corrected',
+        'receipt.snapshot',
+      ].includes(event.kind)
     )
       receipt.proofId = proof.id;
   }
   return next;
+}
+
+// One definition signs and verifies the record currently shown to the donor.
+// Private donor names never leave the ledger in an exported public proof.
+export async function receiptEvidence(receipt: Receipt) {
+  return {
+    id: receipt.id,
+    supplier: receipt.supplier,
+    reference: receipt.reference,
+    purchasedAt: receipt.purchasedAt,
+    createdAt: receipt.createdAt,
+    source: receipt.source,
+    sourceRow: receipt.sourceRow ?? null,
+    totalOre: receipt.totalOre,
+    state: receipt.state,
+    fundedAt: receipt.fundedAt,
+    voidedAt: receipt.voidedAt ?? null,
+    correctionReason: receipt.reason ?? null,
+    itemizedAt: receipt.itemizedAt ?? null,
+    documentHash: receipt.file?.hash ?? null,
+    products: await Promise.all(
+      receipt.products.map(async (p) => ({
+        id: p.id,
+        description: p.description,
+        category: p.category,
+        amountOre: p.amountOre,
+        contributions: await Promise.all(
+          p.shares.map(async (share) => ({
+            supporter: await sha256('supporter:' + share.donorId),
+            amountOre: share.amountOre,
+          })),
+        ),
+      })),
+    ),
+  };
+}
+export async function verifyReceipt(proof: Proof, receipt: Receipt) {
+  if (!(await verifyProof(proof))) return 'invalid' as const;
+  if (proof.payload.evidenceVersion !== 2) return 'legacy' as const;
+  return canonical(proof.payload.receipt) ===
+    canonical(await receiptEvidence(receipt))
+    ? ('match' as const)
+    : ('mismatch' as const);
+}
+
+export function documentHashOf(proof: Proof) {
+  const snapshot = proof.payload.receipt;
+  if (snapshot && typeof snapshot === 'object' && !Array.isArray(snapshot)) {
+    const value = (snapshot as Record<string, unknown>).documentHash;
+    return typeof value === 'string' ? value : null;
+  }
+  return typeof proof.payload.documentHash === 'string'
+    ? proof.payload.documentHash
+    : null;
 }

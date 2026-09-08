@@ -92,11 +92,13 @@ export function Header({
   staff = false,
   online = true,
   showSync = true,
+  heading,
   children,
 }: {
   staff?: boolean;
   online?: boolean;
   showSync?: boolean;
+  heading?: ReactNode;
   children?: ReactNode;
 }) {
   return (
@@ -105,12 +107,12 @@ export function Header({
         <CareImage src="/shelters/pixel-shelter.png" alt="" />
         <span>
           HUNDSTALLET
-          <small>
-            {staff ? 'Care workspace' : 'A second chance, together'}
-          </small>
+          <small>{staff ? 'Care workspace' : 'Your growing shelter'}</small>
         </span>
       </a>
-      <span className="cp-demo-pill">Local demo · no payments</span>
+      {heading ?? (
+        <span className="cp-demo-pill">Local demo · no payments</span>
+      )}
       <div className="cp-header-actions">
         {showSync && <SyncState online={online} />}
         {children}

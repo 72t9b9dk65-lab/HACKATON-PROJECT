@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import './care-platform.css';
+import './shelter-growth.css';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -14,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Hundstallet — A second chance, together',
+  title: 'Hundstallet — Your growing shelter',
   description:
-    'Meet dogs from Hundstallet, explore their locations in Sweden, and try a simple visual donation journey. Independent prototype with simulated giving.',
+    'A growing virtual shelter, clear donation balances and verifiable care transactions. Independent local prototype.',
 };
 
 export default function RootLayout({

@@ -4,7 +4,6 @@ import type {
   Donor,
   LineDraft,
   Product,
-  Share,
   Workspace,
   Stage,
 } from './types.ts';
@@ -203,45 +202,90 @@ export function allocateProducts(
   products: Product[],
   wallets: { id: string; pending: number }[],
 ): Product[] {
-  const remaining = new Map(wallets.map((w) => [w.id, w.pending]));
-  const spent = new Map(wallets.map((w) => [w.id, 0]));
-  if (
-    wallets.reduce((n, w) => n + w.pending, 0) <
-    products.reduce((n, p) => n + p.amountOre, 0)
-  )
+  const total = products.reduce((n, p) => n + p.amountOre, 0);
+  if (wallets.reduce((n, w) => n + w.pending, 0) < total)
     throw new Error(
       'There are not enough available donations. The receipt stays pending; no balances changed.',
     );
-  const result = new Map<string, Share[]>();
-  for (const product of [...products].sort(
+  const ordered = [...products].sort(
     (a, b) => b.amountOre - a.amountOre || a.id.localeCompare(b.id),
-  )) {
-    const ordered = () =>
-      [...wallets]
-        .filter((w) => remaining.get(w.id)! > 0)
+  );
+  const remaining = wallets.map((w) => w.pending);
+  const spent = wallets.map(() => 0);
+  const assignments = new Map<string, number>();
+  let visits = 0;
+  // Largest items first; balance this batch's spending, with backtracking when
+  // a fair greedy choice would strand an indivisible product.
+  function assign(index: number): boolean {
+    if (index === ordered.length) return true;
+    if (++visits > 100_000) return false;
+    const item = ordered[index];
+    const candidates = wallets
+      .map((_, i) => i)
+      .filter((i) => remaining[i] >= item.amountOre)
+      .sort(
+        (a, b) =>
+          spent[a] - spent[b] ||
+          remaining[a] - remaining[b] ||
+          wallets[a].id.localeCompare(wallets[b].id),
+      );
+    const seen = new Set<string>();
+    for (const i of candidates) {
+      const key = remaining[i] + ':' + spent[i];
+      if (seen.has(key)) continue;
+      seen.add(key);
+      remaining[i] -= item.amountOre;
+      spent[i] += item.amountOre;
+      assignments.set(item.id, i);
+      if (assign(index + 1)) return true;
+      remaining[i] += item.amountOre;
+      spent[i] -= item.amountOre;
+      assignments.delete(item.id);
+    }
+    return false;
+  }
+  function greedy(bestFit: boolean) {
+    wallets.forEach((w, i) => {
+      remaining[i] = w.pending;
+      spent[i] = 0;
+    });
+    assignments.clear();
+    for (const item of ordered) {
+      const candidates = wallets
+        .map((_, i) => i)
+        .filter((i) => remaining[i] >= item.amountOre)
         .sort(
           (a, b) =>
-            spent.get(a.id)! - spent.get(b.id)! ||
-            remaining.get(b.id)! - remaining.get(a.id)! ||
-            a.id.localeCompare(b.id),
+            (bestFit ? remaining[a] - remaining[b] : spent[a] - spent[b]) ||
+            remaining[a] - remaining[b] ||
+            wallets[a].id.localeCompare(wallets[b].id),
         );
-    const full = ordered().find(
-      (w) => remaining.get(w.id)! >= product.amountOre,
-    );
-    const shares: Share[] = [];
-    let left = product.amountOre;
-    for (const wallet of full ? [full] : ordered()) {
-      const amountOre = Math.min(left, remaining.get(wallet.id)!);
-      remaining.set(wallet.id, remaining.get(wallet.id)! - amountOre);
-      spent.set(wallet.id, spent.get(wallet.id)! + amountOre);
-      shares.push({ donorId: wallet.id, amountOre });
-      left -= amountOre;
-      if (!left) break;
+      if (!candidates.length) return false;
+      const i = candidates[0];
+      remaining[i] -= item.amountOre;
+      spent[i] += item.amountOre;
+      assignments.set(item.id, i);
     }
-    if (left) throw new Error('Could not allocate this product.');
-    result.set(product.id, shares);
+    return true;
   }
-  return products.map((p) => ({ ...p, shares: result.get(p.id)! }));
+  const fast = greedy(false) || greedy(true);
+  if (!fast) {
+    wallets.forEach((w, i) => {
+      remaining[i] = w.pending;
+      spent[i] = 0;
+    });
+    assignments.clear();
+  }
+  if (!fast && (ordered.length > 1200 || !assign(0)))
+    throw new Error(
+      'These products cannot currently be assigned whole within the available donor balances. Keep them pending, add donations, or allocate a smaller receipt batch. No balances changed.',
+    );
+  return products.map((p) => ({
+    ...p,
+    shares: [
+      { donorId: wallets[assignments.get(p.id)!].id, amountOre: p.amountOre },
+    ],
+  }));
 }
 export function publishedPosts(state: Workspace, now = Date.now()) {
   return state.posts
@@ -452,6 +496,16 @@ export function applyAction(
         throw new Error(
           'This supplier and receipt number have already been recorded.',
         );
+      if (
+        draft.file &&
+        state.receipts.some(
+          (r) =>
+            r.id !== existing?.id &&
+            r.state !== 'voided' &&
+            r.file?.hash === draft.file!.hash,
+        )
+      )
+        throw new Error('This receipt document has already been recorded.');
       const receiptId = existing?.id ?? id();
       const products = expandLines(draft.lines, receiptId);
       if (
@@ -566,6 +620,30 @@ export function applyAction(
           `${money(receipt.totalOre)} SEK assigned to its purchased products.`,
         );
       }
+      break;
+    }
+    case 'seal-records': {
+      for (const receipt of state.receipts) {
+        if (receipt.state === 'draft') continue;
+        const proof = state.proofs.find((p) => p.id === receipt.proofId);
+        if (proof?.payload.evidenceVersion === 2) continue;
+        audit(
+          'receipt.snapshot',
+          receipt.id,
+          'Imported baseline snapshot; original document availability preserved.',
+        );
+      }
+      break;
+    }
+    case 'seal-record': {
+      const receipt = state.receipts.find((r) => r.id === action.receiptId);
+      if (!receipt || receipt.state === 'draft')
+        throw new Error('Choose an allocated or corrected record.');
+      audit(
+        'receipt.snapshot',
+        receipt.id,
+        'Current receipt snapshot; original source and document availability preserved.',
+      );
       break;
     }
     case 'void': {

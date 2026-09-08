@@ -210,29 +210,26 @@ test('new purchases never redistribute an existing product assignment', async ()
   assert.deepEqual(n.receipts.slice(0, before.length), before);
   assertBalanced(n);
 });
-test('a costly service stays one item and can use multiple available portfolios', () => {
-  const [p] = allocateProducts(
-    [
-      {
-        id: 'exam',
-        description: 'Examination',
-        category: 'vaccination',
-        amountOre: 110000,
-        shares: [],
-      },
-    ],
-    [
-      { id: 'a', pending: 50000 },
-      { id: 'b', pending: 70000 },
-    ],
+test('an unaffordable individual item stays pending rather than splitting across donors', () => {
+  assert.throws(
+    () =>
+      allocateProducts(
+        [
+          {
+            id: 'exam',
+            description: 'Exam',
+            category: 'vaccination',
+            amountOre: 110000,
+            shares: [],
+          },
+        ],
+        [
+          { id: 'a', pending: 50000 },
+          { id: 'b', pending: 70000 },
+        ],
+      ),
+    /assigned whole/,
   );
-  assert.equal(p.amountOre, 110000);
-  assert.equal(p.shares.length, 2);
-  assert.equal(
-    p.shares.reduce((n, s) => n + s.amountOre, 0),
-    110000,
-  );
-  assert.equal(p.id, 'exam');
 });
 test('insufficient pooled funds leave all receipts and wallets unchanged', async () => {
   const s = await seed();
@@ -492,7 +489,7 @@ test('fingerprints detect any changed product amount or document and form a veri
   const proof = funded.proofs.at(-1);
   assert.equal(await verifyProof(proof), true);
   const changed = structuredClone(proof);
-  changed.payload.products[0].amountOre++;
+  changed.payload.receipt.products[0].amountOre++;
   assert.equal(await verifyProof(changed), false);
   assert.notEqual(
     await sha256('original receipt'),
