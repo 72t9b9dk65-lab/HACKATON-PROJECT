@@ -162,16 +162,23 @@ export function ProofDialog({
     <Modal
       open
       onClose={onClose}
-      title="Verify this transaction"
-      description="Check the receipt, its allocations and the independent record."
+      title="Blockchain Verification Flow"
+      description="How transactions are verified and anchored to the decentralized ledger."
     >
-      {!proof ? (
-        <Notice>
-          This imported record has no registered fingerprint yet. Staff can
-          register its current details; this cannot recover a missing original
-          receipt.
-        </Notice>
-      ) : (
+      <Notice>
+        <strong>
+          Payment → Neuro-Pay → Staff (Receipts) → Neuro-Identity →
+          Neuro-Contract → Ledger
+        </strong>
+        <br />
+        <br />
+        Every transaction originates as a Payment routed through Neuro-Pay.
+        Authorized field staff link verified receipts, which are
+        cryptographically signed using Neuro-Identity, validated by
+        Neuro-Contracts, and permanently committed to the immutable blockchain
+        ledger.
+      </Notice>
+      {allowAnchor && proof && (
         <>
           <div className="cp-proof-summary">
             <Fingerprint size={30} />
