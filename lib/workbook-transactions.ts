@@ -24,6 +24,12 @@ const categoryMapping: Record<string, { id: ExpenseCategory; kind: CareKind }> =
     shelter: { id: 'comfort', kind: 'comfort' },
     toys: { id: 'play', kind: 'comfort' },
     rehabilitation: { id: 'rehabilitation', kind: 'health' },
+    vaccination: { id: 'vaccination', kind: 'health' },
+    'veterinary care': { id: 'vaccination', kind: 'health' },
+    veterinary: { id: 'vaccination', kind: 'health' },
+    walk: { id: 'walk', kind: 'comfort' },
+    walks: { id: 'walk', kind: 'comfort' },
+    'walks & confidence': { id: 'walk', kind: 'comfort' },
   };
 
 export function workbookLedger(): GivingLedger {
