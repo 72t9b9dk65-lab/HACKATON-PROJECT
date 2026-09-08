@@ -4,7 +4,6 @@ import {
   Heart,
   ArrowUpRight,
   BarChart3,
-  Trees,
   ShieldCheck,
   Image as ImageIcon,
   Search,
@@ -317,6 +316,16 @@ export default function DonorWorkspace() {
               <header>
                 <div>
                   <h2>Your care transactions</h2>
+                  <Button
+                    className="gs-spending-toggle"
+                    variant={view === 'statistics' ? 'default' : 'outline'}
+                    aria-pressed={view === 'statistics'}
+                    onClick={() =>
+                      setView(view === 'statistics' ? 'shelter' : 'statistics')
+                    }
+                  >
+                    <BarChart3 size={17} /> Spending statistics
+                  </Button>
                   <p>Purchased products funded by your donations.</p>
                 </div>
                 <label className="gs-search">
@@ -341,20 +350,6 @@ export default function DonorWorkspace() {
             </section>
           </aside>
           <div className="gs-main-column">
-            <div className="gs-view-switch" aria-label="Shelter view">
-              <Button
-                variant={view === 'shelter' ? 'default' : 'ghost'}
-                onClick={() => setView('shelter')}
-              >
-                <Trees size={17} /> Live shelter
-              </Button>
-              <Button
-                variant={view === 'statistics' ? 'default' : 'ghost'}
-                onClick={() => setView('statistics')}
-              >
-                <BarChart3 size={17} /> Spending statistics
-              </Button>
-            </div>
             {preview !== null && view === 'shelter' && (
               <div className="gs-preview-banner">
                 <span>

@@ -31,7 +31,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  padding-top: 54px;
+  padding-top: 0;
 }
 .gs-donate {
   width: 100%;
@@ -1689,4 +1689,10 @@
   .gs-header-title {
     font-size: 1.1rem;
   }
+}
+
+.gs-spending-toggle {
+  width: 100%;
+  margin: 12px 0 8px;
+  gap: 8px;
 }
