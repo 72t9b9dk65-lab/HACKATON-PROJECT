@@ -565,7 +565,7 @@ export default function DonorWorkspace() {
           </label>
           {valid ? (
             <div className="gs-gift-impact">
-              <CareImage src="/care/upgrades/giardino-livello-3.webp" alt="" />
+              <CareImage src="/care/garden-v3/giardino-livello-3.webp" alt="" />
               <div>
                 <strong>
                   {shelterProgress(

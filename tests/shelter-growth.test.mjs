@@ -419,7 +419,7 @@ test('label lanes clear all area images at every upgrade level', () => {
 });
 
 test('every entrance connects at each level and outdoor roads never cross area art', () => {
-  const manifest = ['upgrades', 'grid-v2'].flatMap((folder) =>
+  const manifest = ['garden-v3', 'grid-v2'].flatMap((folder) =>
     JSON.parse(
       fs.readFileSync(
         new URL(`../public/care/${folder}/manifest.json`, import.meta.url),

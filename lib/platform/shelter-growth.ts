@@ -205,7 +205,7 @@ export function areaAsset(
   zone: Pick<ZoneProgress, 'id' | 'family'>,
   level: number,
 ) {
-  const folder = zone.id === 'garden' ? 'upgrades' : 'grid-v2';
+  const folder = zone.id === 'garden' ? 'garden-v3' : 'grid-v2';
   return `/care/${folder}/${zone.family}-livello-${level}.webp`;
 }
 

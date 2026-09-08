@@ -1,0 +1,122 @@
+[
+  {
+    "id": "giardino-livello-1",
+    "family": "giardino",
+    "level": 1,
+    "entrances": [
+      "top",
+      "right",
+      "bottom",
+      "left"
+    ],
+    "path": "/care/garden-v3/giardino-livello-1.webp",
+    "source": "originals/giardino-livello-1.png",
+    "sourceBounds": [
+      67,
+      74,
+      1189,
+      1146
+    ],
+    "crossAnchor": [
+      627,
+      612
+    ],
+    "transparentFraction": 0.1243
+  },
+  {
+    "id": "giardino-livello-2",
+    "family": "giardino",
+    "level": 2,
+    "entrances": [
+      "top",
+      "right",
+      "bottom",
+      "left"
+    ],
+    "path": "/care/garden-v3/giardino-livello-2.webp",
+    "source": "originals/giardino-livello-2.png",
+    "sourceBounds": [
+      41,
+      19,
+      1229,
+      1171
+    ],
+    "crossAnchor": [
+      627,
+      610
+    ],
+    "transparentFraction": 0.1658
+  },
+  {
+    "id": "giardino-livello-3",
+    "family": "giardino",
+    "level": 3,
+    "entrances": [
+      "top",
+      "right",
+      "bottom",
+      "left"
+    ],
+    "path": "/care/garden-v3/giardino-livello-3.webp",
+    "source": "originals/giardino-livello-3.png",
+    "sourceBounds": [
+      14,
+      17,
+      1241,
+      1208
+    ],
+    "crossAnchor": [
+      627,
+      613
+    ],
+    "transparentFraction": 0.1456
+  },
+  {
+    "id": "giardino-livello-4",
+    "family": "giardino",
+    "level": 4,
+    "entrances": [
+      "top",
+      "right",
+      "bottom",
+      "left"
+    ],
+    "path": "/care/garden-v3/giardino-livello-4.webp",
+    "source": "originals/giardino-livello-4.png",
+    "sourceBounds": [
+      21,
+      27,
+      1235,
+      1217
+    ],
+    "crossAnchor": [
+      627,
+      618
+    ],
+    "transparentFraction": 0.123
+  },
+  {
+    "id": "giardino-livello-5",
+    "family": "giardino",
+    "level": 5,
+    "entrances": [
+      "top",
+      "right",
+      "bottom",
+      "left"
+    ],
+    "path": "/care/garden-v3/giardino-livello-5.webp",
+    "source": "originals/giardino-livello-5.png",
+    "sourceBounds": [
+      14,
+      17,
+      1241,
+      1189
+    ],
+    "crossAnchor": [
+      627,
+      612
+    ],
+    "transparentFraction": 0.1656
+  }
+]
