@@ -1911,7 +1911,7 @@
   background: #dae8cc;
 }
 .gs-growth-slider {
-  padding: 20px 26px;
+  padding: 10px 16px;
   background: #f1f6e9;
   border-bottom: 1px solid #c6d4b7;
   color: #354b36;
@@ -1924,10 +1924,13 @@
   gap: 16px;
 }
 .gs-growth-slider-heading label {
+  font-size: 0.85rem;
+  line-height: 1.25;
   font-weight: 600;
 }
 .gs-growth-slider-heading output {
-  font-size: 1.4rem;
+  font-size: 1.125rem;
+  line-height: 1.25;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -1935,8 +1938,8 @@
 .gs-growth-slider input[type='range'] {
   display: block;
   width: 100%;
-  height: 32px;
-  margin: 12px 0 4px;
+  height: 24px;
+  margin: 4px 0 0;
   accent-color: #376849;
   cursor: pointer;
   touch-action: pan-y;
@@ -1947,19 +1950,16 @@
   border-radius: 10px;
 }
 .gs-growth-slider-scale {
-  font-size: 0.8rem;
+  font-size: 0.72rem;
+  line-height: 1.25;
 }
 .gs-growth-slider-scale span:last-child {
   text-align: right;
 }
 .gs-growth-slider p {
-  margin: 12px 0 0;
-  font-size: 0.9rem;
-}
-.gs-growth-slider p small {
-  display: block;
-  margin-top: 4px;
-  color: #637557;
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.3;
 }
 .gs-zone.is-preview-upgrade .gs-zone-art > img {
   opacity: 0.5;
@@ -1968,9 +1968,90 @@
 .gs-preview-companion {
   pointer-events: none;
 }
+.gs-main-column {
+  container-name: shelter-column;
+  container-type: inline-size;
+}
+
+/* Use the space beside the map for its controls, keeping the range horizontal. */
+@container shelter-column (min-width: 760px) {
+  .gs-scene {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(220px, 24%, 280px);
+    grid-template-rows: auto auto auto;
+  }
+  .gs-scene > .gs-clock {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 26px;
+    padding: 24px 20px;
+    border-bottom: 0;
+    border-left: 1px solid #c8d6c1;
+  }
+  .gs-scene > .gs-clock .gs-date {
+    flex: none;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .gs-scene > .gs-clock .gs-date > svg {
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .gs-scene > .gs-clock .gs-date strong {
+    font-size: 1.15rem;
+    line-height: 1.3;
+  }
+  .gs-scene > .gs-clock .gs-date small {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .gs-scene > .gs-clock .gs-next-horizontal {
+    flex: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 22px;
+  }
+  .gs-scene > .gs-clock .gs-next-horizontal > div {
+    flex: none;
+    min-width: 0;
+  }
+  .gs-scene > .gs-clock .gs-next-preview {
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .gs-scene > .gs-clock .gs-next-preview img {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+  }
+  .gs-scene > .gs-clock .gs-preview-growth-button {
+    width: 100%;
+    min-width: 0;
+    padding: 16px 12px;
+  }
+  .gs-scene > .gs-growth-slider {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .gs-scene > .gs-viewport {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+  }
+  .gs-scene > .gs-map-footer {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+}
 @media (max-width: 600px) {
   .gs-growth-slider {
-    padding: 16px;
+    padding: 10px 12px;
   }
   .gs-growth-slider-heading {
     flex-wrap: wrap;

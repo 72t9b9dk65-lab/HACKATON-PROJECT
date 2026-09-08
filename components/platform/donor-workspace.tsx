@@ -516,10 +516,6 @@ export default function DonorWorkspace() {
                           ).length
                         }{' '}
                         area upgrades
-                        <small>
-                          Faded additions are a preview. Preview dogs are
-                          illustrative and have no real profiles.
-                        </small>
                       </p>
                     </div>
                   )
