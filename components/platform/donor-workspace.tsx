@@ -57,6 +57,7 @@ export default function DonorWorkspace() {
   const [donating, setDonating] = useState(false),
     [amount, setAmount] = useState('500'),
     [preview, setPreview] = useState<number | null>(null);
+  const [isMonthly, setIsMonthly] = useState(false);
   const [dogId, setDogId] = useState<string | null>(null),
     [receiptId, setReceiptId] = useState<string | null>(null),
     [proofReceiptId, setProofReceiptId] = useState<string | null>(null);
@@ -198,7 +199,7 @@ export default function DonorWorkspace() {
         type: 'donate',
         donorId: donor.id,
         amountOre: parsed!,
-        monthly: false,
+        monthly: isMonthly,
         category: 'comfort',
       })
     ) {
@@ -602,16 +603,65 @@ export default function DonorWorkspace() {
           description="Your donation stays pending until staff assign it to purchased care products."
         >
           <div className="gs-amount-presets">
-            {[100, 500, 1000, 2500].map((n) => (
+            {[50, 100, 250, 500, 1000].map((n) => (
               <Button
                 key={n}
                 variant={amount === String(n) ? 'default' : 'outline'}
+                aria-pressed={amount === String(n)}
                 onClick={() => setAmount(String(n))}
               >
                 {n.toLocaleString('en-GB')} SEK
               </Button>
             ))}
           </div>
+          <ol
+            className="gs-donation-example-cards"
+            aria-label="Donation examples"
+          >
+            {[
+              {
+                file: 'food-enrichment-2-days.png',
+                title: 'Food and enrichment for 2 days',
+                panel: '0 0 768 488',
+              },
+              {
+                file: 'vet-care-rehab-2-days.png',
+                title: 'Vet care and rehabilitation for 2 days',
+                height: 488,
+              },
+              {
+                file: 'food-enrichment-10-days.png',
+                title: 'Food and enrichment for 10 days',
+                panel: '0 488 768 536',
+              },
+              {
+                file: 'vet-exam-vaccination.png',
+                title: 'Vet examination and vaccination',
+                height: 536,
+              },
+            ].map((card) => (
+              <li className="gs-donation-example-card" key={card.file}>
+                {card.panel ? (
+                  // The complete sheet contains both food cards; render their panels without editing the supplied files.
+                  <svg viewBox={card.panel} aria-label={card.title}>
+                    <title>{card.title}</title>
+                    <image
+                      href="/care/donation-cards/food-enrichment-10-days.png"
+                      width="1536"
+                      height="1024"
+                    />
+                  </svg>
+                ) : (
+                  <CareImage
+                    src={'/care/donation-cards/' + card.file}
+                    alt={card.title}
+                    width={768}
+                    height={card.height}
+                  />
+                )}
+              </li>
+            ))}
+          </ol>
           <label className="cp-field">
             Your amount
             <div className="cp-money-input">
@@ -624,6 +674,27 @@ export default function DonorWorkspace() {
               <span>SEK</span>
             </div>
           </label>
+          <fieldset
+            className="cp-frequency gs-donation-frequency"
+            aria-label="Payment frequency"
+          >
+            <button
+              type="button"
+              className={!isMonthly ? 'active' : ''}
+              aria-pressed={!isMonthly}
+              onClick={() => setIsMonthly(false)}
+            >
+              One-time payment
+            </button>
+            <button
+              type="button"
+              className={isMonthly ? 'active' : ''}
+              aria-pressed={isMonthly}
+              onClick={() => setIsMonthly(true)}
+            >
+              Monthly
+            </button>
+          </fieldset>
           {valid ? (
             <div className="gs-gift-impact">
               <CareImage src="/care/garden-v3/giardino-livello-3.webp" alt="" />

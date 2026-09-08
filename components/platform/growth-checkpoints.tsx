@@ -1,5 +1,10 @@
 'use client';
-import { useLayoutEffect, useRef, type KeyboardEvent } from 'react';
+import {
+  useLayoutEffect,
+  useRef,
+  type CSSProperties,
+  type KeyboardEvent,
+} from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { money } from '@/lib/platform/model';
 import type { GrowthCheckpoint } from '@/lib/platform/shelter-growth';
@@ -33,6 +38,10 @@ export function GrowthCheckpoints({
   const selected = useRef<HTMLButtonElement>(null);
   const previous = checkpoints.findLast((point) => point.amountOre < value);
   const next = checkpoints.find((point) => point.amountOre > value);
+  const fundedPercent =
+    maximum > 0
+      ? (Math.max(0, Math.min(value, donated, maximum)) / maximum) * 100
+      : 0;
   useLayoutEffect(() => {
     const row = strip.current;
     const point = selected.current;
@@ -48,17 +57,32 @@ export function GrowthCheckpoints({
     return () => observer.disconnect();
   }, [value, checkpoints.length]);
 
-  function navigate(event: KeyboardEvent<HTMLButtonElement>) {
+  function navigate(
+    event: KeyboardEvent<HTMLButtonElement | HTMLInputElement>,
+  ) {
     const target = {
       ArrowLeft: previous,
+      ArrowDown: previous,
       ArrowRight: next,
+      ArrowUp: next,
       Home: checkpoints[0],
       End: checkpoints.at(-1),
     }[event.key];
-    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    if (
+      ![
+        'ArrowLeft',
+        'ArrowDown',
+        'ArrowRight',
+        'ArrowUp',
+        'Home',
+        'End',
+      ].includes(event.key)
+    )
+      return;
     event.preventDefault();
     if (!target) return;
     onChange(target.amountOre);
+    if (event.currentTarget.tagName === 'INPUT') return;
     requestAnimationFrame(() => {
       strip.current
         ?.querySelector<HTMLButtonElement>(
@@ -74,12 +98,32 @@ export function GrowthCheckpoints({
         <strong>Preview total donated</strong>
         <output aria-live="polite">{money(value)} SEK</output>
       </div>
-      <progress
-        className="gs-growth-progress"
-        aria-label="Your total donated"
-        max={maximum}
-        value={donated}
-      />
+      <div
+        className="gs-growth-range"
+        style={{ '--funded-percent': `${fundedPercent}%` } as CSSProperties}
+      >
+        <input
+          type="range"
+          className="gs-growth-progress"
+          aria-label="Preview total donated"
+          aria-valuetext={`${money(value)} SEK`}
+          min={0}
+          max={maximum}
+          step={1}
+          value={value}
+          onKeyDown={navigate}
+          onChange={(event) => {
+            const amount = Number(event.target.value);
+            const nearest = checkpoints.reduce((best, point) =>
+              Math.abs(point.amountOre - amount) <
+              Math.abs(best.amountOre - amount)
+                ? point
+                : best,
+            );
+            onChange(nearest.amountOre);
+          }}
+        />
+      </div>
       <div className="gs-growth-slider-scale">
         <span>0 SEK</span>
         <span>{money(maximum)} SEK · Fully upgraded</span>

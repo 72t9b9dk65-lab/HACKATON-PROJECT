@@ -688,8 +688,70 @@
 }
 .gs-amount-presets {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 9px;
+}
+.gs-amount-presets > button {
+  min-width: 0;
+  height: auto;
+  min-height: 40px;
+  padding: 8px 6px;
+  white-space: normal;
+}
+.gs-donation-example-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gs-donation-example-card {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border: 1px solid var(--cp-line);
+  border-radius: 12px;
+  background: #f7f4e9;
+  scroll-snap-align: start;
+}
+.gs-donation-example-card > img,
+.gs-donation-example-card > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  overflow: hidden;
+}
+.cp-dialog:has(.gs-donation-example-cards) {
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+.cp-dialog:has(.gs-donation-example-cards) > .cp-field,
+.cp-dialog:has(.gs-donation-example-cards) > .gs-gift-impact,
+.cp-dialog:has(.gs-donation-example-cards) > .gs-donation-frequency {
+  margin: 0;
+}
+.gs-donation-frequency {
+  min-width: 0;
+}
+@media (max-width: 560px) {
+  .gs-donation-example-cards {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 88%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    padding-bottom: 6px;
+  }
+  .cp-dialog:has(.gs-donation-example-cards) .cp-modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 .gs-gift-impact {
   display: flex;
@@ -1223,7 +1285,7 @@
     height: 18px;
   }
   .gs-amount-presets {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .gs-gift-impact img {
     width: 75px;
@@ -1915,26 +1977,72 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+.gs-growth-range {
+  position: relative;
+  margin: 2px 0;
+}
+.gs-growth-range::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  right: 12px;
+  height: 5px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    #376849 0 var(--funded-percent),
+    #d4d4d4 var(--funded-percent) 100%
+  );
+  pointer-events: none;
+}
 .gs-growth-progress {
+  position: relative;
   display: block;
   width: 100%;
-  height: 5px;
-  margin: 8px 0 6px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
   appearance: none;
   border: 0;
-  border-radius: 999px;
-  overflow: hidden;
-  background: #d4d4d4;
-  color: #376849;
+  background: transparent;
+  cursor: grab;
+  touch-action: pan-y;
 }
-.gs-growth-progress::-webkit-progress-bar {
-  background: #d4d4d4;
+.gs-growth-progress:active {
+  cursor: grabbing;
 }
-.gs-growth-progress::-webkit-progress-value {
-  background: #376849;
+.gs-growth-progress::-webkit-slider-runnable-track {
+  height: 5px;
+  background: transparent;
 }
-.gs-growth-progress::-moz-progress-bar {
-  background: #376849;
+.gs-growth-progress::-webkit-slider-thumb {
+  appearance: none;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  margin-top: -9.5px;
+  border: 1px solid #b8c0b4;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px #243b2926;
+}
+.gs-growth-progress::-moz-range-track {
+  height: 5px;
+  background: transparent;
+}
+.gs-growth-progress::-moz-range-progress {
+  background: transparent;
+}
+.gs-growth-progress::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #b8c0b4;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px #243b2926;
 }
 .gs-growth-navigation {
   display: flex;
