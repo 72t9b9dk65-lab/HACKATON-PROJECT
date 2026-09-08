@@ -14,6 +14,7 @@ import {
   areaAsset,
   WORLD_WIDTH,
   WORLD_HEIGHT,
+  maximumShelterDonationOre,
 } from '../lib/platform/shelter-growth.ts';
 import { seedWorkspace } from '../lib/platform/seed.ts';
 import {
@@ -57,6 +58,58 @@ test('cumulative donated thresholds include pending and exact one-ore boundaries
   assert.deepEqual(
     shelterProgress('a', 5000, 0, 5000, profileDogs).residentIds,
     p.residentIds,
+  );
+});
+test('growth preview reaches every upgrade using anonymous companions without changing the owned shelter', () => {
+  const donated = 529500;
+  const maximum = maximumShelterDonationOre(profileDogs);
+  const owned = shelterProgress('personal', donated, 0, 0, profileDogs);
+  const halfway = shelterProgress(
+    'personal',
+    donated,
+    0,
+    Math.floor((maximum - donated) / 2),
+    profileDogs,
+  );
+  const full = shelterProgress(
+    'personal',
+    donated,
+    0,
+    maximum - donated,
+    profileDogs,
+  );
+  assert.ok(maximum >= donated);
+  assert.ok(full.zones.every((zone) => zone.projectedLevel === 5));
+  assert.equal(
+    full.residentIds.length + full.potentialIds.length,
+    profileDogs.filter((dog) => !dog.group).length,
+  );
+  assert.deepEqual(full.residentIds, owned.residentIds);
+  assert.deepEqual(
+    full.zones.map((zone) => zone.level),
+    owned.zones.map((zone) => zone.level),
+  );
+  assert.equal(full.usedOre, owned.usedOre);
+  assert.equal(full.pendingOre, owned.pendingOre);
+  assert.deepEqual(owned.potentialIds, []);
+  assert.ok(
+    full.potentialIds.every(
+      (id) =>
+        id.startsWith('preview-companion-') &&
+        !profileDogs.some((dog) => dog.id === id),
+    ),
+  );
+  assert.deepEqual(
+    full.potentialIds.slice(0, halfway.potentialIds.length),
+    halfway.potentialIds,
+  );
+  assert.ok(
+    halfway.zones.every(
+      (zone) =>
+        zone.projectedLevel >= zone.level &&
+        zone.projectedLevel <=
+          full.zones.find((z) => z.id === zone.id).projectedLevel,
+    ),
   );
 });
 test('random companion prefixes are stable on reload, catalog reordering and reversals', () => {

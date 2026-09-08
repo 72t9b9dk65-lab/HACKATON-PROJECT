@@ -22,7 +22,11 @@ import {
   parseMoney,
   publishedPosts,
 } from '@/lib/platform/model';
-import { shelterProgress, areaAsset } from '@/lib/platform/shelter-growth';
+import {
+  shelterProgress,
+  areaAsset,
+  maximumShelterDonationOre,
+} from '@/lib/platform/shelter-growth';
 import { CareImage } from './care-image';
 import { DogPortrait } from '@/components/dog-portrait';
 import { GrowingShelter } from './growing-shelter';
@@ -65,6 +69,7 @@ export default function DonorWorkspace() {
     return () => clearTimeout(timer);
   }, []);
   const state = store.state;
+  const previewActive = preview !== null;
   useLayoutEffect(() => {
     const dashboard = dashboardRef.current;
     if (!dashboard) return;
@@ -118,16 +123,26 @@ export default function DonorWorkspace() {
       observer.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [state, query, limit, view, preview]);
+  }, [state, query, limit, view, previewActive]);
   if (!state) return <LoadingWorkspace store={store} />;
   const donor =
     balances(state).find((d) => d.id === donorId) ?? balances(state)[0];
+  const donatedOre = Math.max(0, donor.used) + Math.max(0, donor.pending);
+  const previewMaximumOre = Math.max(
+    donatedOre,
+    maximumShelterDonationOre(profileDogs),
+  );
+  const previewExtraOre = Math.min(
+    Math.max(0, preview ?? 0),
+    previewMaximumOre - donatedOre,
+  );
+  const previewTotalOre = donatedOre + previewExtraOre;
   const clock = now ?? Date.parse(state.createdAt),
     progress = shelterProgress(
       donor.id,
       donor.used,
       donor.pending,
-      preview ?? 0,
+      previewExtraOre,
       profileDogs,
     );
   const rows = donorProducts(state, donor.id),
@@ -194,14 +209,20 @@ export default function DonorWorkspace() {
     <section className="gs-next gs-next-horizontal">
       <div>
         <span className="gs-eyebrow">Growing together</span>
-        <h2>{progress.residentIds.length} visual companions</h2>
+        <h2>
+          {progress.residentIds.length +
+            (previewActive ? progress.potentialIds.length : 0)}{' '}
+          visual companions
+        </h2>
         <p>
-          {progress.nextDogOre === null
-            ? 'All companions unlocked'
-            : `${money(progress.nextDogOre)} SEK more donated for your next companion`}
+          {previewActive
+            ? `${progress.potentialIds.length} additional companions in this preview`
+            : progress.nextDogOre === null
+              ? 'All companions unlocked'
+              : `${money(progress.nextDogOre)} SEK more donated for your next companion`}
         </p>
       </div>
-      {nextZone && (
+      {!previewActive && nextZone && (
         <div className="gs-next-preview">
           <CareImage src={areaAsset(nextZone, nextZone.level + 1)} alt="" />
           <div>
@@ -214,13 +235,17 @@ export default function DonorWorkspace() {
         </div>
       )}
       <Button
+        className="gs-preview-growth-button"
         variant="outline"
+        aria-expanded={previewActive}
+        aria-controls="shelter-growth-slider"
         onClick={() => {
-          setDonating(true);
+          setPreview(previewActive ? null : 0);
           setView('shelter');
         }}
       >
-        <Eye size={16} /> Preview growth
+        {previewActive ? <X size={22} /> : <Eye size={22} />}
+        {previewActive ? 'Close preview' : 'Preview growth'}
       </Button>
     </section>
   );
@@ -422,23 +447,83 @@ export default function DonorWorkspace() {
             </section>
           </aside>
           <div className="gs-main-column">
-            {preview !== null && view === 'shelter' && (
-              <div className="gs-preview-banner">
-                <span>
-                  <Eye size={18} />
-                  <strong>Donation preview</strong> ·{' '}
-                  {progress.residentIds.length + progress.potentialIds.length}{' '}
-                  potential companions
-                  {preview > 0 ? ' with ' + money(preview) + ' SEK extra' : ''}
-                </span>
-                <Button variant="ghost" onClick={() => setPreview(null)}>
-                  <X size={17} /> Close preview
-                </Button>
-              </div>
-            )}
             {view === 'shelter' ? (
               <GrowingShelter
                 growthSummary={growthSummary}
+                previewControls={
+                  previewActive && (
+                    <div
+                      className="gs-growth-slider"
+                      id="shelter-growth-slider"
+                    >
+                      <div className="gs-growth-slider-heading">
+                        <label htmlFor="shelter-donation-range">
+                          Preview total donated
+                        </label>
+                        <output htmlFor="shelter-donation-range">
+                          {money(previewTotalOre)} SEK
+                        </output>
+                      </div>
+                      <input
+                        id="shelter-donation-range"
+                        type="range"
+                        min={donatedOre}
+                        max={previewMaximumOre}
+                        step={1}
+                        value={previewTotalOre}
+                        disabled={previewMaximumOre === donatedOre}
+                        aria-valuetext={`${money(previewTotalOre)} SEK total, ${progress.residentIds.length + progress.potentialIds.length} visual companions`}
+                        onChange={(e) => {
+                          const total = Math.min(
+                            previewMaximumOre,
+                            Math.max(
+                              donatedOre,
+                              Math.round(Number(e.target.value) / 100) * 100,
+                            ),
+                          );
+                          setPreview(total - donatedOre);
+                        }}
+                        onKeyDown={(e) => {
+                          const delta = {
+                            ArrowLeft: -5000,
+                            ArrowDown: -5000,
+                            ArrowRight: 5000,
+                            ArrowUp: 5000,
+                          }[e.key];
+                          if (delta !== undefined) {
+                            e.preventDefault();
+                            setPreview(
+                              Math.min(
+                                previewMaximumOre,
+                                Math.max(donatedOre, previewTotalOre + delta),
+                              ) - donatedOre,
+                            );
+                          }
+                        }}
+                      />
+                      <div className="gs-growth-slider-scale">
+                        <span>{money(donatedOre)} SEK · Your donations</span>
+                        <span>
+                          {money(previewMaximumOre)} SEK · Fully upgraded
+                        </span>
+                      </div>
+                      <p>
+                        <strong>+{money(previewExtraOre)} SEK</strong> ·{' '}
+                        {progress.potentialIds.length} new companions ·{' '}
+                        {
+                          progress.zones.filter(
+                            (z) => z.projectedLevel > z.level,
+                          ).length
+                        }{' '}
+                        area upgrades
+                        <small>
+                          Faded additions are a preview. Preview dogs are
+                          illustrative and have no real profiles.
+                        </small>
+                      </p>
+                    </div>
+                  )
+                }
                 progress={progress}
                 clock={clock}
                 preview={preview !== null}
@@ -598,7 +683,7 @@ export default function DonorWorkspace() {
               variant="outline"
               disabled={!valid}
               onClick={() => {
-                setPreview(parsed);
+                setPreview(Math.min(parsed!, previewMaximumOre - donatedOre));
                 setDonating(false);
                 setView('shelter');
               }}

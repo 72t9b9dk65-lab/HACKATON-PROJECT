@@ -152,6 +152,12 @@ export function thresholds(zone: (typeof zones)[number]) {
       : [0, 3, 7, 15, 27].map((n) => n + zone.first)
   ).map(companionThresholdOre);
 }
+export function maximumShelterDonationOre(catalog: { group?: boolean }[]) {
+  return Math.max(
+    companionThresholdOre(catalog.filter((dog) => !dog.group).length),
+    ...zones.map((zone) => thresholds(zone)[4]),
+  );
+}
 export function shelterProgress(
   donorId: string,
   usedOre: number,
@@ -170,7 +176,11 @@ export function shelterProgress(
     pendingOre,
     potentialOre: potential,
     residentIds: order.slice(0, count),
-    potentialIds: order.slice(count, futureCount),
+    // Preview companions have no real profile identity.
+    potentialIds: Array.from(
+      { length: futureCount - count },
+      (_, i) => `preview-companion-${count + i + 1}`,
+    ),
     zones: zones.map((zone) => {
       const steps = thresholds(zone);
       const level = steps.filter((s) => s <= donated).length;

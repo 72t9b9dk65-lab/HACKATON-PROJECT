@@ -36,6 +36,7 @@ type Props = {
   onDog: (id: string) => void;
   onDonate: () => void;
   growthSummary: ReactNode;
+  previewControls?: ReactNode;
 };
 export function GrowingShelter({
   progress,
@@ -44,6 +45,7 @@ export function GrowingShelter({
   onDog,
   onDonate,
   growthSummary,
+  previewControls,
 }: Props) {
   const [reduced, setReduced] = useState(false);
   const viewport = useRef<HTMLDivElement>(null);
@@ -76,7 +78,11 @@ export function GrowingShelter({
   const moment = shelterMoment(clock);
   const poseMoment = shelterMoment(clock);
   const network = useMemo(
-    () => buildShelterNetwork(progress.zones, preview),
+    () =>
+      buildShelterNetwork(
+        progress.zones.filter((z) => !preview || z.projectedLevel > 0),
+        preview,
+      ),
     [progress.zones, preview],
   );
   const fitScale = Math.min(
@@ -87,6 +93,16 @@ export function GrowingShelter({
   const scale = baseScale * zoom;
   const areaOrder = [...progress.zones].sort((a, b) => a.y - b.y || a.x - b.x);
   const selected = progress.zones.find((z) => z.id === focusedArea);
+  const wasPreviewActive = useRef(preview);
+  useEffect(() => {
+    const justOpened = preview && !wasPreviewActive.current;
+    wasPreviewActive.current = preview;
+    if (justOpened || (preview && selected?.projectedLevel === 0)) {
+      setFocusedArea(null);
+      setZoom(fitScale / baseScale);
+      setPan({ x: 0, y: 0 });
+    }
+  }, [preview, selected?.projectedLevel, fitScale, baseScale]);
   const selectedIndex = areaOrder.findIndex((z) => z.id === focusedArea);
   const adjacentAreas = selected
     ? network.connections
@@ -117,7 +133,7 @@ export function GrowingShelter({
       // One shared scale lets navigation keep exactly the same magnification.
       const largest = Math.max(
         ...progress.zones.map((z) =>
-          zoneSize(z.id, Math.max(1, preview ? z.projectedLevel : z.level)),
+          zoneSize(z.id, preview ? 5 : Math.max(1, z.level)),
         ),
       );
       const focusScale = Math.max(
@@ -230,6 +246,7 @@ export function GrowingShelter({
         </div>
         {growthSummary}
       </header>
+      {previewControls}
       <div
         ref={viewport}
         className={'gs-viewport' + (dragging ? ' is-dragging' : '')}
@@ -292,81 +309,94 @@ export function GrowingShelter({
               />
             ))}
           </svg>
-          {progress.zones.map((z) => {
-            const shown = preview
-              ? Math.max(1, z.projectedLevel)
-              : Math.max(1, z.level);
-            const ghost =
-              z.level === 0 || (preview && z.projectedLevel > z.level);
-            const size = zoneSize(z.id, shown);
-            return (
-              <div
-                key={z.id}
-                className={
-                  'gs-zone gs-zone-' + z.id + ' ' + (ghost ? 'is-locked' : '')
-                }
-                style={{ left: z.x, top: z.y, width: size, height: size }}
-              >
-                <button
-                  className="gs-zone-art"
-                  data-zone-focus={z.id}
-                  onKeyDown={navigateAreasWithKeys}
-                  onClick={() => focusArea(z.id)}
-                  aria-label={'Zoom into ' + z.name}
-                  aria-pressed={focusedArea === z.id}
-                >
-                  <CareImage
-                    src={areaAsset(z, shown)}
-                    alt={z.name + ' level ' + shown}
-                    width={480}
-                    height={480}
-                    draggable={false}
-                    loading="eager"
-                  />
-                </button>
-                <button
+          {progress.zones
+            .filter((z) => !preview || z.projectedLevel > 0)
+            .map((z) => {
+              const shown = preview
+                ? Math.max(1, z.projectedLevel)
+                : Math.max(1, z.level);
+              const ghost =
+                z.level === 0 || (preview && z.projectedLevel > z.level);
+              const size = zoneSize(z.id, shown);
+              return (
+                <div
+                  key={z.id}
                   className={
-                    'gs-zone-label' +
-                    ((z.entrances as readonly string[]).includes('bottom')
-                      ? ' gs-label-beside-road'
-                      : '')
+                    'gs-zone gs-zone-' +
+                    z.id +
+                    ' ' +
+                    (ghost ? 'is-locked' : '') +
+                    (preview && ghost ? ' is-preview-upgrade' : '')
                   }
-                  onClick={onDonate}
-                  title={
-                    z.nextThresholdOre !== null
-                      ? money(z.remainingOre) + ' SEK more donated to upgrade'
-                      : 'Fully upgraded'
-                  }
-                  aria-label={
-                    z.name +
-                    (z.level ? ' level ' + z.level : ' locked') +
-                    '. ' +
-                    (z.nextThresholdOre
-                      ? money(z.remainingOre) + ' SEK more donated to upgrade'
-                      : 'Fully upgraded')
-                  }
+                  style={{ left: z.x, top: z.y, width: size, height: size }}
                 >
-                  <strong>
-                    {!z.level && <LockKeyhole size={18} />} {z.name}
-                  </strong>
-                  <span>
-                    {z.level
-                      ? 'Level ' +
-                        (preview ? z.projectedLevel : z.level) +
-                        ' / 5'
-                      : z.donationGapOre
-                        ? preview && z.projectedLevel > 0
-                          ? 'Would unlock with this gift'
-                          : money(z.donationGapOre) + ' SEK to unlock'
-                        : 'Unlocked'}
-                  </span>
-                </button>
-              </div>
-            );
-          })}
+                  <button
+                    className="gs-zone-art"
+                    data-zone-focus={z.id}
+                    onKeyDown={navigateAreasWithKeys}
+                    onClick={() => focusArea(z.id)}
+                    aria-label={'Zoom into ' + z.name}
+                    aria-pressed={focusedArea === z.id}
+                  >
+                    <CareImage
+                      src={areaAsset(z, shown)}
+                      alt={z.name + ' level ' + shown}
+                      width={480}
+                      height={480}
+                      draggable={false}
+                      loading="eager"
+                    />
+                  </button>
+                  <button
+                    className={
+                      'gs-zone-label' +
+                      ((z.entrances as readonly string[]).includes('bottom')
+                        ? ' gs-label-beside-road'
+                        : '')
+                    }
+                    onClick={onDonate}
+                    title={
+                      z.nextThresholdOre !== null
+                        ? money(z.remainingOre) + ' SEK more donated to upgrade'
+                        : 'Fully upgraded'
+                    }
+                    aria-label={
+                      z.name +
+                      (z.level ? ' level ' + z.level : ' locked') +
+                      '. ' +
+                      (z.nextThresholdOre
+                        ? money(z.remainingOre) + ' SEK more donated to upgrade'
+                        : 'Fully upgraded')
+                    }
+                  >
+                    <strong>
+                      {!z.level && <LockKeyhole size={18} />} {z.name}
+                    </strong>
+                    <span>
+                      {z.level
+                        ? 'Level ' +
+                          (preview ? z.projectedLevel : z.level) +
+                          ' / 5'
+                        : z.donationGapOre
+                          ? preview && z.projectedLevel > 0
+                            ? 'Would unlock with this gift'
+                            : money(z.donationGapOre) + ' SEK to unlock'
+                          : 'Unlocked'}
+                    </span>
+                  </button>
+                </div>
+              );
+            })}
           {progress.residentIds.map((id, i) => resident(id, i))}
           {preview &&
-            progress.potentialIds.map((id, i) => resident(id, i, true))}
+            progress.potentialIds.map((id, i) => (
+              <PreviewShelterDog
+                key={id}
+                id={id}
+                index={i}
+                progress={progress}
+              />
+            ))}
         </div>
         {selected && (
           <>
@@ -457,6 +487,50 @@ export function GrowingShelter({
         </small>
       </footer>
     </section>
+  );
+}
+
+// Generic breed sprites carry no Hundstallet identity or profile link.
+const previewSprites = [
+  '/dogs/pixel-breeds/labrador-retriever.png',
+  '/dogs/pixel-breeds/samoyed.png',
+  '/dogs/pixel-breeds/french-bulldog.png',
+  '/dogs/pixel-breeds/dachshund.png',
+  '/dogs/pixel-breeds/mixed-medium.png',
+];
+function PreviewShelterDog({
+  id,
+  index,
+  progress,
+}: {
+  id: string;
+  index: number;
+  progress: ShelterProgress;
+}) {
+  const areas = progress.zones.filter((z) => z.projectedLevel > 0);
+  const zone = areas[index % areas.length];
+  const slot = Math.floor(index / areas.length);
+  const x = zone.x + ((slot % 3) - 1) * 48;
+  const y = zone.y + (Math.floor(slot / 3) - 1) * 48;
+  return (
+    <div
+      className="gs-dog is-preview gs-preview-companion"
+      style={{
+        left: x,
+        top: y,
+        width: 76,
+        height: 90,
+        zIndex: Math.round(y) + 1000,
+      }}
+    >
+      <CareImage
+        src={previewSprites[hashSeed(id) % previewSprites.length]}
+        alt="Illustrative preview companion"
+        width={90}
+        height={90}
+        draggable={false}
+      />
+    </div>
   );
 }
 
