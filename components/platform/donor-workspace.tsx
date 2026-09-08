@@ -284,8 +284,10 @@ export default function DonorWorkspace({
                   : r.supplier}
               </strong>
               <small>
-                {dateLabel(r.purchasedAt, false)} ·{' '}
-                {r.source === 'workbook' ? 'Imported record' : r.reference}
+                {dateLabel(r.purchasedAt, false)}
+                {r.source !== 'workbook' && r.reference
+                  ? ' · ' + r.reference
+                  : null}
               </small>
             </span>
           </button>
