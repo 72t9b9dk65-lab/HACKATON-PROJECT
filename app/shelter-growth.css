@@ -1715,7 +1715,7 @@
   grid-column: 1 / -1;
 }
 .gs-sidebar-transactions {
-  flex: 1;
+  flex: 0 0 auto;
   min-height: 0;
 }
 .gs-sidebar-transactions > .gs-transaction-list {
@@ -1769,26 +1769,6 @@
   top: 0;
   left: 0;
   width: 100%;
-}
-@media (min-width: 761px) {
-  .gs-sidebar-transactions > .gs-transaction-list {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-  }
-  .gs-rail-visible-row {
-    flex: 1;
-    display: flex;
-  }
-  .gs-rail-visible-row > .gs-transaction {
-    width: 100%;
-    box-sizing: border-box;
-    align-content: space-between;
-  }
-  .gs-rail-visible-row:last-child > .gs-transaction {
-    padding-bottom: 0;
-  }
 }
 .gs-sidebar-transactions .gs-transaction {
   padding: 10px 0;
@@ -1923,7 +1903,7 @@
   align-items: baseline;
   gap: 16px;
 }
-.gs-growth-slider-heading label {
+.gs-growth-slider-heading > strong {
   font-size: 0.85rem;
   line-height: 1.25;
   font-weight: 600;
@@ -1935,19 +1915,94 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.gs-growth-slider input[type='range'] {
+.gs-growth-progress {
   display: block;
   width: 100%;
-  height: 24px;
-  margin: 4px 0 0;
-  accent-color: #376849;
-  cursor: pointer;
-  touch-action: pan-y;
+  height: 5px;
+  margin: 8px 0 6px;
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #d4d4d4;
+  color: #376849;
 }
-.gs-growth-slider input:focus-visible {
-  outline: 2px solid #376849;
-  outline-offset: 4px;
-  border-radius: 10px;
+.gs-growth-progress::-webkit-progress-bar {
+  background: #d4d4d4;
+}
+.gs-growth-progress::-webkit-progress-value {
+  background: #376849;
+}
+.gs-growth-progress::-moz-progress-bar {
+  background: #376849;
+}
+.gs-growth-navigation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  min-inline-size: 0;
+}
+.care-platform .gs-growth-arrow {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid #bdc9ae;
+  border-radius: 12px;
+  background: #fffdf5;
+  color: #354b36;
+}
+.gs-growth-checkpoint-window {
+  --checkpoint-width: 72px;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.gs-growth-checkpoint-window::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  width: var(--checkpoint-width);
+  height: 44px;
+  transform: translateX(-50%);
+  border-radius: 8px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  pointer-events: none;
+}
+.gs-growth-checkpoints {
+  position: relative;
+  display: flex;
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 4px max(0px, calc(50% - var(--checkpoint-width) / 2));
+}
+.gs-growth-checkpoints::-webkit-scrollbar {
+  display: none;
+}
+.care-platform .gs-growth-checkpoint {
+  display: flex;
+  flex: 0 0 var(--checkpoint-width);
+  min-width: 0;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  transition: none;
+  font-size: 0.8rem;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .gs-growth-slider-scale {
   font-size: 0.72rem;

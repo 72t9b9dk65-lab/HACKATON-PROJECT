@@ -4,6 +4,9 @@ import fs from 'node:fs';
 import { profileDogs } from '../lib/donation-shell.ts';
 import {
   shelterProgress,
+  shelterPreviewProgress,
+  shelterGrowthCheckpoints,
+  thresholds,
   companionThresholdOre,
   companionCount,
   companionOrder,
@@ -112,6 +115,150 @@ test('growth preview reaches every upgrade using anonymous companions without ch
           full.zones.find((z) => z.id === zone.id).projectedLevel,
     ),
   );
+});
+test('backward preview revisits earned levels and stable companions, including zero', () => {
+  const owned = shelterProgress('personal', 450000, 150000, 0, profileDogs);
+  const earlier = shelterPreviewProgress(
+    'personal',
+    450000,
+    150000,
+    100000,
+    profileDogs,
+  );
+  assert.equal(earlier.residentIds.length, 20);
+  assert.deepEqual(earlier.residentIds, owned.residentIds.slice(0, 20));
+  assert.deepEqual(earlier.potentialIds, []);
+  assert.equal(earlier.zones.find((z) => z.id === 'kennel').level, 3);
+  assert.equal(earlier.zones.find((z) => z.id === 'sport').level, 0);
+  assert.ok(earlier.zones.every((z) => z.projectedLevel === z.level));
+  const network = buildShelterNetwork(
+    earlier.zones.filter((z) => z.projectedLevel > 0),
+    true,
+  );
+  assert.ok(network.connections.every((edge) => !edge.locked));
+  const start = shelterPreviewProgress(
+    'personal',
+    450000,
+    150000,
+    0,
+    profileDogs,
+  );
+  assert.deepEqual(start.residentIds, []);
+  assert.deepEqual(start.potentialIds, []);
+  assert.ok(start.zones.every((z) => z.level === (z.id === 'garden' ? 1 : 0)));
+  assert.deepEqual(
+    shelterPreviewProgress('personal', 450000, 150000, 600000, profileDogs),
+    owned,
+  );
+  const future = shelterPreviewProgress(
+    'personal',
+    450000,
+    150000,
+    1400000,
+    profileDogs,
+  );
+  assert.deepEqual(future.residentIds, owned.residentIds);
+  assert.equal(future.potentialIds.length, 40);
+  assert.ok(
+    future.potentialIds.every((id) => id.startsWith('preview-companion-')),
+  );
+  assert.ok(future.zones.every((z) => z.projectedLevel === 5));
+  assert.deepEqual(
+    future.zones.map((z) => z.level),
+    owned.zones.map((z) => z.level),
+  );
+  assert.equal(future.usedOre, owned.usedOre);
+  assert.equal(future.pendingOre, owned.pendingOre);
+});
+test('backward preview does not treat unallocated donations as earned upgrades', () => {
+  for (const used of [0, 450000]) {
+    const pending = 600000 - used;
+    const owned = shelterProgress('personal', used, pending, 0, profileDogs);
+    const earlier = shelterPreviewProgress(
+      'personal',
+      used,
+      pending,
+      550000,
+      profileDogs,
+    );
+    assert.equal(earlier.residentIds.length, 57);
+    assert.deepEqual(
+      earlier.zones.map((z) => z.projectedLevel),
+      owned.zones.map((z) => z.level),
+    );
+    assert.ok(earlier.zones.every((z) => z.projectedLevel === z.level));
+  }
+});
+test('growth checkpoints include every dog and area level, grouped by amount', () => {
+  const points = shelterGrowthCheckpoints(1400000, 0, profileDogs);
+  assert.equal(points[0].amountOre, 0);
+  assert.equal(points.at(-1).amountOre, 1400000);
+  assert.equal(new Set(points.map((p) => p.amountOre)).size, points.length);
+  assert.ok(
+    points.every(
+      (p, index) => index === 0 || p.amountOre > points[index - 1].amountOre,
+    ),
+  );
+  for (let count = 1; count <= 100; count++) {
+    assert.equal(
+      points.find((p) => p.amountOre === companionThresholdOre(count))
+        .companion,
+      count,
+    );
+  }
+  for (const zone of shelterProgress('a', 1400000, 0, 0, profileDogs).zones) {
+    thresholds(zone).forEach((amount, index) => {
+      assert.ok(
+        points
+          .find((p) => p.amountOre === amount)
+          .upgrades.some(
+            (upgrade) => upgrade.id === zone.id && upgrade.level === index + 1,
+          ),
+      );
+    });
+  }
+  const shared = points.find((p) => p.amountOre === 20000);
+  assert.equal(shared.companion, 4);
+  assert.deepEqual(shared.upgrades.map((upgrade) => upgrade.id).sort(), [
+    'garden',
+    'kennel',
+    'play',
+  ]);
+});
+test('checkpoint navigation brackets current donations and each reward stop changes the preview', () => {
+  const used = 50000,
+    pending = 479500,
+    donated = used + pending;
+  const points = shelterGrowthCheckpoints(used, pending, profileDogs);
+  const current = points.findIndex((p) => p.current);
+  assert.equal(points[current].amountOre, donated);
+  assert.equal(points[current - 1].amountOre, 520000);
+  assert.equal(points[current + 1].amountOre, 540000);
+  assert.ok(
+    points[current].upgrades.some(
+      (upgrade) => upgrade.id === 'garden' && upgrade.level === 4,
+    ),
+  );
+  const snapshots = points.map((p) =>
+    shelterPreviewProgress('a', used, pending, p.amountOre, profileDogs),
+  );
+  for (let index = 1; index < points.length; index++) {
+    if (points[index].current) continue;
+    const before = snapshots[index - 1],
+      after = snapshots[index];
+    const dogCount = (p) => p.residentIds.length + p.potentialIds.length;
+    assert.ok(
+      dogCount(after) > dogCount(before) ||
+        after.zones.some(
+          (zone, i) => zone.projectedLevel > before.zones[i].projectedLevel,
+        ),
+      `Checkpoint ${points[index].amountOre} should reveal a reward`,
+    );
+  }
+  const beyondMaximum = shelterGrowthCheckpoints(1500000, 1234, profileDogs);
+  assert.equal(beyondMaximum.at(-1).amountOre, 1501234);
+  assert.equal(beyondMaximum.at(-1).current, true);
+  assert.equal(beyondMaximum.filter((p) => p.companion).length, 100);
 });
 test('random companion prefixes are stable on reload, catalog reordering and reversals', () => {
   const order = companionOrder('personal', profileDogs);

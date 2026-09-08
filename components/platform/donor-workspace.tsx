@@ -23,12 +23,15 @@ import {
 } from '@/lib/platform/model';
 import {
   shelterProgress,
+  shelterPreviewProgress,
+  shelterGrowthCheckpoints,
   areaAsset,
   maximumShelterDonationOre,
 } from '@/lib/platform/shelter-growth';
 import { CareImage } from './care-image';
 import { DogPortrait } from '@/components/dog-portrait';
 import { GrowingShelter } from './growing-shelter';
+import { GrowthCheckpoints } from './growth-checkpoints';
 import { ProofDialog } from './proof-dialog';
 import {
   Header,
@@ -133,19 +136,36 @@ export default function DonorWorkspace() {
     donatedOre,
     maximumShelterDonationOre(profileDogs),
   );
-  const previewExtraOre = Math.min(
-    Math.max(0, preview ?? 0),
-    previewMaximumOre - donatedOre,
+  const previewTotalOre = Math.min(
+    Math.max(0, donatedOre + (preview ?? 0)),
+    previewMaximumOre,
   );
-  const previewTotalOre = donatedOre + previewExtraOre;
+  const previewDeltaOre = previewTotalOre - donatedOre;
+  const earlierPreview = previewActive && previewDeltaOre < 0;
+  const growthCheckpoints = shelterGrowthCheckpoints(
+    donor.used,
+    donor.pending,
+    profileDogs,
+  );
   const clock = now ?? Date.parse(state.createdAt),
     progress = shelterProgress(
       donor.id,
       donor.used,
       donor.pending,
-      previewExtraOre,
+      0,
       profileDogs,
     );
+  const sceneProgress = previewActive
+    ? shelterPreviewProgress(
+        donor.id,
+        donor.used,
+        donor.pending,
+        previewTotalOre,
+        profileDogs,
+      )
+    : progress;
+  const shownCompanions =
+    sceneProgress.residentIds.length + sceneProgress.potentialIds.length;
   const rows = donorProducts(state, donor.id),
     posts = publishedPosts(state, clock);
   const receipts = state.receipts
@@ -200,17 +220,15 @@ export default function DonorWorkspace() {
     <section className="gs-next gs-next-horizontal">
       <div>
         <span className="gs-eyebrow">Growing together</span>
-        <h2>
-          {progress.residentIds.length +
-            (previewActive ? progress.potentialIds.length : 0)}{' '}
-          visual companions
-        </h2>
+        <h2>{shownCompanions} visual companions</h2>
         <p>
-          {previewActive
-            ? `${progress.potentialIds.length} additional companions in this preview`
-            : progress.nextDogOre === null
-              ? 'All companions unlocked'
-              : `${money(progress.nextDogOre)} SEK more donated for your next companion`}
+          {earlierPreview
+            ? 'Revisiting earlier growth'
+            : previewActive
+              ? `${sceneProgress.potentialIds.length} additional companions in this preview`
+              : progress.nextDogOre === null
+                ? 'All companions unlocked'
+                : `${money(progress.nextDogOre)} SEK more donated for your next companion`}
         </p>
       </div>
       {!previewActive && nextZone && (
@@ -241,7 +259,6 @@ export default function DonorWorkspace() {
     </section>
   );
   const renderTransaction = (r: (typeof receipts)[number]) => {
-    const proof = state.proofs.find((p) => p.id === r.proofId);
     return (
       <article
         key={r.id}
@@ -287,10 +304,7 @@ export default function DonorWorkspace() {
             onClick={() => setProofReceiptId(r.id)}
           >
             <span>
-              <ShieldCheck size={16} />{' '}
-              {proof?.anchors.length
-                ? 'Verified by blockchain'
-                : 'Blockchain verification'}
+              <ShieldCheck size={16} /> Blockchain verified
             </span>
             <small>Click for more info</small>
           </Button>
@@ -377,7 +391,7 @@ export default function DonorWorkspace() {
               <header>
                 <div>
                   <div className="gs-transaction-title">
-                    <h2>Your care transactions</h2>
+                    <h2>What your donation funded</h2>
                     <span aria-label={`${receipts.length} transactions`}>
                       {receipts.length}
                     </span>
@@ -424,71 +438,40 @@ export default function DonorWorkspace() {
                       className="gs-growth-slider"
                       id="shelter-growth-slider"
                     >
-                      <div className="gs-growth-slider-heading">
-                        <label htmlFor="shelter-donation-range">
-                          Preview total donated
-                        </label>
-                        <output htmlFor="shelter-donation-range">
-                          {money(previewTotalOre)} SEK
-                        </output>
-                      </div>
-                      <input
-                        id="shelter-donation-range"
-                        type="range"
-                        min={donatedOre}
-                        max={previewMaximumOre}
-                        step={1}
+                      <GrowthCheckpoints
+                        checkpoints={growthCheckpoints}
+                        donated={donatedOre}
+                        maximum={previewMaximumOre}
                         value={previewTotalOre}
-                        disabled={previewMaximumOre === donatedOre}
-                        aria-valuetext={`${money(previewTotalOre)} SEK total, ${progress.residentIds.length + progress.potentialIds.length} visual companions`}
-                        onChange={(e) => {
-                          const total = Math.min(
-                            previewMaximumOre,
-                            Math.max(
-                              donatedOre,
-                              Math.round(Number(e.target.value) / 100) * 100,
-                            ),
-                          );
-                          setPreview(total - donatedOre);
-                        }}
-                        onKeyDown={(e) => {
-                          const delta = {
-                            ArrowLeft: -5000,
-                            ArrowDown: -5000,
-                            ArrowRight: 5000,
-                            ArrowUp: 5000,
-                          }[e.key];
-                          if (delta !== undefined) {
-                            e.preventDefault();
-                            setPreview(
-                              Math.min(
-                                previewMaximumOre,
-                                Math.max(donatedOre, previewTotalOre + delta),
-                              ) - donatedOre,
-                            );
-                          }
-                        }}
+                        onChange={(total) => setPreview(total - donatedOre)}
                       />
-                      <div className="gs-growth-slider-scale">
-                        <span>{money(donatedOre)} SEK · Your donations</span>
-                        <span>
-                          {money(previewMaximumOre)} SEK · Fully upgraded
-                        </span>
-                      </div>
                       <p>
-                        <strong>+{money(previewExtraOre)} SEK</strong> ·{' '}
-                        {progress.potentialIds.length} new companions ·{' '}
-                        {
-                          progress.zones.filter(
-                            (z) => z.projectedLevel > z.level,
-                          ).length
-                        }{' '}
-                        area upgrades
+                        {earlierPreview ? (
+                          <>
+                            Earlier growth · {shownCompanions} companions ·{' '}
+                            {
+                              sceneProgress.zones.filter((z) => z.level > 0)
+                                .length
+                            }{' '}
+                            areas
+                          </>
+                        ) : (
+                          <>
+                            <strong>+{money(previewDeltaOre)} SEK</strong> ·{' '}
+                            {sceneProgress.potentialIds.length} new companions ·{' '}
+                            {
+                              sceneProgress.zones.filter(
+                                (z) => z.projectedLevel > z.level,
+                              ).length
+                            }{' '}
+                            area upgrades
+                          </>
+                        )}
                       </p>
                     </div>
                   )
                 }
-                progress={progress}
+                progress={sceneProgress}
                 clock={clock}
                 preview={preview !== null}
                 onDog={setDogId}

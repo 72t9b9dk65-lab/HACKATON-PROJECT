@@ -245,7 +245,7 @@ export function ExpenseTransactions({
       className="expense-transactions"
       aria-labelledby="expense-transactions-title"
     >
-      <h2 id="expense-transactions-title">Your care transactions</h2>
+      <h2 id="expense-transactions-title">What your donation funded</h2>
       <div className="expense-transaction-list">
         {sorted.map((transaction) => {
           const expense = transaction.expenses[0];

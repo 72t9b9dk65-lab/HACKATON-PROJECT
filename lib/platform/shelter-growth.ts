@@ -178,6 +178,55 @@ export function maximumShelterDonationOre(_catalog: { group?: boolean }[]) {
   return companionThresholdOre(MAX_COMPANIONS);
 }
 
+export type GrowthCheckpoint = {
+  amountOre: number;
+  companion: number | null;
+  upgrades: { id: ZoneId; name: string; level: number }[];
+  current: boolean;
+};
+
+/** Group simultaneous rewards into one stop on the preview's donation scale. */
+export function shelterGrowthCheckpoints(
+  usedOre: number,
+  pendingOre: number,
+  catalog: { group?: boolean }[],
+) {
+  const used = Math.max(0, usedOre);
+  const donated = used + Math.max(0, pendingOre);
+  const points = new Map<number, GrowthCheckpoint>();
+  const at = (amountOre: number) => {
+    if (!points.has(amountOre)) {
+      points.set(amountOre, {
+        amountOre,
+        companion: null,
+        upgrades: [],
+        current: amountOre === donated,
+      });
+    }
+    return points.get(amountOre)!;
+  };
+  at(0);
+  at(donated);
+  at(Math.max(donated, maximumShelterDonationOre(catalog)));
+  if (catalog.some((dog) => !dog.group)) {
+    for (let count = 1; count <= MAX_COMPANIONS; count++) {
+      at(companionThresholdOre(count)).companion = count;
+    }
+  }
+  for (const zone of zones) {
+    thresholds(zone).forEach((amount, index) => {
+      // Pending-funded upgrades first appear at the current donation stop.
+      const total = amount > used ? Math.max(amount, donated) : amount;
+      at(total).upgrades.push({
+        id: zone.id,
+        name: zone.name,
+        level: index + 1,
+      });
+    });
+  }
+  return [...points.values()].sort((a, b) => a.amountOre - b.amountOre);
+}
+
 export function shelterProgress(
   donorId: string,
   usedOre: number,
@@ -219,6 +268,43 @@ export function shelterProgress(
   };
 }
 export type ShelterProgress = ReturnType<typeof shelterProgress>;
+
+/** Revisit earned levels without turning unspent donations into past upgrades. */
+export function shelterPreviewProgress(
+  donorId: string,
+  usedOre: number,
+  pendingOre: number,
+  totalOre: number,
+  catalog: { id: string; group?: boolean }[],
+) {
+  const donated = Math.max(0, usedOre) + Math.max(0, pendingOre);
+  const total = Math.max(0, totalOre);
+  if (total >= donated) {
+    return shelterProgress(
+      donorId,
+      usedOre,
+      pendingOre,
+      total - donated,
+      catalog,
+    );
+  }
+  const earlierUsed = Math.min(Math.max(0, usedOre), total);
+  const earlier = shelterProgress(
+    donorId,
+    earlierUsed,
+    total - earlierUsed,
+    0,
+    catalog,
+  );
+  return {
+    ...earlier,
+    zones: earlier.zones.map((zone) => ({
+      ...zone,
+      projectedLevel: zone.level,
+    })),
+  };
+}
+
 export const tileSize = (level: number) => 210 + Math.max(1, level) * 22;
 export type Entrance = 'top' | 'right' | 'bottom' | 'left';
 export const WORLD_WIDTH = 1304;
@@ -370,8 +456,6 @@ export function pointOnRoute(points: Point[], fraction: number) {
   return points.at(-1)!;
 }
 
-export function zoneSize(id: ZoneId, level: number) {
-  if (id === 'garden') return 255 + Math.max(1, level) * 24;
-  if (id === 'kennel') return 242 + Math.max(1, level) * 25;
+export function zoneSize(_id: ZoneId, level: number) {
   return tileSize(level);
 }
