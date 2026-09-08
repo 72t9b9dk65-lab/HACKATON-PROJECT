@@ -44,7 +44,11 @@ import {
   dateLabel,
   useClock,
 } from './shared';
-export default function DonorWorkspace() {
+export default function DonorWorkspace({
+  staffWorkspaceUrl,
+}: {
+  staffWorkspaceUrl: string;
+}) {
   const store = useCareWorkspace(),
     now = useClock();
   const [donorId, setDonorId] = useState('personal');
@@ -322,7 +326,17 @@ export default function DonorWorkspace() {
             My little shelter<span>, connected to real dogs</span>
           </h1>
         }
-      />
+      >
+        <a
+          className="gs-workspace-link"
+          href={staffWorkspaceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open staff workspace in a new tab"
+        >
+          Staff workspace <ArrowUpRight size={17} />
+        </a>
+      </Header>
       <main className="gs-main">
         {store.error && <Notice kind="error">{store.error}</Notice>}
         {message && (

@@ -1736,6 +1736,29 @@
 }
 .gs-platform > .cp-header .cp-header-actions {
   flex-shrink: 0;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+.care-platform .gs-workspace-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  order: 1;
+  gap: 7px;
+  min-height: 40px;
+  padding: 9px 13px;
+  border: 1px solid var(--cp-accent);
+  border-radius: 11px;
+  background: var(--cp-accent);
+  color: #fffdf6;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.care-platform .gs-workspace-link:hover {
+  background: #254f43;
 }
 @media (max-width: 1000px) {
   .gs-platform > .cp-header {
