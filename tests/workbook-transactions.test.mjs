@@ -32,10 +32,12 @@ test('All 102 source rows retain their amounts, date-only precision, categories,
   assert.equal(new Set(ledger.expenses.map((expense) => expense.id)).size, 102);
   const sourceTotals = {
     Food: 132800,
-    Medicine: 123300,
+    Medicine: 78300,
     Shelter: 110800,
-    Toys: 110400,
+    Toys: 55400,
     Rehabilitation: 2200,
+    'Veterinary care': 45000,
+    'Walks & confidence': 55000,
   };
   const totals = {
     Food: 0,
@@ -43,6 +45,8 @@ test('All 102 source rows retain their amounts, date-only precision, categories,
     Shelter: 0,
     Toys: 0,
     Rehabilitation: 0,
+    'Veterinary care': 0,
+    'Walks & confidence': 0,
   };
   for (const [index, expense] of ledger.expenses.entries()) {
     const row = fixture.transactions[index];
@@ -60,11 +64,11 @@ test('All 102 source rows retain their amounts, date-only precision, categories,
   assert.equal(summary.pendingOre, 0);
   assert.deepEqual(summary.byCategory, {
     food: 132800,
-    medicine: 123300,
+    medicine: 78300,
     rehabilitation: 2200,
-    vaccination: 0,
-    walk: 0,
-    play: 110400,
+    vaccination: 45000,
+    walk: 55000,
+    play: 55400,
     comfort: 110800,
   });
   assert.equal(
@@ -85,6 +89,8 @@ test('Imported dates never acquire invented source times and all categories have
     Shelter: 'sleep',
     Toys: 'play',
     Rehabilitation: 'rehabilitation',
+    'Veterinary care': 'vaccination',
+    'Walks & confidence': 'walk',
   };
   for (const expense of ledger.expenses) {
     assert.equal(expenseActivity(expense), expected[expenseLabel(expense)]);

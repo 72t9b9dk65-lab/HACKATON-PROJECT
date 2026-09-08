@@ -67,6 +67,12 @@ export async function seedWorkspace(
     shelter: 'comfort',
     toys: 'play',
     rehabilitation: 'rehabilitation',
+    vaccination: 'vaccination',
+    'veterinary care': 'vaccination',
+    veterinary: 'vaccination',
+    walk: 'walk',
+    walks: 'walk',
+    'walks & confidence': 'walk',
   };
   for (const row of workbookRows) {
     const receipt: Receipt = {
