@@ -1,0 +1,642 @@
+[
+  {
+    "id": "cuccia-livello-1",
+    "family": "cuccia",
+    "level": 1,
+    "entrances": [
+      "right"
+    ],
+    "path": "/care/upgrades/cuccia-livello-1.webp",
+    "sourceBounds": {
+      "left": 175,
+      "top": 78,
+      "right": 1171,
+      "bottom": 1044
+    }
+  },
+  {
+    "id": "cuccia-livello-2",
+    "family": "cuccia",
+    "level": 2,
+    "entrances": [
+      "right"
+    ],
+    "path": "/care/upgrades/cuccia-livello-2.webp",
+    "sourceBounds": {
+      "left": 72,
+      "top": 99,
+      "right": 1173,
+      "bottom": 1132
+    }
+  },
+  {
+    "id": "cuccia-livello-3",
+    "family": "cuccia",
+    "level": 3,
+    "entrances": [
+      "right"
+    ],
+    "path": "/care/upgrades/cuccia-livello-3.webp",
+    "sourceBounds": {
+      "left": 30,
+      "top": 90,
+      "right": 1170,
+      "bottom": 1140
+    }
+  },
+  {
+    "id": "cuccia-livello-4",
+    "family": "cuccia",
+    "level": 4,
+    "entrances": [
+      "right"
+    ],
+    "path": "/care/upgrades/cuccia-livello-4.webp",
+    "sourceBounds": {
+      "left": 16,
+      "top": 107,
+      "right": 1223,
+      "bottom": 1140
+    }
+  },
+  {
+    "id": "cuccia-livello-5",
+    "family": "cuccia",
+    "level": 5,
+    "entrances": [
+      "right"
+    ],
+    "path": "/care/upgrades/cuccia-livello-5.webp",
+    "sourceBounds": {
+      "left": 11,
+      "top": 111,
+      "right": 1225,
+      "bottom": 1145
+    }
+  },
+  {
+    "id": "gioco-livello-1",
+    "family": "gioco",
+    "level": 1,
+    "entrances": [
+      "left",
+      "right"
+    ],
+    "path": "/care/upgrades/gioco-livello-1.webp",
+    "sourceBounds": {
+      "left": 223,
+      "top": 225,
+      "right": 1029,
+      "bottom": 1049
+    }
+  },
+  {
+    "id": "gioco-livello-2",
+    "family": "gioco",
+    "level": 2,
+    "entrances": [
+      "left",
+      "right"
+    ],
+    "path": "/care/upgrades/gioco-livello-2.webp",
+    "sourceBounds": {
+      "left": 77,
+      "top": 218,
+      "right": 1177,
+      "bottom": 1049
+    }
+  },
+  {
+    "id": "gioco-livello-3",
+    "family": "gioco",
+    "level": 3,
+    "entrances": [
+      "left",
+      "right"
+    ],
+    "path": "/care/upgrades/gioco-livello-3.webp",
+    "sourceBounds": {
+      "left": 74,
+      "top": 226,
+      "right": 1179,
+      "bottom": 1070
+    }
+  },
+  {
+    "id": "gioco-livello-4",
+    "family": "gioco",
+    "level": 4,
+    "entrances": [
+      "left",
+      "right"
+    ],
+    "path": "/care/upgrades/gioco-livello-4.webp",
+    "sourceBounds": {
+      "left": 4,
+      "top": 173,
+      "right": 1248,
+      "bottom": 1093
+    }
+  },
+  {
+    "id": "cura-livello-1",
+    "family": "cura",
+    "level": 1,
+    "entrances": [
+      "left"
+    ],
+    "path": "/care/upgrades/cura-livello-1.webp",
+    "sourceBounds": {
+      "left": 257,
+      "top": 246,
+      "right": 992,
+      "bottom": 944
+    }
+  },
+  {
+    "id": "cura-livello-2",
+    "family": "cura",
+    "level": 2,
+    "entrances": [
+      "left"
+    ],
+    "path": "/care/upgrades/cura-livello-2.webp",
+    "sourceBounds": {
+      "left": 120,
+      "top": 200,
+      "right": 1134,
+      "bottom": 1052
+    }
+  },
+  {
+    "id": "cura-livello-3",
+    "family": "cura",
+    "level": 3,
+    "entrances": [
+      "left"
+    ],
+    "path": "/care/upgrades/cura-livello-3.webp",
+    "sourceBounds": {
+      "left": 111,
+      "top": 176,
+      "right": 1156,
+      "bottom": 1082
+    }
+  },
+  {
+    "id": "cura-livello-4",
+    "family": "cura",
+    "level": 4,
+    "entrances": [
+      "left"
+    ],
+    "path": "/care/upgrades/cura-livello-4.webp",
+    "sourceBounds": {
+      "left": 77,
+      "top": 76,
+      "right": 1182,
+      "bottom": 1153
+    }
+  },
+  {
+    "id": "benessere-livello-1",
+    "family": "benessere",
+    "level": 1,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/upgrades/benessere-livello-1.webp",
+    "sourceBounds": {
+      "left": 255,
+      "top": 213,
+      "right": 990,
+      "bottom": 979
+    }
+  },
+  {
+    "id": "benessere-livello-2",
+    "family": "benessere",
+    "level": 2,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/upgrades/benessere-livello-2.webp",
+    "sourceBounds": {
+      "left": 70,
+      "top": 159,
+      "right": 1184,
+      "bottom": 1077
+    }
+  },
+  {
+    "id": "benessere-livello-3",
+    "family": "benessere",
+    "level": 3,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/upgrades/benessere-livello-3.webp",
+    "sourceBounds": {
+      "left": 25,
+      "top": 135,
+      "right": 1144,
+      "bottom": 1128
+    }
+  },
+  {
+    "id": "benessere-livello-4",
+    "family": "benessere",
+    "level": 4,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/upgrades/benessere-livello-4.webp",
+    "sourceBounds": {
+      "left": 58,
+      "top": 89,
+      "right": 1195,
+      "bottom": 1135
+    }
+  },
+  {
+    "id": "benessere-livello-5",
+    "family": "benessere",
+    "level": 5,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/upgrades/benessere-livello-5.webp",
+    "sourceBounds": {
+      "left": 28,
+      "top": 89,
+      "right": 1184,
+      "bottom": 1132
+    }
+  },
+  {
+    "id": "cibo-livello-1",
+    "family": "cibo",
+    "level": 1,
+    "entrances": [
+      "right"
+    ],
+    "path": "/care/upgrades/cibo-livello-1.webp",
+    "sourceBounds": {
+      "left": 265,
+      "top": 320,
+      "right": 988,
+      "bottom": 865
+    }
+  },
+  {
+    "id": "cibo-livello-2",
+    "family": "cibo",
+    "level": 2,
+    "entrances": [
+      "right"
+    ],
+    "path": "/care/upgrades/cibo-livello-2.webp",
+    "sourceBounds": {
+      "left": 87,
+      "top": 244,
+      "right": 1145,
+      "bottom": 1040
+    }
+  },
+  {
+    "id": "cibo-livello-3",
+    "family": "cibo",
+    "level": 3,
+    "entrances": [
+      "right"
+    ],
+    "path": "/care/upgrades/cibo-livello-3.webp",
+    "sourceBounds": {
+      "left": 65,
+      "top": 206,
+      "right": 1126,
+      "bottom": 1021
+    }
+  },
+  {
+    "id": "cibo-livello-4",
+    "family": "cibo",
+    "level": 4,
+    "entrances": [
+      "right"
+    ],
+    "path": "/care/upgrades/cibo-livello-4.webp",
+    "sourceBounds": {
+      "left": 30,
+      "top": 131,
+      "right": 1224,
+      "bottom": 1098
+    }
+  },
+  {
+    "id": "sport-piscina-livello-1",
+    "family": "sport-piscina",
+    "level": 1,
+    "entrances": [
+      "top",
+      "left",
+      "right"
+    ],
+    "path": "/care/upgrades/sport-piscina-livello-1.webp",
+    "sourceBounds": {
+      "left": 209,
+      "top": 283,
+      "right": 1044,
+      "bottom": 985
+    }
+  },
+  {
+    "id": "sport-piscina-livello-2",
+    "family": "sport-piscina",
+    "level": 2,
+    "entrances": [
+      "top",
+      "left",
+      "right"
+    ],
+    "path": "/care/upgrades/sport-piscina-livello-2.webp",
+    "sourceBounds": {
+      "left": 80,
+      "top": 222,
+      "right": 1167,
+      "bottom": 1015
+    }
+  },
+  {
+    "id": "sport-piscina-livello-3",
+    "family": "sport-piscina",
+    "level": 3,
+    "entrances": [
+      "top",
+      "left",
+      "right"
+    ],
+    "path": "/care/upgrades/sport-piscina-livello-3.webp",
+    "sourceBounds": {
+      "left": 68,
+      "top": 156,
+      "right": 1179,
+      "bottom": 1112
+    }
+  },
+  {
+    "id": "sport-piscina-livello-4",
+    "family": "sport-piscina",
+    "level": 4,
+    "entrances": [
+      "top",
+      "left",
+      "right"
+    ],
+    "path": "/care/upgrades/sport-piscina-livello-4.webp",
+    "sourceBounds": {
+      "left": 29,
+      "top": 156,
+      "right": 1225,
+      "bottom": 1101
+    }
+  },
+  {
+    "id": "sport-piscina-livello-5",
+    "family": "sport-piscina",
+    "level": 5,
+    "entrances": [
+      "top",
+      "left",
+      "right"
+    ],
+    "path": "/care/upgrades/sport-piscina-livello-5.webp",
+    "sourceBounds": {
+      "left": 33,
+      "top": 116,
+      "right": 1217,
+      "bottom": 1114
+    }
+  },
+  {
+    "id": "abbeveraggio-livello-1",
+    "family": "abbeveraggio",
+    "level": 1,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/upgrades/abbeveraggio-livello-1.webp",
+    "sourceBounds": {
+      "left": 254,
+      "top": 303,
+      "right": 994,
+      "bottom": 954
+    }
+  },
+  {
+    "id": "abbeveraggio-livello-2",
+    "family": "abbeveraggio",
+    "level": 2,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/upgrades/abbeveraggio-livello-2.webp",
+    "sourceBounds": {
+      "left": 66,
+      "top": 188,
+      "right": 1171,
+      "bottom": 1033
+    }
+  },
+  {
+    "id": "abbeveraggio-livello-3",
+    "family": "abbeveraggio",
+    "level": 3,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/upgrades/abbeveraggio-livello-3.webp",
+    "sourceBounds": {
+      "left": 60,
+      "top": 201,
+      "right": 1096,
+      "bottom": 1024
+    }
+  },
+  {
+    "id": "abbeveraggio-livello-4",
+    "family": "abbeveraggio",
+    "level": 4,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/upgrades/abbeveraggio-livello-4.webp",
+    "sourceBounds": {
+      "left": 33,
+      "top": 136,
+      "right": 1176,
+      "bottom": 1114
+    }
+  },
+  {
+    "id": "abbeveraggio-livello-5",
+    "family": "abbeveraggio",
+    "level": 5,
+    "entrances": [
+      "top",
+      "right"
+    ],
+    "path": "/care/upgrades/abbeveraggio-livello-5.webp",
+    "sourceBounds": {
+      "left": 44,
+      "top": 214,
+      "right": 1184,
+      "bottom": 1055
+    }
+  },
+  {
+    "id": "cura-livello-5",
+    "family": "cura",
+    "level": 5,
+    "entrances": [
+      "left"
+    ],
+    "path": "/care/upgrades/cura-livello-5.webp",
+    "sourceBounds": {
+      "left": 71,
+      "top": 34,
+      "right": 1250,
+      "bottom": 1107
+    }
+  },
+  {
+    "id": "gioco-livello-5",
+    "family": "gioco",
+    "level": 5,
+    "entrances": [
+      "left",
+      "right"
+    ],
+    "path": "/care/upgrades/gioco-livello-5.webp",
+    "sourceBounds": {
+      "left": 30,
+      "top": 87,
+      "right": 1273,
+      "bottom": 1077
+    }
+  },
+  {
+    "id": "cibo-livello-5",
+    "family": "cibo",
+    "level": 5,
+    "entrances": [
+      "right"
+    ],
+    "path": "/care/upgrades/cibo-livello-5.webp",
+    "sourceBounds": {
+      "left": 58,
+      "top": 52,
+      "right": 1248,
+      "bottom": 1114
+    }
+  },
+  {
+    "id": "giardino-livello-1",
+    "family": "giardino",
+    "level": 1,
+    "entrances": [
+      "top",
+      "right",
+      "bottom",
+      "left"
+    ],
+    "path": "/care/upgrades/giardino-livello-1.webp",
+    "sourceBounds": {
+      "left": 145,
+      "top": 145,
+      "right": 1107,
+      "bottom": 1107
+    }
+  },
+  {
+    "id": "giardino-livello-2",
+    "family": "giardino",
+    "level": 2,
+    "entrances": [
+      "top",
+      "right",
+      "bottom",
+      "left"
+    ],
+    "path": "/care/upgrades/giardino-livello-2.webp",
+    "sourceBounds": {
+      "left": 97,
+      "top": 69,
+      "right": 1157,
+      "bottom": 1160
+    }
+  },
+  {
+    "id": "giardino-livello-3",
+    "family": "giardino",
+    "level": 3,
+    "entrances": [
+      "top",
+      "right",
+      "bottom",
+      "left"
+    ],
+    "path": "/care/upgrades/giardino-livello-3.webp",
+    "sourceBounds": {
+      "left": 112,
+      "top": 107,
+      "right": 1140,
+      "bottom": 1142
+    }
+  },
+  {
+    "id": "giardino-livello-4",
+    "family": "giardino",
+    "level": 4,
+    "entrances": [
+      "top",
+      "right",
+      "bottom",
+      "left"
+    ],
+    "path": "/care/upgrades/giardino-livello-4.webp",
+    "sourceBounds": {
+      "left": 35,
+      "top": 30,
+      "right": 1218,
+      "bottom": 1177
+    }
+  },
+  {
+    "id": "giardino-livello-5",
+    "family": "giardino",
+    "level": 5,
+    "entrances": [
+      "top",
+      "right",
+      "bottom",
+      "left"
+    ],
+    "path": "/care/upgrades/giardino-livello-5.webp",
+    "sourceBounds": {
+      "left": 77,
+      "top": 72,
+      "right": 1172,
+      "bottom": 1150
+    }
+  }
+]

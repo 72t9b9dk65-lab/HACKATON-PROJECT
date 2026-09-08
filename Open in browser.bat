@@ -20,8 +20,10 @@ echo.
 echo Opening Hundstallet in your browser...
 echo Keep this window open. Press Ctrl+C to stop the site.
 echo.
+call npm run db:local
+if errorlevel 1 goto failed
 set "EARTHHEALTH_OPEN_BROWSER=1"
-call npm run dev -- --hostname 127.0.0.1
+call npm run dev:isolated
 if errorlevel 1 goto failed
 exit /b 0
 
